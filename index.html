@@ -608,7 +608,7 @@ td input,td select,td textarea{padding:5px 6px;font-size:12.5px;}
     <!-- HAMMADDE -->
     <div class="page" id="page-hammadde">
       <div class="card">
-        <h2>🧪 Hammadde Kütüphanesi</h2>
+        <h2>🧪 Hammadde Kütüphanesi <span class="hint" id="ingCount" style="font-family:var(--sans);text-transform:none;font-weight:400;"></span></h2>
         <p class="hint">Formülde kullanılacak tüm maddeler burada tanımlanır: CAS/EC No, fonksiyon, NOAEL, toksikolojik yorum, referans ve yasaklılık/kısıtlılık durumu.</p>
         <div class="search-row">
           <input type="text" id="ingSearch" placeholder="INCI adıyla ara…">
@@ -643,7 +643,7 @@ td input,td select,td textarea{padding:5px 6px;font-size:12.5px;}
     <!-- AMBALAJ -->
     <div class="page" id="page-ambalaj">
       <div class="card">
-        <h2>📦 Ambalaj Kütüphanesi</h2>
+        <h2>📦 Ambalaj Kütüphanesi <span class="hint" id="pkgCount" style="font-family:var(--sans);text-transform:none;font-weight:400;"></span></h2>
         <p class="hint">Kavanoz, şişe, sprey, tüp, airless gibi ambalaj/kapak tipleri; görselleri ile birlikte kaydedilir ve ürünlerde seçilerek kullanılır.</p>
         <div class="search-row">
           <input type="text" id="packagingSearch" placeholder="Ambalaj adı, tipi, çapı… ile ara">
@@ -2501,6 +2501,8 @@ function yasakBadge(y){
 function renderIngredientList(){
   const wrap=document.getElementById('ingredientListWrap');
   const q=(document.getElementById('ingSearch').value||'').toLowerCase();
+  const countEl=document.getElementById('ingCount');
+  if(countEl) countEl.textContent = q ? `(${list.length} / ${ingredients.length} kayıt)` : `(${ingredients.length} kayıt)`;
   const list=ingredients.filter(i=>(i.inci||'').toLowerCase().includes(q));
   if(!list.length){ wrap.innerHTML='<div class="empty">Kayıtlı madde yok.</div>'; return; }
   wrap.innerHTML=`<table><thead><tr><th>INCI</th><th>CAS No</th><th>Fonksiyon</th><th>NOAEL</th><th>Durum</th></tr></thead><tbody>`+
@@ -2943,6 +2945,8 @@ function renderPackagingList(){
   const q=(document.getElementById('packagingSearch').value||'').toLocaleLowerCase('tr');
   let list=packagings.slice();
   if(q) list=list.filter(p=> (p.ad||'').toLocaleLowerCase('tr').includes(q) || (p.kod||'').toLocaleLowerCase('tr').includes(q) || (p.altGrup||'').toLocaleLowerCase('tr').includes(q) || (p.anaGrup||'').toLocaleLowerCase('tr').includes(q) || (p.materyal||'').toLocaleLowerCase('tr').includes(q) || (p.renk||'').toLocaleLowerCase('tr').includes(q));
+  const pkgCountEl=document.getElementById('pkgCount');
+  if(pkgCountEl) pkgCountEl.textContent = q ? `(${list.length} / ${packagings.length} kayıt)` : `(${packagings.length} kayıt)`;
   list.sort((a,b)=>(a.kod||'').localeCompare(b.kod||'', 'tr', {numeric:true}));
   if(!list.length){ wrap.innerHTML='<div class="empty">Kayıtlı ambalaj yok.</div>'; return; }
   wrap.innerHTML=list.map(p=>`
