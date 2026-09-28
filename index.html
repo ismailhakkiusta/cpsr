@@ -278,6 +278,7 @@ td input,td select,td textarea{padding:5px 6px;font-size:12.5px;}
 .report img{max-width:100%;}
 .report a{word-break:break-all;}
 .report li{word-break:break-word;overflow-wrap:anywhere;}
+.report tfoot td{background:#f2e8cd;color:#5c4310;border-top:2px solid #7a5c14;font-weight:700;}
 .report-cover{page-break-after:always;position:relative;min-height:850px;padding:6px 6px 40px 22px;}
 .report-cover .cv-accent{position:absolute;top:0;left:0;bottom:0;width:8px;background:linear-gradient(180deg,#7a5c14,#c9a227);}
 .report-cover .cv-inner{padding:10px 6px 0 8px;}
@@ -516,6 +517,7 @@ td input,td select,td textarea{padding:5px 6px;font-size:12.5px;}
             <option value="all">Tümü</option>
           </select>
           <button class="btn" id="btnNewFirm">+ Yeni Firma</button>
+          <button class="btn ghost" id="btnFirmReport">📊 Rapor Al</button>
         </div>
         <div id="firmListWrap"></div>
       </div>
@@ -534,6 +536,7 @@ td input,td select,td textarea{padding:5px 6px;font-size:12.5px;}
             <option value="Sonlandırıldı">Sonlandırıldı</option>
             <option value="Yenilendi">Yenilendi</option>
           </select>
+          <button class="btn ghost" id="btnContractDateReport">📊 Tarih Sırasına Göre Rapor Al</button>
         </div>
         <div id="contractListWrap"></div>
       </div>
@@ -2102,6 +2105,25 @@ function renderFirmList(){
 document.getElementById('firmSearch').addEventListener('input', renderFirmList);
 document.getElementById('firmRoleFilter').addEventListener('change', renderFirmList);
 document.getElementById('btnNewFirm').addEventListener('click', ()=>openFirmWindow(null));
+document.getElementById('btnFirmReport').addEventListener('click', ()=>{
+  const list=visibleFirms().slice().sort((a,b)=>(a.cariKod||a.ureticiKod||a.danismanlikKod||'').localeCompare((b.cariKod||b.ureticiKod||b.danismanlikKod||''),'tr',{numeric:true}));
+  let toplamAktifSozlesme=0;
+  const rows=list.map(f=>{
+    const cs=getContracts(f);
+    const aktif=cs.filter(c=>c.status==='Aktif').length;
+    toplamAktifSozlesme+=aktif;
+    const roller=[f.roles&&f.roles.sahip?'Ürün Sahibi':'', f.roles&&f.roles.uretici?'Üretici':'', f.roles&&f.roles.danismanlik?'Danışmanlık':''].filter(Boolean).join(' / ');
+    let durum='—';
+    if(f.roles&&f.roles.sahip){
+      if(firmHasActiveContract(f)) durum='Aktif';
+      else if(firmHasTerminatedContract(f)) durum='Sonlandırıldı';
+      else durum='Pasif';
+    }
+    const kod=[f.cariKod,f.ureticiKod,f.danismanlikKod].filter(Boolean).join(' / ')||'—';
+    return [esc(kod), esc(f.unvan), esc(f.yetkili||'—'), esc(f.tel||'—'), esc(f.email||'—'), esc(roller||'—'), aktif+' / '+cs.length, durum==='—'?'—':bizBadge(durum)];
+  });
+  openQuickReportWindow('Tüm Firmalar — Cari Kod Sırasına Göre', fmtDate(todayStr())+' itibarıyla', ['Kod','Ünvan','Yetkili','Telefon','E-posta','Rol','Aktif / Toplam Sözleşme','Durum'], rows, 'Tum-Firmalar-Raporu', reportFooter(8,'TOPLAM',{1:list.length+' firma', 6:toplamAktifSozlesme+' aktif sözleşme'}));
+});
 function deleteFirm(firmId){
   if(!isAdmin()) return false;
   if(products.some(p=>p.firmSahipId===firmId || p.firmUreticiId===firmId)){ alert('Bu firmaya bağlı ürünler var, önce onları güncelleyin.'); return false; }
@@ -2489,6 +2511,14 @@ function renderContractList(){
 }
 document.getElementById('contractSearch').addEventListener('input', renderContractList);
 document.getElementById('contractStatusFilter').addEventListener('change', renderContractList);
+document.getElementById('btnContractDateReport').addEventListener('click', ()=>{
+  const all=[];
+  visibleFirms().forEach(f=>{ getContracts(f).forEach(c=>{ all.push({f, c}); }); });
+  all.sort((a,b)=>(a.c.startDate||'').localeCompare(b.c.startDate||''));
+  const rows=all.map(x=>[fmtDate(x.c.startDate), esc(x.f.unvan), esc(x.c.contractNo), esc(x.c.hizmetTuru), fmtMoney(x.c.monthlyRate)+'/ay', fmtDate(x.c.plannedEndDate), bizBadge(x.c.status)]);
+  const aktifAylik=round2(all.filter(x=>x.c.status==='Aktif').reduce((s,x)=>s+(parseFloat(x.c.monthlyRate)||0),0));
+  openQuickReportWindow('Tüm Sözleşmeler — Tarih Sırasına Göre', fmtDate(todayStr())+' itibarıyla', ['Başlangıç Tarihi','Firma','Sözleşme No','Hizmet Türü','Aylık Tutar','Planlanan Bitiş','Durum'], rows, 'Tum-Sozlesmeler-Tarih-Sirasi', reportFooter(7,'TOPLAM',{1:all.length+' sözleşme', 4:fmtMoney(aktifAylik)+'/ay (aktifler)'}));
+});
 
 /* =========================================================================
    HAMMADDE KÜTÜPHANESİ
@@ -2501,9 +2531,9 @@ function yasakBadge(y){
 function renderIngredientList(){
   const wrap=document.getElementById('ingredientListWrap');
   const q=(document.getElementById('ingSearch').value||'').toLowerCase();
+  const list=ingredients.filter(i=>(i.inci||'').toLowerCase().includes(q));
   const countEl=document.getElementById('ingCount');
   if(countEl) countEl.textContent = q ? `(${list.length} / ${ingredients.length} kayıt)` : `(${ingredients.length} kayıt)`;
-  const list=ingredients.filter(i=>(i.inci||'').toLowerCase().includes(q));
   if(!list.length){ wrap.innerHTML='<div class="empty">Kayıtlı madde yok.</div>'; return; }
   wrap.innerHTML=`<table><thead><tr><th>INCI</th><th>CAS No</th><th>Fonksiyon</th><th>NOAEL</th><th>Durum</th></tr></thead><tbody>`+
     list.map(i=>`<tr data-id="${i.id}" ${isGuest()?'':'style="cursor:pointer;"'}>
@@ -2945,9 +2975,9 @@ function renderPackagingList(){
   const q=(document.getElementById('packagingSearch').value||'').toLocaleLowerCase('tr');
   let list=packagings.slice();
   if(q) list=list.filter(p=> (p.ad||'').toLocaleLowerCase('tr').includes(q) || (p.kod||'').toLocaleLowerCase('tr').includes(q) || (p.altGrup||'').toLocaleLowerCase('tr').includes(q) || (p.anaGrup||'').toLocaleLowerCase('tr').includes(q) || (p.materyal||'').toLocaleLowerCase('tr').includes(q) || (p.renk||'').toLocaleLowerCase('tr').includes(q));
+  list.sort((a,b)=>(a.kod||'').localeCompare(b.kod||'', 'tr', {numeric:true}));
   const pkgCountEl=document.getElementById('pkgCount');
   if(pkgCountEl) pkgCountEl.textContent = q ? `(${list.length} / ${packagings.length} kayıt)` : `(${packagings.length} kayıt)`;
-  list.sort((a,b)=>(a.kod||'').localeCompare(b.kod||'', 'tr', {numeric:true}));
   if(!list.length){ wrap.innerHTML='<div class="empty">Kayıtlı ambalaj yok.</div>'; return; }
   wrap.innerHTML=list.map(p=>`
     <div class="list-row" data-id="${p.id}" style="align-items:flex-start;${isGuest()?'':'cursor:pointer;'}">
@@ -4271,6 +4301,7 @@ const REPORT_WORD_STYLES = `
   table{font-family:Calibri,Arial,sans-serif;font-size:12px;width:100%;border-collapse:collapse;margin:10px 0;}
   table th{background:#f2e8cd;color:#5c4310;border:1px solid #c9b98a;padding:5px 7px;text-align:left;}
   table td{border:1px solid #c9b98a;padding:5px 7px;color:#20180a;}
+  tfoot td{background:#f2e8cd;color:#5c4310;border:1px solid #c9b98a;border-top:2px solid #7a5c14;padding:5px 7px;font-weight:bold;}
   p{font-size:13px;margin:7px 0;}
   img{max-width:400px;}
   .report-cover{page-break-after:always;mso-page-break-after:always;}
@@ -4312,19 +4343,28 @@ function bindPrint(el, filename){
   };
 }
 // Dashboard'daki özet kartlara tıklandığında açılan, PDF/Word olarak da indirilebilen hızlı liste raporu.
-function openQuickReportWindow(title, subtitle, headers, rows, filenamePrefix){
+function openQuickReportWindow(title, subtitle, headers, rows, filenamePrefix, footerCells){
   createWindow({title, icon:'📊', width:840, height:680, render:(body,win,close)=>{
     let html=docPrintBtn()+`<div class="report"><h1>${esc(title)}</h1><div class="rsub">${esc(subtitle||'')}${subtitle?' · ':''}${rows.length} kayıt</div>`;
     if(!rows.length){ html+='<p class="empty" style="font-family:var(--sans)">Kayıt yok.</p>'; }
     else{
       html+='<table><thead><tr>'+headers.map(h=>`<th>${esc(h)}</th>`).join('')+'</tr></thead><tbody>'+
         rows.map(r=>'<tr>'+r.map(c=>`<td>${c}</td>`).join('')+'</tr>').join('')+
-        '</tbody></table>';
+        '</tbody>'+
+        (footerCells? '<tfoot><tr class="rep-total">'+footerCells.map(c=>`<td>${c}</td>`).join('')+'</tr></tfoot>' : '')+
+        '</table>';
     }
     html+='</div>';
     body.innerHTML=html;
     bindPrint(body, filenamePrefix+'-'+todayStr()+'.pdf');
   }});
+}
+// Rapor dip toplam satırı için yardımcı: etiket + (sütun index → değer) eşlemesinden, başlık sayısı kadar hücre üretir.
+function reportFooter(colCount, label, valuesByCol){
+  const cells=[]; for(let i=0;i<colCount;i++) cells.push('');
+  cells[0]='<b>'+esc(label)+'</b>';
+  Object.keys(valuesByCol||{}).forEach(k=>{ cells[parseInt(k)]='<b>'+valuesByCol[k]+'</b>'; });
+  return cells;
 }
 // Firmanın güncel bakiyesine göre kopyalanabilir bir hatırlatma metni hazırlar (WhatsApp/e-posta'ya
 // yapıştırmak için) — sistem hiçbir mesaj göndermez, sadece metni hazırlar.
@@ -4975,6 +5015,7 @@ function renderDashboard(){
   if(dashPrefsBtn) dashPrefsBtn.addEventListener('click', openDashboardPrefsWindow);
   wrap.querySelectorAll('[data-statnav]').forEach(el=>el.addEventListener('click',()=>{
     const nav=el.dataset.statnav;
+    const sumOf=(arr,fn)=>round2(arr.reduce((s,x)=>s+(parseFloat(fn(x))||0),0));
     if(nav==='firma-all' || nav==='firma-aktif' || nav==='firma-pasif'){
       let list=sahipFirms;
       if(nav==='firma-aktif') list=list.filter(f=>firmHasActiveContract(f));
@@ -4982,7 +5023,7 @@ function renderDashboard(){
       list=list.slice().sort((a,b)=>(a.cariKod||'').localeCompare(b.cariKod||'','tr',{numeric:true}));
       const title=nav==='firma-all'?'Toplam Firma Raporu':(nav==='firma-aktif'?'Aktif Firmalar Raporu':'Pasif Firmalar Raporu');
       const rows=list.map(f=>[esc(f.cariKod||'—'), esc(f.unvan), esc(f.yetkili||'—'), esc(f.tel||'—'), esc(f.roles&&f.roles.sahip?'Ürün Sahibi':'')+(f.roles&&f.roles.uretici?' / Üretici':''), firmHasActiveContract(f)?bizBadge('Aktif'):bizBadge('Pasif')]);
-      openQuickReportWindow(title, fmtDate(todayStr())+' itibarıyla', ['Cari Kod','Ünvan','Yetkili','Telefon','Rol','Durum'], rows, 'Firma-Raporu');
+      openQuickReportWindow(title, fmtDate(todayStr())+' itibarıyla', ['Cari Kod','Ünvan','Yetkili','Telefon','Rol','Durum'], rows, 'Firma-Raporu', reportFooter(6,'TOPLAM',{1:list.length+' firma'}));
     }
     else if(nav==='tahsilat-all' || nav==='tahsilat-buay'){
       let list=vp.slice();
@@ -4995,31 +5036,31 @@ function renderDashboard(){
         else if(p.sozlesmeId){ const f=firms.find(x=>x.id===p.companyId); const c=f?(f.contracts||[]).find(x=>x.id===p.sozlesmeId):null; kaynak='Sözleşme — '+(c?c.contractNo:'—'); }
         return [fmtDate(p.tarih), esc(companyNameById(p.companyId)), esc(kaynak), fmtMoney(p.tutar), esc(p.odemeTuru||'—')];
       });
-      openQuickReportWindow(title, fmtDate(todayStr())+' itibarıyla', ['Tarih','Firma','Kaynak','Tutar','Ödeme Türü'], rows, nav==='tahsilat-all'?'Toplam-Tahsilat-Raporu':'Bu-Ay-Tahsilat-Raporu');
+      openQuickReportWindow(title, fmtDate(todayStr())+' itibarıyla', ['Tarih','Firma','Kaynak','Tutar','Ödeme Türü'], rows, nav==='tahsilat-all'?'Toplam-Tahsilat-Raporu':'Bu-Ay-Tahsilat-Raporu', reportFooter(5,'TOPLAM',{1:list.length+' hareket', 3:fmtMoney(sumOf(list,p=>p.tutar))}));
     }
     else if(nav==='tahsilat-bekleyen'){
       const rows=bekleyenBuAyRows.map(r=>[esc(r.firma), esc(r.kaynak), fmtDate(r.vade), fmtMoney(r.tutar)]);
-      openQuickReportWindow('Bu Ay Bekleyen Tahsilat Raporu', fmtDate(todayStr())+' itibarıyla', ['Firma','Kaynak','Vade Tarihi','Kalan Tutar'], rows, 'Bu-Ay-Bekleyen-Tahsilat-Raporu');
+      openQuickReportWindow('Bu Ay Bekleyen Tahsilat Raporu', fmtDate(todayStr())+' itibarıyla', ['Firma','Kaynak','Vade Tarihi','Kalan Tutar'], rows, 'Bu-Ay-Bekleyen-Tahsilat-Raporu', reportFooter(4,'TOPLAM',{1:bekleyenBuAyRows.length+' kalem', 3:fmtMoney(sumOf(bekleyenBuAyRows,r=>r.tutar))}));
     }
     else if(nav==='tahsilat-gecikmis'){
       const rows=gecikmisRows.map(r=>[esc(r.firma), esc(r.kaynak), fmtDate(r.vade), r.gunGecikti+' gün', fmtMoney(r.tutar)]);
-      openQuickReportWindow('Gecikmiş Tahsilat Raporu', fmtDate(todayStr())+' itibarıyla', ['Firma','Kaynak','Vade Tarihi','Gecikme','Kalan Tutar'], rows, 'Gecikmis-Tahsilat-Raporu');
+      openQuickReportWindow('Gecikmiş Tahsilat Raporu', fmtDate(todayStr())+' itibarıyla', ['Firma','Kaynak','Vade Tarihi','Gecikme','Kalan Tutar'], rows, 'Gecikmis-Tahsilat-Raporu', reportFooter(5,'TOPLAM',{1:gecikmisRows.length+' kalem', 4:fmtMoney(sumOf(gecikmisRows,r=>r.tutar))}));
     }
     else if(nav==='isler-all'){
       const list=vj.filter(j=>j.durum==='Beklemede'||j.durum==='Devam Ediyor').slice().sort((a,b)=>(a.teslimTarihi||'').localeCompare(b.teslimTarihi||''));
       const rows=list.map(j=>[esc(companyNameById(j.companyId)), esc(j.isTuru), j.teslimTarihi?fmtDate(j.teslimTarihi):'—', fmtMoney(j.tutar), bizBadge(j.durum)]);
-      openQuickReportWindow('Devam Eden İşler Raporu', fmtDate(todayStr())+' itibarıyla', ['Firma','İş Türü','Teslim Tarihi','Tutar','Durum'], rows, 'Devam-Eden-Isler-Raporu');
+      openQuickReportWindow('Devam Eden İşler Raporu', fmtDate(todayStr())+' itibarıyla', ['Firma','İş Türü','Teslim Tarihi','Tutar','Durum'], rows, 'Devam-Eden-Isler-Raporu', reportFooter(5,'TOPLAM',{1:list.length+' iş', 3:fmtMoney(sumOf(list,j=>j.tutar))}));
     }
     else if(nav==='urun-all'){ goToPage('urunler'); }
     else if(nav==='uts-bekleyen'){
-      openQuickReportWindow('ÜTS Bekleyen Ürünler Raporu', fmtDate(todayStr())+' itibarıyla', ['Ürün','ÜTS Durumu','Ürün Sahibi'], utsBekleyenRows, 'UTS-Bekleyen-Urunler-Raporu');
+      openQuickReportWindow('ÜTS Bekleyen Ürünler Raporu', fmtDate(todayStr())+' itibarıyla', ['Ürün','ÜTS Durumu','Ürün Sahibi'], utsBekleyenRows, 'UTS-Bekleyen-Urunler-Raporu', reportFooter(3,'TOPLAM',{1:utsBekleyenRows.length+' ürün'}));
     }
     else if(nav==='yenileme-yaklasan'){
-      openQuickReportWindow('Yaklaşan Sözleşme Yenilemeleri (30 Gün)', fmtDate(todayStr())+' itibarıyla', ['Firma','Sözleşme No','Hizmet Türü','Planlanan Bitiş'], yenilemeRows, 'Yaklasan-Sozlesme-Yenilemeleri');
+      openQuickReportWindow('Yaklaşan Sözleşme Yenilemeleri (30 Gün)', fmtDate(todayStr())+' itibarıyla', ['Firma','Sözleşme No','Hizmet Türü','Planlanan Bitiş'], yenilemeRows, 'Yaklasan-Sozlesme-Yenilemeleri', reportFooter(4,'TOPLAM',{1:yenilemeRows.length+' sözleşme'}));
     }
     else if(nav==='yeni-firma-buay'){
       const rows=yeniFirmaBuAy.map(f=>[esc(f.cariKod||f.ureticiKod||f.danismanlikKod||'—'), esc(f.unvan), esc(f.yetkili||'—'), new Date(f.createdAt).toLocaleDateString('tr-TR')]);
-      openQuickReportWindow('Bu Ay Eklenen Firmalar', fmtDate(todayStr())+' itibarıyla', ['Kod','Ünvan','Yetkili','Eklenme Tarihi'], rows, 'Bu-Ay-Yeni-Firmalar');
+      openQuickReportWindow('Bu Ay Eklenen Firmalar', fmtDate(todayStr())+' itibarıyla', ['Kod','Ünvan','Yetkili','Eklenme Tarihi'], rows, 'Bu-Ay-Yeni-Firmalar', reportFooter(4,'TOPLAM',{1:yeniFirmaBuAy.length+' firma'}));
     }
   }));
   wrap.querySelectorAll('[data-jobrow]').forEach(el=>el.addEventListener('click',()=>openJobWindow(jobs.find(x=>x.id===el.dataset.jobrow))));
@@ -5038,7 +5079,7 @@ function renderDashboard(){
       else if(p.sozlesmeId){ const f=firms.find(x=>x.id===p.companyId); const c=f?(f.contracts||[]).find(x=>x.id===p.sozlesmeId):null; kaynak='Sözleşme — '+(c?c.contractNo:'—'); }
       return [fmtDate(p.tarih), esc(companyNameById(p.companyId)), esc(kaynak), fmtMoney(p.tutar), esc(p.odemeTuru||'—')];
     });
-    openQuickReportWindow(mt.label+' Tahsilat Raporu', fmtMoney(mt.total)+' toplam', ['Tarih','Firma','Kaynak','Tutar','Ödeme Türü'], rows, mt.label.replace(/\s+/g,'-')+'-Tahsilat-Raporu');
+    openQuickReportWindow(mt.label+' Tahsilat Raporu', fmtMoney(mt.total)+' toplam', ['Tarih','Firma','Kaynak','Tutar','Ödeme Türü'], rows, mt.label.replace(/\s+/g,'-')+'-Tahsilat-Raporu', reportFooter(5,'TOPLAM',{1:list.length+' hareket', 3:fmtMoney(round2(list.reduce((s,p)=>s+(parseFloat(p.tutar)||0),0)))}));
   }));
   const topfirmaWrap=document.getElementById('chartTopfirmaWrap');
   if(topfirmaWrap) topfirmaWrap.querySelectorAll('rect[data-idx]').forEach(r=>r.addEventListener('click',()=>{
@@ -5050,7 +5091,7 @@ function renderDashboard(){
     const ud=utsDist[parseInt(r.dataset.idx)]; if(!ud) return;
     const list=vp2.filter(p=>(p.utsDurumu||'Başvurulmadı')===ud.utsKey);
     const rows=list.map(p=>[esc((p.marka?p.marka+' ':'')+p.urunAdi), esc(companyNameById(p.firmSahipId)), esc(p.utsDurumu||'Başvurulmadı')]);
-    openQuickReportWindow('ÜTS Durumu: '+ud.utsKey, list.length+' ürün', ['Ürün','Ürün Sahibi','ÜTS Durumu'], rows, 'UTS-'+ud.utsKey.replace(/\s+/g,'-'));
+    openQuickReportWindow('ÜTS Durumu: '+ud.utsKey, list.length+' ürün', ['Ürün','Ürün Sahibi','ÜTS Durumu'], rows, 'UTS-'+ud.utsKey.replace(/\s+/g,'-'), reportFooter(3,'TOPLAM',{1:list.length+' ürün'}));
   }));
   wrap.querySelectorAll('[data-firmrow]').forEach(el=>el.addEventListener('click',()=>{
     const firmId=el.dataset.firmrow;
