@@ -1215,7 +1215,7 @@ function deadlineStatus(dateStr, durum){
   return {key:'ok', label:diff+' gün kaldı'};
 }
 function bizBadge(status){
-  const tone={Aktif:'ok',Ödendi:'ok',Tamamlandı:'ok','Teslim Edildi':'ok',Yenilendi:'na',Planlandı:'na','Devam Ediyor':'na',
+  const tone={Aktif:'ok',Ödendi:'ok',Tamamlandı:'ok','Teslim Edildi':'ok',Yenilendi:'na',Planlandı:'na','Devam Ediyor':'na','Rapor Hazır':'ok',
     Başlandı:'warn',Beklemede:'warn','Ödeme Bekliyor':'warn',Bekliyor:'warn',Kısmi:'warn',
     Pasif:'bad',Sonlandırıldı:'bad','İptal':'bad',Gecikmiş:'bad',Ödenmedi:'bad'}[status] || 'na';
   return `<span class="badge ${tone}">${esc(status)}</span>`;
@@ -1241,7 +1241,7 @@ function emptyProduct(name){
     exposureScenarioId:"", marDAp:100,
     kullanimTalimati:"", uyarilar:"Tahriş olmuş ciltlere uygulamayınız. Çocukların ulaşamayacağı yerlerde, 25°C'nin altında, ısı ve nemden uzak tutarak saklayınız. Gözle teması halinde bol su ile yıkayınız.",
     kismB_sonuc:"", kismB_gerekce:"",
-    degUserId:"", degIsim:"",degMeslek:"",degYetkinlik:"",degTarih:"", imzaData:"",
+    degUserId:"", degIsim:"",degMeslek:"",degYetkinlik:"",degTarih:"", imzaData:"", raporHazir:false,
     hazirlamaTarihi:"", yayinTarihi:""
   };
 }
@@ -3403,8 +3403,9 @@ function renderProductList(){
     const isOpen=!!expandedProductGroups[key];
     const rowsHtml=items.map(p=>`
       <div class="list-row" data-id="${p.id}">
-        <div class="lr-main"><b>${esc(p.marka)} — ${esc(p.urunAdi)||'İsimsiz Ürün'}</b><span>${esc(p.nominalMiktar||'')}</span></div>
+        <div class="lr-main"><b>${p.raporHazir?'<span title="Rapor Hazır" style="color:var(--ok);">✅</span>':'<span title="Rapor Hazır Değil" style="color:var(--muted);">⬜</span>'} ${esc(p.marka)} — ${esc(p.urunAdi)||'İsimsiz Ürün'}</b><span>${esc(p.nominalMiktar||'')}</span></div>
         <div class="lr-actions">
+          ${p.raporHazir?bizBadge('Rapor Hazır'):''}
           ${utsBadge(p.utsDurumu)}
           <button class="btn ghost small" data-open="${p.id}">Aç</button>
           <button class="btn ghost small" data-dup="${p.id}">Kopyala</button>
@@ -3893,6 +3894,7 @@ function renderPETab(tab, el, p, win){
         <button data-bt="tanim">Ürün Tanımı</button>
         <button data-bt="stabilite">Stabilite Raporu</button>
         <button data-bt="rafomru">Raf Ömrü Beyanı</button>
+        <button data-bt="toksrapor">Toksikolojik Rapor (Excel)</button>
       </div>
       <div id="bg_body"></div>`;
     const bgTabs=el.querySelector('#bg_tabs');
@@ -3959,7 +3961,12 @@ function renderProductReport(el, p){
   const etiketImgs = (p.etiketGorseller||[]).map(im=>`<img src="${im.dataURL}" style="max-width:100%;margin:8px 0;">`).join('');
 
   el.innerHTML=`
-    <div class="toolbar" style="margin-bottom:10px;"><button class="btn" id="pe_print">📄 PDF Olarak İndir</button><button class="btn ghost" id="pe_word">📝 Word Olarak İndir</button></div>
+    <div class="toolbar" style="margin-bottom:10px;justify-content:space-between;">
+      <label style="display:flex;align-items:center;gap:8px;font-family:var(--sans);text-transform:none;font-size:13px;cursor:pointer;">
+        <input type="checkbox" id="pe_raporhazir" style="width:auto;" ${p.raporHazir?'checked':''}> ✅ Rapor Hazır (ürün listesinde işaretlenir)
+      </label>
+      <div><button class="btn" id="pe_print">📄 PDF Olarak İndir</button><button class="btn ghost" id="pe_word">📝 Word Olarak İndir</button></div>
+    </div>
     <div class="report">
       <div class="report-cover">
         <div class="cv-accent"></div>
@@ -4112,6 +4119,9 @@ function renderProductReport(el, p){
   el.querySelector('#pe_word').addEventListener('click', ()=>{
     const filename='CPSR-Raporu-'+(p.urunAdi||'urun').replace(/[^a-zA-Z0-9ığüşöçİĞÜŞÖÇ\-]/g,'_');
     downloadAsWord(el.querySelector('.report'), filename);
+  });
+  el.querySelector('#pe_raporhazir').addEventListener('change',(e)=>{
+    p.raporHazir=e.target.checked; reSave(p);
   });
 }
 
@@ -4291,6 +4301,7 @@ function renderBelgeTab(bt,el,p){
   if(bt==='tanim') renderBelgeTanim(el,p);
   if(bt==='stabilite') renderBelgeStabilite(el,p);
   if(bt==='rafomru') renderBelgeRafOmru(el,p);
+  if(bt==='toksrapor') renderBelgeToksRapor(el,p);
 }
 const REPORT_WORD_STYLES = `
   body{font-family:Georgia,'Times New Roman',serif;color:#20180a;line-height:1.6;}
@@ -4842,6 +4853,84 @@ function renderRafOmruPreview(el,p){
       ${p.imzaData?`<p><b>İmza/Kaşe:</b></p><img src="${p.imzaData}" style="max-width:160px;">`:''}
     </div>`;
   bindPrint(el, 'Raf-Omru-Beyani-'+(p.urunAdi||'urun').replace(/[^a-zA-Z0-9ığüşöçİĞÜŞÖÇ\\-]/g,'_')+'.pdf');
+}
+
+// ---- Toksikolojik Rapor (Excel) ----
+function renderBelgeToksRapor(el,p){
+  el.innerHTML=`
+    <p class="hint">Bu belge, ürünün maruziyet bilgilerini ve formülde yer alan tüm maddelerin SED/MoS hesaplamalı toksikolojik profilini içerir. CPSR Raporu'ndaki 2.7–2.9 bölümleriyle aynı hesaplamaya dayanır; buradan doğrudan <b>Excel (.xlsx)</b> olarak indirebilirsiniz.</p>
+    <div class="toolbar"><button class="btn ghost" id="tr_preview">Önizle</button><button class="btn" id="tr_excel">📊 Excel Olarak İndir</button></div>
+    <div id="tr_out"></div>`;
+  el.querySelector('#tr_preview').addEventListener('click', ()=>renderToksRaporPreview(el.querySelector('#tr_out'), p));
+  el.querySelector('#tr_excel').addEventListener('click', ()=>downloadToksikolojikRaporExcel(p));
+  renderToksRaporPreview(el.querySelector('#tr_out'), p);
+}
+function renderToksRaporPreview(el,p){
+  const scn=scenarios.find(x=>x.id===p.exposureScenarioId);
+  const A=scn?scn.A:0;
+  let rows='';
+  formulaRowsOf(p).forEach(row=>{
+    const ing=ingredients.find(i=>i.id===row.ingId)||{};
+    const sed=calcSED(A,row.ust,p.marDAp); const m=calcMoS(ing.noael,sed);
+    rows+=`<tr><td>${esc(ing.inci)}</td><td>${esc(ing.cas)}</td><td>${row.alt||'—'}</td><td>${row.ust||'—'}</td><td>${sed!==null?sed.toFixed(4):'N/A'}</td><td>${esc(ing.noael||'N/A')}</td><td>${m!==null?m.toFixed(1):'—'}</td></tr>`;
+  });
+  if(!scn){ el.innerHTML='<p class="empty" style="font-family:var(--sans)">Önce "Maruziyet" sekmesinden bir senaryo seçin.</p>'; }
+  el.innerHTML=(scn?'':'<p class="empty" style="font-family:var(--sans)">Maruziyet senaryosu seçilmedi — aşağıdaki A değeri 0 kabul edilmiştir.</p>')+`<div class="report">
+    <h2>Maruziyet Bilgileri</h2>
+    <table>
+      <tr><td>Uygulama Alanı</td><td>${esc(scn?scn.uygulamaAlani:'—')}</td></tr>
+      <tr><td>Ürün Tipi</td><td>${esc(p.urunTipi||'—')}</td></tr>
+      <tr><td>Uygulama Sıklığı</td><td>${esc(scn?scn.siklik:'—')}</td></tr>
+      <tr><td>Olası Maruziyet Yolları</td><td>${esc(scn?scn.yollar:'—')}</td></tr>
+      <tr><td>Hesaplanmış Günlük Maruziyet (g/gün)</td><td>${esc(scn?scn.gunlukMaruziyet:'—')}</td></tr>
+      <tr><td>Uygulanan Cilt Alanı cm²</td><td>${esc(scn?scn.ciltAlani:'—')}</td></tr>
+      <tr><td>Günlük Uygulanan Tahmini Miktar qx (g/gün)</td><td>${esc(scn?scn.qx:'—')}</td></tr>
+      <tr><td>Alıkonma Faktörü (Fret)</td><td>${esc(scn?scn.fret:'—')}</td></tr>
+      <tr><td>Hedef Tüketici Grup</td><td>${esc(scn?scn.hedefGrup:'—')}</td></tr>
+      <tr><td>Hesaplanmış Bağıl Rölatif Maruziyet (A, mg/kg/gün)</td><td><b>${esc(A)}</b></td></tr>
+    </table>
+    <h2>Toksikolojik Profil</h2>
+    <table><thead><tr><th>INCI</th><th>CAS</th><th>Alt %</th><th>Üst %</th><th>SED</th><th>NOAEL</th><th>MoS</th></tr></thead><tbody>${rows||'<tr><td colspan="7">Formül girilmedi.</td></tr>'}</tbody></table>
+  </div>`;
+}
+function downloadToksikolojikRaporExcel(p){
+  if(typeof XLSX==='undefined'){ alert('Excel kütüphanesi yüklenemedi. İnternet bağlantınızı kontrol edin.'); return; }
+  const scn=scenarios.find(x=>x.id===p.exposureScenarioId);
+  const A=scn?scn.A:0;
+  const rows=formulaRowsOf(p);
+  if(!rows.length){ alert('Bu ürün için henüz formül girilmedi.'); return; }
+  const wsData=[
+    ['Uygulama Alanı', scn?scn.uygulamaAlani:''],
+    ['Ürün Tipi', p.urunTipi||''],
+    ['Uygulama Sıklığı', scn?scn.siklik:''],
+    ['Olası Maruziyet Yolları', scn?scn.yollar:''],
+    ['Hesaplanmış Günlük Maruziyet (g/gün)', scn&&scn.gunlukMaruziyet!==undefined?parseFloat(scn.gunlukMaruziyet)||scn.gunlukMaruziyet:''],
+    ['Uygulanan Cilt Alanı cm2', scn&&scn.ciltAlani!==undefined?parseFloat(scn.ciltAlani)||scn.ciltAlani:''],
+    ['Günlük Olarak Uygulanan Tahmini Miktar qx (g/gün)', scn&&scn.qx!==undefined?parseFloat(scn.qx)||scn.qx:''],
+    ['Uygulanan Bağıl Miktar (mg/kg ağırlık/gün) qx', '-'],
+    ['Alıkonma Faktörü (Uygulama Sıklığı) Fret', scn&&scn.fret!==undefined?parseFloat(scn.fret)||scn.fret:''],
+    ['Hedef Tüketici Grup', scn?scn.hedefGrup:''],
+    ['Hesaplanmış Bağıl Rölatif Maruziyet (mg/kg/vücut ağırlığı/gün)', parseFloat(A)||A],
+    [],
+    ['INCI/Madde İsmi:','CAS No','EC No','% Alt Sınır','% Üst Sınır','Fonksiyon','SED (mg/kg vücut ağırlığı/gün)','NOAEL','MOS','Toksikolojik Yorum','Reference']
+  ];
+  rows.forEach(row=>{
+    const ing=ingredients.find(i=>i.id===row.ingId)||{};
+    const sed=calcSED(A,row.ust,p.marDAp);
+    const m=calcMoS(ing.noael,sed);
+    wsData.push([
+      ing.inci||'', ing.cas||'', ing.ec||'',
+      row.alt!==undefined&&row.alt!==''?parseFloat(row.alt):'', row.ust!==undefined&&row.ust!==''?parseFloat(row.ust):'',
+      ing.fonksiyon||'', sed!==null?Number(sed.toFixed(4)):'N/A', ing.noael||'N/A', m!==null?Number(m.toFixed(2)):'-',
+      ing.toxYorum||'', ing.referans||''
+    ]);
+  });
+  const ws=XLSX.utils.aoa_to_sheet(wsData);
+  ws['!cols']=[{wch:30},{wch:22},{wch:16},{wch:10},{wch:10},{wch:16},{wch:16},{wch:10},{wch:10},{wch:60},{wch:40}];
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Tablo');
+  XLSX.writeFile(wb, 'Toksikolojik-Rapor-'+(p.urunAdi||'urun').replace(/[^a-zA-Z0-9ığüşöçİĞÜŞÖÇ\-]/g,'_')+'.xlsx');
+  logAction('Toksikolojik Rapor (Excel) İndirildi', p.urunAdi);
 }
 
 /* =========================================================================
