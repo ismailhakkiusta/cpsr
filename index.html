@@ -791,7 +791,7 @@ const storage=(typeof window!=='undefined' && window.storage && typeof window.st
 
 let firms=[], ingredients=[], packagings=[], processes=[], scenarios=[], formulas=[], products=[];
 let jobs=[], payments=[];
-let usedCariKodlar=[], usedUreticiKodlar=[], usedDanismanlikKodlar=[], usedSozlesmeNolar=[], usedAmbalajKodlar=[];
+let usedCariKodlar=[], usedUreticiKodlar=[], usedDanismanlikKodlar=[], usedSozlesmeNolar=[], usedAmbalajKodlar=[], usedIsKodlari=[];
 let dashboardPrefs={hidden:[]};
 /* ---- İş Yönetimi (Sözleşme/İş/Tahsilat) sabitleri ---- */
 const PAYMENT_PERIODS=["Aylık","3 Aylık","6 Aylık","Yıllık"];
@@ -1260,8 +1260,8 @@ async function loadAll(){
   }
   try{ const r=await storage.get('cpsr-products'); products = r? JSON.parse(r.value) : []; }
   catch(e){ products=[]; }
-  try{ const r=await storage.get('cpsr-business'); if(r){ const d=JSON.parse(r.value); jobs=d.jobs||[]; payments=d.payments||[]; } else throw 0; }
-  catch(e){ jobs=[]; payments=[]; }
+  try{ const r=await storage.get('cpsr-business'); if(r){ const d=JSON.parse(r.value); jobs=d.jobs||[]; payments=d.payments||[]; usedIsKodlari=d.usedIsKodlari||[]; } else throw 0; }
+  catch(e){ jobs=[]; payments=[]; usedIsKodlari=[]; }
   Object.keys(DEFAULT_REFLISTS).forEach(k=>{ if(!refLists[k]) refLists[k]=JSON.parse(JSON.stringify(DEFAULT_REFLISTS[k])); });
   if(Array.isArray(refLists.isDurumu) && !refLists.isDurumu.includes('Teslim Edildi')) refLists.isDurumu.push('Teslim Edildi');
   // Geriye dönük uyumluluk: mevcut firma/sözleşme kodlarını kalıcı kayıt defterine ekle (daha önce kaydedilmemişse)
@@ -1272,6 +1272,7 @@ async function loadAll(){
   products.forEach(p=>{ if(migrateProductFormula(p)) migrated=true; });
   products.forEach(p=>{ if(migrateProductFormulaRevisions(p)) migrated=true; });
   packagings.forEach(pk=>{ if(migratePackagingRecord(pk)) migrated=true; });
+  jobs.forEach(j=>{ if(!j.isKodu){ j.isKodu=generateIsKodu(); migrated=true; } });
   if(migrated) scheduleSave();
   setStatus('hazır');
 }
@@ -1281,7 +1282,7 @@ async function saveAll(){
   try{
     await storage.set('cpsr-libraries', JSON.stringify({firms,ingredients,packagings,processes,scenarios,formulas,refLists,usedCariKodlar,usedUreticiKodlar,usedDanismanlikKodlar,usedSozlesmeNolar,usedAmbalajKodlar,dashboardPrefs}));
     await storage.set('cpsr-products', JSON.stringify(products));
-    await storage.set('cpsr-business', JSON.stringify({jobs,payments}));
+    await storage.set('cpsr-business', JSON.stringify({jobs,payments,usedIsKodlari}));
     setStatus('kaydedildi ✓');
   }catch(e){ setStatus('kayıt hatası — dışa aktarın'); }
   writeToFileHandle();
@@ -2043,8 +2044,14 @@ function ambalajKisaKod(altGrup){
 function generateAmbalajKod(altGrup){
   const prefix=ambalajKisaKod(altGrup);
   let n=1, code;
-  do{ code=prefix+'-'+pad4(n); n++; }while(usedAmbalajKodlar.includes(code));
+  do{ code=prefix+'-'+pad4(n); n++; }while(usedAmbalajKodlar.includes(code) || packagings.some(p=>p.kod===code)); // cihazlar arası aktarımda çakışmayı önler
   usedAmbalajKodlar.push(code);
+  return code;
+}
+function generateIsKodu(){
+  let n=1, code;
+  do{ code='IS-'+pad4(n); n++; }while(usedIsKodlari.includes(code) || jobs.some(j=>j.isKodu===code)); // cihazlar arası aktarımda çakışmayı önler
+  usedIsKodlari.push(code);
   return code;
 }
 // Eski (Ana Grup/Alt Grup sistemi öncesi) ambalaj kayıtlarını yeni yapıya taşır.
@@ -5324,6 +5331,8 @@ function fillJobStatusFilter(){
   sel.innerHTML='<option value="all">Tüm Durumlar</option>'+refLists.isDurumu.map(s=>opt(null,s,s,cur)).join('');
   sel.value = refLists.isDurumu.includes(cur) || cur==='all' ? cur : 'all';
 }
+const JOB_CANCELLED_STATUSES=['İptal','Sonlandırıldı'];
+let expandedJobGroups={yarim:true, tamamlanan:false, kapanan:false, iptal:false};
 function renderJobList(){
   fillJobStatusFilter();
   const wrap=document.getElementById('jobListWrap');
@@ -5331,19 +5340,55 @@ function renderJobList(){
   const statusF=document.getElementById('jobStatusFilter').value;
   let list=visibleJobs().filter(j=> !q || companyNameById(j.companyId).toLowerCase().includes(q) || (j.isTuru||'').toLowerCase().includes(q));
   if(statusF!=='all') list=list.filter(j=>j.durum===statusF);
-  list=list.slice().sort((a,b)=>(b.tarih||'').localeCompare(a.tarih||''));
   if(!list.length){ wrap.innerHTML='<div class="empty">Kayıt yok.</div>'; return; }
-  wrap.innerHTML='<table><thead><tr><th>Firma</th><th>İş Türü</th><th>Tutar</th><th>Ödeme Durumu</th><th>İş Durumu</th><th>Teslim Tarihi</th><th></th></tr></thead><tbody>'+
-    list.map(j=>{
-      const ds=deadlineStatus(j.teslimTarihi, j.durum);
-      const dsColor={overdue:'var(--danger)',today:'var(--amber)',soon:'var(--amber)',ok:'var(--ink)',done:'var(--ok)',none:'var(--muted)'}[ds.key];
-      const payStatus=jobPaymentStatus(j);
-      return `<tr data-id="${j.id}" style="cursor:pointer;">
-        <td>${esc(companyNameById(j.companyId))}</td><td>${esc(j.isTuru)}</td><td>${fmtMoney(j.tutar)}${j.adet?(' <span class="hint">('+esc(j.adet)+' × '+fmtMoney(j.birimUcret)+')</span>'):''}</td>
-        <td>${payStatus==='—'?'—':bizBadge(payStatus)}</td><td>${bizBadge(j.durum)}</td>
-        <td style="color:${dsColor}">${fmtDate(j.teslimTarihi)}${ds.key!=='none'&&ds.key!=='done'?' ('+ds.label+')':''}</td>
-      </tr>`;
-    }).join('')+'</tbody></table>';
+  // 1) Yarım olan işler: henüz tamamlanmamış (ve iptal/sonlandırılmamış)
+  // 2) Tamamlanan işler: tamamlandı/teslim edildi ama TESLİM+ÖDEME ikisi birden tamam değil
+  //    (ödemesi alınıp teslimi bekleyen VEYA ödemesi beklenen işler)
+  // 3) Ödemesi alınan ve teslim edilen işler: hem teslim edilmiş hem tam ödenmiş
+  // 4) İptal olan işler
+  // — bir işin durumu/ödemesi değiştiğinde otomatik olarak doğru gruba geçer.
+  const yarim=list.filter(j=>!JOB_CLOSED_STATUSES.includes(j.durum) && !JOB_CANCELLED_STATUSES.includes(j.durum))
+    .sort((a,b)=>(a.teslimTarihi||'9999-99-99').localeCompare(b.teslimTarihi||'9999-99-99'));
+  const kapanan=list.filter(j=>j.durum==='Teslim Edildi' && jobPaymentStatus(j)==='Ödendi')
+    .sort((a,b)=>(a.teslimTarihi||a.tarih||'').localeCompare(b.teslimTarihi||b.tarih||''));
+  const tamamlanan=list.filter(j=>JOB_CLOSED_STATUSES.includes(j.durum) && !JOB_CANCELLED_STATUSES.includes(j.durum) && !kapanan.includes(j))
+    .sort((a,b)=>(a.teslimTarihi||a.tarih||'').localeCompare(b.teslimTarihi||b.tarih||''));
+  const iptal=list.filter(j=>JOB_CANCELLED_STATUSES.includes(j.durum))
+    .sort((a,b)=>(b.tarih||'').localeCompare(a.tarih||''));
+  function jobRow(j){
+    const ds=deadlineStatus(j.teslimTarihi, j.durum);
+    const dsColor={overdue:'var(--danger)',today:'var(--amber)',soon:'var(--amber)',ok:'var(--ink)',done:'var(--ok)',none:'var(--muted)'}[ds.key];
+    const payStatus=jobPaymentStatus(j);
+    return `<tr data-id="${j.id}" style="cursor:pointer;">
+      <td class="hint" style="font-family:var(--mono);">${esc(j.isKodu||'—')}</td>
+      <td>${esc(companyNameById(j.companyId))}</td><td>${esc(j.isTuru)}</td><td>${fmtMoney(j.tutar)}${j.adet?(' <span class="hint">('+esc(j.adet)+' × '+fmtMoney(j.birimUcret)+')</span>'):''}</td>
+      <td>${payStatus==='—'?'—':bizBadge(payStatus)}</td><td>${bizBadge(j.durum)}</td>
+      <td style="color:${dsColor}">${fmtDate(j.teslimTarihi)}${ds.key!=='none'&&ds.key!=='done'?' ('+ds.label+')':''}</td>
+    </tr>`;
+  }
+  function groupBlock(key, label, icon, arr){
+    if(!arr.length) return '';
+    const open=!!expandedJobGroups[key];
+    let html=`<div class="firm-group" data-jobgrouptoggle="${key}">
+      <div class="firm-group-head" style="cursor:pointer;">${open?'▾':'▸'} ${icon} ${label} <span class="hint">(${arr.length} iş)</span></div>`;
+    if(open){
+      html+='<table><thead><tr><th>İş Kodu</th><th>Firma</th><th>İş Türü</th><th>Tutar</th><th>Ödeme Durumu</th><th>İş Durumu</th><th>Teslim Tarihi</th></tr></thead><tbody>'+
+        arr.map(jobRow).join('')+'</tbody></table>';
+    }
+    html+='</div>';
+    return html;
+  }
+  let html='';
+  html+=groupBlock('yarim','Yarım Olan İşler','🔧',yarim);
+  html+=groupBlock('tamamlanan','Tamamlanan İşler (Teslim/Ödeme Bekleyen)','🔶',tamamlanan);
+  html+=groupBlock('kapanan','Ödemesi Alınan ve Teslim Edilen İşler','✅',kapanan);
+  html+=groupBlock('iptal','İptal Olan İşler','🚫',iptal);
+  wrap.innerHTML=html || '<div class="empty">Kayıt yok.</div>';
+  wrap.querySelectorAll('[data-jobgrouptoggle]').forEach(h=>h.querySelector('.firm-group-head').addEventListener('click',()=>{
+    const key=h.dataset.jobgrouptoggle;
+    expandedJobGroups[key]=!expandedJobGroups[key];
+    renderJobList();
+  }));
   wrap.querySelectorAll('tr[data-id]').forEach(tr=>tr.addEventListener('click',()=>openJobWindow(jobs.find(x=>x.id===tr.dataset.id))));
 }
 document.getElementById('jobSearch').addEventListener('input', renderJobList);
@@ -5359,12 +5404,13 @@ function deleteJob(jobId){
 function openJobWindow(job){
   const isNew=!job;
   if(!isNew && !isAdmin()){ const f=firms.find(x=>x.id===job.companyId); if(f && f.ownerId && f.ownerId!==session.userId){ alert('Bu iş kaydını düzenleme yetkiniz yok.'); return; } }
-  const d=job? {...job} : {id:uid(), companyId:'', tarih:todayStr(), isTuru:refLists.isTuru[0]||'', durum:refLists.isDurumu[0]||'', teslimTarihi:'', adet:'', birimUcret:'', tutar:'', dosya:'', aciklama:'', yonlendirenKisi:''};
-  createWindow({title:isNew?'Yeni İş':'İş Düzenle', icon:'🗂️', width:560, height:640, render:(body,win,close)=>{
+  const d=job? {...job} : {id:uid(), isKodu:'', companyId:'', tarih:todayStr(), isTuru:refLists.isTuru[0]||'', durum:refLists.isDurumu[0]||'', teslimTarihi:'', adet:'', birimUcret:'', tutar:'', dosya:'', aciklama:'', yonlendirenKisi:''};
+  createWindow({title:(isNew?'Yeni İş':'İş Düzenle — '+(d.isKodu||'')), icon:'🗂️', width:560, height:640, render:(body,win,close)=>{
     const paidSoFar = job ? jobPaidAmount(job, payments) : 0;
     const lastPayDate = job ? jobLastPaymentDate(job, payments) : null;
     const payStatus = job ? jobPaymentStatus(job, payments) : 'Ödeme Bekliyor';
     body.innerHTML=`
+      ${!isNew?`<p class="hint" style="font-family:var(--mono);">İş Kodu: <b>${esc(d.isKodu)}</b></p>`:''}
       <div class="frow"><label>Firma</label><select id="j_company"><option value="">Seçiniz</option>${visibleFirms().map(f=>opt(null,f.id,f.unvan,d.companyId)).join('')}</select></div>
       <div class="fgrid">
         <div class="frow"><label>Tarih</label><input id="j_tarih" type="date" value="${esc(d.tarih)}"></div>
@@ -5411,7 +5457,7 @@ function openJobWindow(job){
       d.tutar=parseFloat(body.querySelector('#j_tutar').value)||0;
       d.dosya=body.querySelector('#j_dosya').value; d.aciklama=body.querySelector('#j_aciklama').value;
       d.yonlendirenKisi=body.querySelector('#j_yonlendiren').value;
-      if(isNew){ jobs.push(d); logAction('İş Oluşturuldu', companyNameById(companyId)+' — '+d.isTuru); } else { Object.assign(job,d); logAction('İş Düzenlendi', companyNameById(companyId)+' — '+d.isTuru); }
+      if(isNew){ d.isKodu=generateIsKodu(); jobs.push(d); logAction('İş Oluşturuldu', d.isKodu+' — '+companyNameById(companyId)+' — '+d.isTuru); } else { Object.assign(job,d); logAction('İş Düzenlendi', (job.isKodu||'')+' — '+companyNameById(companyId)+' — '+d.isTuru); }
       scheduleSave(); renderJobList(); close();
     };
   }});
