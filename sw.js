@@ -1,8 +1,8 @@
-/* CPSR Yönetim Sistemi — çevrimdışı önbellek
+/* YKU Proforma & Sipariş — çevrimdışı önbellek
    Program dosyası her açılışta önce internetten güncellenir (varsa),
    internet yoksa telefondaki son kopya açılır. Verileriniz bu önbellekte değil,
    cihazın kendi veritabanında (IndexedDB) durur. */
-const CACHE = 'cpsr-v29-1';
+const CACHE = 'yku-siparis-v23-1';
 const CORE = ['./', './index.html', './manifest.webmanifest', './icon-180.png', './icon-192.png', './icon-512.png'];
 const CDN = [
   'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js',
