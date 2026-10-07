@@ -10,7 +10,7 @@
 <meta name="theme-color" content="#2E5B61">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
-<title>YKU Proforma & Sipariş Takip v51</title>
+<title>YKU Proforma & Sipariş Takip v61</title>
 <style>
 :root{
   --zebra:#F6F8F7;--sb:rgba(22,36,42,.18);--sbh:rgba(22,36,42,.34);
@@ -320,6 +320,39 @@ details.mu-det[open]>summary::before{content:'▾ ';color:var(--accent)}
 .prbtn{all:unset;cursor:pointer;margin-left:4px}
 .prbtn .pill{font-size:12px}
 .prsum{margin-top:10px;padding:10px 12px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+.codehint{font-size:12.5px;margin-top:4px;line-height:1.4}
+.codehint.bad{color:var(--bad)}
+.codehint.warn{color:var(--warn)}
+.codehint a{text-decoration:underline;cursor:pointer;color:inherit;font-weight:600}
+.oqlist{display:flex;flex-direction:column;gap:6px}
+.oq{display:flex;gap:10px;align-items:flex-start;padding:9px 11px;border:1px solid var(--line);border-radius:10px;cursor:pointer}
+.oq:has(input:checked){border-color:var(--ok);background:color-mix(in srgb,var(--ok) 9%,transparent)}
+.oq input{margin-top:3px}
+.tvgs{margin-top:12px}
+details.tvg .tvb{padding:12px 14px}
+details.tvg .tvb>.tw{margin:0}
+.pcf td:first-child{white-space:nowrap;font-weight:550}
+.pcf input{width:100%;min-width:140px}
+.tnlist{display:flex;flex-direction:column;gap:8px}
+.tn{border-left:3px solid var(--accent);padding:4px 10px;background:var(--accent-2);border-radius:0 8px 8px 0}
+.qprev{font-size:13.5px;padding:8px 10px;border-radius:8px;background:var(--accent-2);min-height:0}
+.qprev:empty{display:none}
+.cofg{grid-template-columns:minmax(0,1fr)!important}
+.cofg>*{min-width:0}
+.cofg input{width:100%;min-width:0;box-sizing:border-box}
+.coinfo-card{min-width:0;box-sizing:border-box}
+div.f{display:flex;flex-direction:column;gap:4px}
+div.f>span:first-child{font-size:13px;color:var(--muted);font-weight:500}
+.coinfo-card{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:inherit;font:inherit;font-size:13.5px;cursor:pointer}
+.coinfo-card:hover{border-color:var(--accent)}
+.coinfo-t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.coinfo-card .sub{flex:1}
+.coedit{color:var(--accent);font-weight:600;white-space:nowrap;font-size:13px}
+.stelock{max-width:420px;margin:30px auto;padding:26px 24px;text-align:center}
+.stelock .sl-ic{font-size:34px;line-height:1}
+.stelock h2{margin:8px 0 4px;font-size:19px}
+.stelock form{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+.stelock input{text-align:center}
 .mrev{border:1px solid var(--warn);background:var(--warn-bg);border-radius:var(--r);padding:12px 14px;margin-bottom:14px}
 .modal .mbody>.mrev h3{margin:0 0 6px;color:var(--warn)}
 .mrev-i{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin:8px 0}
@@ -478,6 +511,7 @@ ol.steps li{margin-bottom:5px}
   #print .phd{display:flex;align-items:center;gap:12px;border-bottom:1.5px solid #000;padding-bottom:5px;margin-bottom:7px}
   #print .phd img{max-height:15mm;max-width:45mm;object-fit:contain}
   #print .phd .co{font-weight:700;font-size:11pt}
+  #print .phd .co .coi{font-weight:400;font-size:8pt;color:#333;line-height:1.35}
   #print .phd .tt{margin-left:auto;text-align:right;font-size:9pt}
   #print .phd h1{font-size:14pt;margin:0}
   #print .rcp{font-size:9pt;page-break-inside:avoid}
@@ -496,6 +530,16 @@ ol.steps li{margin-bottom:5px}
   #print .rcp.xdense ol,#print .rcp.xdense p{font-size:6.8pt}
   #print .rcp.xdense h2{font-size:8.5pt;margin:3px 0 1px}
   #print table.sig{margin-top:8px}
+  #print .arge1{page-break-inside:auto}
+  #print .arge1 .hd td{font-size:8.5pt;padding:1px 10px 1px 0}
+  #print .arge1 .two{display:flex;gap:10px;align-items:flex-start}
+  #print .arge1 .two>div{flex:1;min-width:0}
+  #print .arge1 .pcn td{height:15px}
+  #print .arge1 .nl{border-bottom:1px solid #999;height:20px}
+  #print .arge1 .inci{font-size:7.8pt;line-height:1.3}
+  #print .arge1 .psigfoot{margin-top:6px}
+  #print .arge1.xdense .nl{height:16px}
+  #print .arge1.xdense .pcn td{height:12px}
   #print .psig{display:flex;flex-direction:column;align-items:flex-start;gap:2px;margin-top:4px;font-size:8.5pt;font-weight:400}
   #print .psigfoot .psig{align-items:flex-end;text-align:right}
   #print .psig img{max-height:15mm;max-width:45mm;object-fit:contain}
@@ -516,7 +560,7 @@ ol.steps li{margin-bottom:5px}
 <div id="app">
   <aside class="side">
     <div class="brand">
-      <div><b>Proforma & Sipariş</b><span>YKU Cosmetic v51</span></div>
+      <div><b>Proforma & Sipariş</b><span>YKU Cosmetic v61</span></div>
       <span class="mobile-save" id="mUser"></span><button class="btn sm pri mobile-save" onclick="saveNow()">Kaydet</button>
     </div>
     <nav class="nav" id="nav"></nav>
@@ -865,8 +909,8 @@ td input,td select,td textarea{padding:5px 6px;font-size:12.5px;}
 .report-cover .cv-accent{position:absolute;top:0;left:0;bottom:0;width:8px;background:linear-gradient(180deg,#7a5c14,#c9a227);}
 .report-cover .cv-inner{padding:10px 6px 0 8px;}
 .report-cover .cv-toprow{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;}
-.report-cover .cv-logo{width:64px;height:64px;flex:none;border-radius:50%;overflow:hidden;box-shadow:0 0 0 1px #d8c9a0;background:#fff;}
-.report-cover .cv-logo img{width:100%;height:100%;object-fit:cover;}
+.report-cover .cv-logo{flex:none;display:flex;align-items:center;min-height:20px;max-width:260px;}
+.report-cover .cv-logo img{display:block;width:auto;height:auto;max-height:72px;max-width:260px;object-fit:contain;}
 .report-cover .cv-headright{text-align:right;}
 .report-cover .cv-headright .cv-brand{font-size:19px;font-weight:800;color:#20180a;}
 .report-cover .cv-headright .cv-product{font-size:14px;color:#3a2f18;}
@@ -1068,6 +1112,17 @@ tr.lg-row.cur td{box-shadow:inset 0 2px 0 var(--teal),inset 0 -2px 0 var(--teal)
 ::-webkit-scrollbar-thumb:hover{background:var(--y-sbh);background-clip:padding-box}
 tbody tr:nth-child(even) td{background:var(--y-zebra)!important}
 tbody tr:hover td{background:var(--teal-lt)!important}
+.report tbody tr td,.report tr td{background:#fffdf6!important;color:#20180a!important;border-color:#e2d6b5!important}
+.report tbody tr:nth-child(even) td{background:#f8f1de!important}
+.report tbody tr:hover td{background:#f3ead2!important}
+.report table th,.report th{background:#f2e8cd!important;color:#5c4310!important;border-color:#e2d6b5!important}
+.report td b,.report td strong{color:#20180a!important}
+.report tfoot td{background:#f2e8cd!important;color:#5c4310!important}
+.ylogo-opts{display:flex;flex-wrap:wrap;gap:10px;margin-top:4px}
+.ylogo{display:flex;align-items:center;gap:10px;padding:8px 12px;border:1px solid var(--line);border-radius:10px;cursor:pointer;min-width:220px}
+.ylogo.on{border-color:var(--teal);background:var(--teal-lt)}
+.ylogo img{width:auto;height:auto;max-width:110px;max-height:48px;object-fit:contain;background:#fff;border-radius:4px;padding:3px;box-shadow:0 0 0 1px var(--line)}
+.ylogo small{color:var(--muted)}
 .firm-group{border-radius:10px;transition:box-shadow .15s}
 .firm-group-head{background:var(--y-surface)!important;border:1px solid var(--line);border-left:4px solid var(--line)!important;font-weight:550!important;color:var(--ink)!important}
 .firm-group-head:hover{border-left-color:var(--teal)!important}
@@ -6123,7 +6178,8 @@ function renderPETab(tab, el, p, win){
       <div class="frow"><label>İmza (görsel yükle — kullanıcı seçiliyse profildeki imza otomatik kullanılır)</label>
         <input type="file" id="pe_imza" accept="image/*">
         <div class="thumbrow" id="pe_imza_thumb"></div>
-      </div>`;
+      </div>
+      <div class="frow"><label>Rapor kapağındaki logo</label><div id="pe_logo_sel"></div></div>`;
     el.querySelectorAll('[data-f]').forEach(inp=>inp.addEventListener('input',()=>{ p[inp.dataset.f]=inp.value; reSave(p); }));
     function renderImza(){ el.querySelector('#pe_imza_thumb').innerHTML = p.imzaData ? `<div class="thumb"><img src="${p.imzaData}"><button class="rm" id="pe_imza_rm">✕</button></div>` : ''; const rm=el.querySelector('#pe_imza_rm'); if(rm) rm.onclick=()=>{ p.imzaData=''; reSave(p); renderImza(); }; }
     function renderWarn(){
@@ -6139,6 +6195,7 @@ function renderPETab(tab, el, p, win){
     }
     renderWarn();
     renderImza();
+    ykuLogoBind(el,p);
     el.querySelector('#pe_deg_user').addEventListener('change',(e)=>{
       const uid_=e.target.value;
       p.degUserId=uid_;
@@ -6206,7 +6263,7 @@ function renderProductReport(el, p){
   const kullanilanFormulLabel = activeRev
     ? (activeRev.sourceLibraryFormulaAd || ('Ürüne özel formül (Rev. '+pad2(activeRev.revNo)+', '+fmtDate(activeRev.tarih)+')'))
     : 'seçilmedi';
-  const logoSrc=document.querySelector('.brand .mark img')?.src || '';
+  const logoSrc=ykuReportLogo(p);
 
   const procStepsHtml = proc && proc.steps && proc.steps.length
     ? '<ol style="padding-left:18px;">'+proc.steps.map(s=>`<li style="margin-bottom:6px;"><b>${esc(s.title||'Adım')}</b>${s.desc?(' — '+esc(s.desc)):''}${s.not?`<br><span style="font-size:11px;color:#6b6355;">Kontrol: ${esc(s.not)}</span>`:''}</li>`).join('')+'</ol>'
@@ -6377,8 +6434,7 @@ function renderProductReport(el, p){
       <table><tr><td><b>İsim</b></td><td>${esc(p.degIsim)}</td></tr>
       <tr><td><b>Meslek</b></td><td>${esc(p.degMeslek)}</td></tr>
       <tr><td><b>Yetkinlik</b></td><td>${esc(p.degYetkinlik)}</td></tr>
-      <tr><td><b>Tarih</b></td><td>${fmtDate(p.degTarih)}</td></tr></table>
-      ${p.imzaData?`<p><b>İmza:</b></p><img src="${p.imzaData}" style="max-width:160px;margin-top:4px;">`:''}
+      <tr><td><b>Tarih</b></td><td>${fmtDate(p.degTarih)}</td></tr>${p.imzaData?`<tr><td><b>İmza</b></td><td><img src="${p.imzaData}" style="max-width:160px;max-height:80px;display:block;"></td></tr>`:''}</table>
     </div>`;
   el.querySelector('#pe_print').addEventListener('click', (e)=>{
     const filename='CPSR-Raporu-'+(p.urunAdi||'urun').replace(/[^a-zA-Z0-9ığüşöçİĞÜŞÖÇ\-]/g,'_')+'.pdf';
@@ -8405,11 +8461,20 @@ function ykuJobCards(){const page=document.getElementById('page-isler');if(!page
   box.querySelectorAll('[data-stg]').forEach(b=>b.addEventListener('click',()=>{ykuStageF=ykuStageF===b.dataset.stg?'':b.dataset.stg;if(ykuStageF){expandedJobGroups.yarim=true;expandedJobGroups.tamamlanan=true}renderJobList()}));
 }
 {const _rjl=renderJobList;renderJobList=function(){ykuJobCards();return _rjl.apply(this,arguments)}}
+function ykuLogoOpts(p){const o=[],du=users.find(x=>x.id===p.degUserId),me=users.find(x=>x.id===session.userId);let fl='';try{fl=parent.steCompanyLogo()||''}catch(e){}
+  if(du&&du.logoData)o.push({k:'deg',l:'Değerlendirici',n:du.adSoyad||du.kullaniciAdi||'',src:du.logoData});
+  if(me&&me.logoData&&me!==du)o.push({k:'me',l:'Giriş yapan kullanıcı',n:me.adSoyad||me.kullaniciAdi||'',src:me.logoData});
+  if(fl)o.push({k:'firm',l:'Firma logosu',n:'Dosya ve ayarlar',src:fl});return o}
+function ykuReportLogo(p){const o=ykuLogoOpts(p);return (o.find(x=>x.k===p.logoSel)||o[0]||{}).src||document.querySelector('.brand .mark img')?.src||''}
+function ykuLogoSelHtml(p){const o=ykuLogoOpts(p);if(!o.length)return '<div class="hint">Logo yok. Kullanıcılar sayfasında değerlendiriciye “Rapor logosu” ya da Dosya ve ayarlar’dan firma logosu yükle.</div>';
+  const cur=(o.find(x=>x.k===p.logoSel)||o[0]).k;
+  return `<div class="ylogo-opts">${o.map(x=>`<label class="ylogo ${x.k===cur?'on':''}">${o.length>1?`<input type="radio" name="pe_logo" value="${x.k}" ${x.k===cur?'checked':''}>`:''}<img src="${x.src}" alt=""><span><b>${esc(x.l)}</b><br><small>${esc(x.n)}</small></span></label>`).join('')}</div>${o.length>1?'<div class="hint">Seçtiğin logo bu işin raporunun kapağında kullanılır.</div>':''}`}
+function ykuLogoBind(el,p){const w=el.querySelector('#pe_logo_sel');if(!w)return;w.innerHTML=ykuLogoSelHtml(p);w.querySelectorAll('input[name="pe_logo"]').forEach(r=>r.addEventListener('change',()=>{p.logoSel=r.value;reSave(p);ykuLogoBind(el,p)}))}
 function ykuSyncUsers(){let L=[];try{L=parent.steYkuUsers()||[]}catch(e){}if(!L.length)return 0;let ch=0;
   const F=['adSoyad','meslek','yetkinlik','imzaData','mezunOkul','diplomaNo','dogumYeriTarihi','ikametgahAdresi','iban','meslekOrgutu'];
   L.forEach(v=>{let u=users.find(x=>ykuLow(x.kullaniciAdi)===ykuLow(v.kullaniciAdi));
     if(!u){u={id:uid(),kullaniciAdi:v.kullaniciAdi,role:v.role,canApprove:v.role==='yonetici',passHash:v.passHash||'',createdAt:Date.now()};users.push(u);ch++}
-    F.forEach(f=>{if(v[f]&&u[f]!==v[f]){u[f]=v[f];ch++}});if(u.role!==v.role){u.role=v.role;ch++}});
+    F.forEach(f=>{if(v[f]&&u[f]!==v[f]){u[f]=v[f];ch++}});if((v.logoData||'')!==(u.logoData||'')){u.logoData=v.logoData||'';ch++}if(u.role!==v.role){u.role=v.role;ch++}});
   if(ch)saveUsers();
   let me='';try{me=parent.steCurrentUsername()}catch(e){}const mu=me&&users.find(x=>ykuLow(x.kullaniciAdi)===ykuLow(me));if(mu&&session.userId!==mu.id){session={role:'yonetici',userId:mu.id}}
   return ch}
@@ -8621,12 +8686,17 @@ function inciHtml(formula){const r=inciComp(formula);if(!r.rows.length)return '<
 function matUsage(id){return DB.products.filter(p=>p.formula.some(f=>f.matId===id))}
 
 /* ---- Formül fazları ve reçete ---- */
-function phaseGroups(formula){const g=[];(formula||[]).forEach(f=>{const ph=f.phase||'';if(!g.length||g[g.length-1].phase!==ph)g.push({phase:ph,items:[]});g[g.length-1].items.push(f)});return g}
+const phKey=p=>String(p||'').trim().replace(/\s+/g,' ').toLocaleUpperCase('tr');
+function phaseCmp(a,b){const A=phKey(a),B=phKey(b);if(A===B)return 0;if(!A)return 1;if(!B)return -1;return A.localeCompare(B,'tr',{numeric:true})}
+/* aynı fazdaki satırları bir araya toplar; fazlar A, B, C… sırasıyla, faz içinde % büyükten küçüğe */
+const phCanon=p=>{const t=String(p||'').trim().replace(/\s+/g,' ');return PHASES.find(z=>phKey(z)===phKey(t))||t};
+function sortByPhase(list){return (list||[]).map((f,i)=>[f,i]).sort((a,b)=>phaseCmp(a[0].phase,b[0].phase)||pn(b[0].pct)-pn(a[0].pct)||a[1]-b[1]).map(x=>x[0])}
+function phaseGroups(formula){const m=new Map();sortByPhase(formula).forEach(f=>{const k=phKey(f.phase);if(!m.has(k))m.set(k,{phase:String(f.phase||'').trim(),items:[]});m.get(k).items.push(f)});return [...m.values()]}
 function lineKg(l,p){return l.unit==='Kg'?pn(l.qty):pn(l.qty)*pn(p?.unitKg)}
 function recipeTotalKg(p,qty){return pn(qty)*pn(p.unitKg)}
 const r3=v=>Math.round((+v||0)*1000)/1000;
 const revTxt=r=>'Rev. '+String(r??0).padStart(2,'0');
-function formulaSig(o){return JSON.stringify({f:(o.formula||[]).map(f=>[f.phase||'',f.matId,pn(f.pct)]),s:o.steps||[],n:o.notes||'',u:pn(o.unitKg)})}
+function formulaSig(o){return JSON.stringify({f:(o.formula||[]).map(f=>JSON.stringify([phKey(f.phase),f.matId,pn(f.pct)])).sort(),s:o.steps||[],n:o.notes||'',u:pn(o.unitKg)})}
 function revSnapshot(p){return{rev:p.rev??0,date:p.revDate||'',note:p.revNote||'',formula:JSON.parse(JSON.stringify(p.formula||[])),steps:[...(p.steps||[])],notes:p.notes||'',unitKg:p.unitKg}}
 /* ürünü yeni değerlerle güncelle; formül değiştiyse eskisini sakla, revizyon numarasını artır */
 function applyRevision(p,nw,note){const before=formulaSig(p),after=formulaSig({...p,...nw});
@@ -8883,8 +8953,13 @@ function renderSide(){
   document.getElementById('filebox').innerHTML=`${S.user?`<div class="uline"><span>👤 <b>${esc(S.user.name||S.user.username)}</b> <span class="sub">${S.user.role==='yonetici'?'Yönetici':'Kullanıcı'}</span></span><button class="btn link xsl" onclick="logout()">Çıkış</button></div>`:''}<div style="margin-bottom:6px;word-break:break-all">${esc(S.fileName||'Dosya yok')}</div>${st}<div class="row-actions" style="margin-bottom:0"><button class="btn sm pri" onclick="saveNow()">Kaydet</button><button class="btn sm" onclick="openFile()">Aç</button><button class="btn sm" onclick="lockNow()" title="Kaydet ve şifre ekranına dön">🔒 Kilitle</button></div>${S.fileHandle?'<div class="sub">Değişiklikler dosyaya otomatik yazılır.</div>':''}`;
 }
 function steOpenNow(){return S.steOpen!=null?S.steOpen:(String(S.view).startsWith('ste:')&&S.view!=='ste:raporlar')}
-function go(v){if(!canSee(v)){toast('Bu sayfayı görme yetkin yok.',true);return}if(String(v).startsWith('ste:')&&!String(S.view).startsWith('ste:'))S.steOpen=null;S.view=v;render();window.scrollTo(0,0)}
-function render(){if(needLogin()){showLogin();return}hideLogin();if(!canSee(S.view))S.view='panel';renderSide();if(String(S.view).startsWith('ste:'))steShow();else{steHide();renderMain()}}
+/* ---- STE ek şifresi ---- */
+const steLocked=()=>!!(S.user&&S.user.stePassHash&&!S.steUnlocked);
+function steLockBox(){return `<div class="stelock tw"><div class="sl-ic">🔒</div><h2>STE bölümü şifreli</h2><p class="sub">Devam etmek için <b>${esc(S.user.name||S.user.username)}</b> kullanıcısının STE şifresini gir.</p><form onsubmit="event.preventDefault();steUnlock()" autocomplete="off"><input type="password" id="ste_pw" autocomplete="off" placeholder="STE şifresi"><div id="ste_err" class="pill bad" style="display:none;border-radius:6px;padding:6px 10px">STE şifresi hatalı.</div><button class="btn pri" type="submit">STE’yi aç</button></form></div>`}
+async function steUnlock(){const el=document.getElementById('ste_pw'),v=el.value;if(!v)return;if((await hashPw(v))!==S.user.stePassHash){document.getElementById('ste_err').style.display='block';el.value='';el.focus();return}
+  S.steUnlocked=true;DB.log.unshift({t:new Date().toISOString(),m:'STE bölümü açıldı',u:S.user.name||S.user.username});S.dirty=true;scheduleSave();render()}
+function go(v){if(!String(v).startsWith('ste:')&&String(S.view).startsWith('ste:')&&S.user&&S.user.steAsk!=='once')S.steUnlocked=false;if(!canSee(v)){toast('Bu sayfayı görme yetkin yok.',true);return}if(String(v).startsWith('ste:')&&!String(S.view).startsWith('ste:'))S.steOpen=null;S.view=v;render();window.scrollTo(0,0)}
+function render(){if(needLogin()){showLogin();return}hideLogin();if(!canSee(S.view))S.view='panel';renderSide();if(String(S.view).startsWith('ste:')){if(steLocked()){steHide();document.getElementById('main').innerHTML=head('STE','Bu bölüm ayrı bir şifreyle korunuyor.')+steLockBox();setTimeout(()=>document.getElementById('ste_pw')?.focus(),30)}else steShow()}else{steHide();renderMain()}}
 function renderMain(){if(String(S.view).startsWith('ste:'))return;document.getElementById('main').innerHTML=(VIEWS[S.view]||VIEWS.panel)();if(S.view==='panel'||!VIEWS[S.view])try{dashAfter()}catch(e){console.warn(e)}}
 function head(t,p,tools){const hs=S.view!=='help'&&HELP_MAP[S.view];return `<div class="top"><div><h1>${t}${hs?` <button class="hlp" onclick="helpGo('${hs}')" title="Kullanım kılavuzunda aç">?</button>`:''}</h1>${p?`<p>${p}</p>`:''}</div><div class="tools">${tools||''}</div></div>`}
 
@@ -8986,7 +9061,7 @@ const HELP=[
 <h4>İlk kurulum</h4>
 <ol><li>Sol alttaki <b>Aç</b> düğmesine ya da <b>Dosya ve ayarlar &gt; Kayıt dosyası aç</b>’a bas. Daha önce bir kayıt dosyan yoksa <b>Yeni kayıt dosyası</b> ile başla.</li>
 <li>Kayıt dosyasını bulut klasörüne (iCloud Drive, Google Drive, OneDrive, Dropbox) koyarsan her bilgisayardan ve telefondan aynı dosyayla çalışabilirsin.</li>
-<li><b>Dosya ve ayarlar &gt; Ayarlar</b>’dan firma adını, logonu, varsayılan para birimini ve KDV oranını gir. Logo ve firma adı bütün çıktıların başlığında görünür.</li></ol>
+<li><b>Dosya ve ayarlar &gt; Ayarlar</b>’dan firma adını, logonu, adres ve iletişim bilgilerini (Adres ve iletişim bilgileri kartına tıklayınca açılan pencereden: adres, telefon, e-posta, web, vergi dairesi, vergi/MERSİS no), varsayılan para birimini ve KDV oranını gir. Logo, firma adı ve adres/iletişim bilgileri bütün çıktıların başlığında görünür.</li></ol>
 <h4>Kaydetme</h4>
 <ul><li><b>Chrome ve Edge</b>’de kayıt dosyası bir kez açıldıktan sonra her değişiklik birkaç saniye içinde <b>otomatik</b> kaydedilir. Sol altta “Kaydedildi” ya da “Kaydedilmemiş değişiklik” yazar.</li>
 <li><b>iPhone / iPad (Safari)</b>’de otomatik kayıt yoktur: <b>Kaydet</b>’e bastığında paylaşım menüsü açılır, “Dosyalar’a kaydet” ile aynı dosyanın üzerine kaydedersin.</li>
@@ -9003,7 +9078,9 @@ const HELP=[
 <li><b>Kullanıcı:</b> yalnızca işaretlediğin sayfaları görür (Firmalar, STE, Proformalar, Siparişler, Ürünler, Tedarik, Ar-Ge, Raporlar, kütüphaneler, İşlem kaydı). Genel bakış ve bu kılavuz herkese açıktır.</li>
 <li>Kullanıcıyı <b>Pasif</b> yaparak girişini kapatabilirsin. En az bir aktif yönetici her zaman kalmalıdır.</li></ul>
 <h4>İmza ve değerlendirici bilgileri</h4>
-<p>Kullanıcı kartında <b>İmza</b> bölümünden beyaz ya da şeffaf zeminli imza/kaşe görseli yükle. İmza; iş emri, reçete, proforma, kontrol listesi, rapor ve Ar-Ge çıktılarında “Hazırlayan” alanına basılır. <b>STE / CPSR değerlendirici bilgileri</b> (meslek, yetkinlik, okul, diploma no vb.) CPSR raporlarında güvenlilik değerlendiricisi, STE sözleşmelerinde sorumlu yönetici bilgisi olarak kullanılır.</p>
+<p>Kullanıcı kartında <b>İmza</b> bölümünden beyaz ya da şeffaf zeminli imza/kaşe görseli yükle. İmza; iş emri, reçete, proforma, kontrol listesi, rapor ve Ar-Ge çıktılarında “Hazırlayan” alanına, <b>adın altına</b> basılır (CPSR raporunda değerlendirici tablosunda adın altındaki İmza satırına). <b>Rapor logosu</b> da değerlendirici bilgileri bölümünden yüklenir. CPSR raporunun kapağı için üç kaynak vardır: işte seçilen değerlendiricinin logosu, giriş yapan kullanıcının logosu ve Dosya ve ayarlar’daki firma logosu. Birden fazlası varsa CPSR işinin <b>Değerlendirici</b> sekmesindeki “Rapor kapağındaki logo” bölümünden hangisinin kullanılacağını seçersin; seçim o işe kaydedilir. Seçim yapılmamışsa bu sıradaki ilk logo kullanılır. <b>STE / CPSR değerlendirici bilgileri</b> (meslek, yetkinlik, okul, diploma no vb.) CPSR raporlarında güvenlilik değerlendiricisi, STE sözleşmelerinde sorumlu yönetici bilgisi olarak kullanılır.</p>
+<h4>STE şifresi</h4>
+<p>Kullanıcı kartındaki <b>STE şifresi</b> bölümünden, giriş şifresine ek olarak STE bölümü için ayrı bir şifre belirlenebilir. Tanımlıysa STE sayfalarına girerken şifre ekranı çıkar. <b>Ne zaman sorulsun</b> seçeneğiyle şifre STE’ye <b>her girişte</b> (STE dışına çıkınca yeniden kilitlenir) ya da <b>oturumda bir kez</b> (Kilitle/Çıkış’a kadar açık kalır) sorulur. STE kilitliyken Raporlar’daki STE raporları ve STE eksik bilgiler sekmeleri ile Genel bakıştaki STE özeti de gizlenir. Şifreyi değiştirmek için yeni şifreyi yaz, kaldırmak için “STE şifresini kaldır”ı işaretle.</p>
 <h4>Kilitle ve çıkış</h4>
 <p>Sol alttaki <b>🔒 Kilitle</b> önce kaydeder, sonra şifre ekranını getirir. Masadan kalkarken kullan. <b>Çıkış</b> da aynı şekilde oturumu kapatır.</p>
 <div class="hwarn">⚠️ Giriş kontrolü kimin hangi ekranı göreceğini düzenler; kayıt dosyası şifrelenmez. Bulut klasörünün paylaşım ayarlarını kontrol et. Yönetici şifresini unutursan dosyaya giremezsin; şifreyi güvenli bir yerde sakla.</div>`},
@@ -9035,6 +9112,7 @@ const HELP=[
 <ul><li><b>Liste görünümü:</b> INCI sütunu, karışımdaki INCI’leri büyükten küçüğe düz metin olarak tek satırda gösterir; ekrana sığmayan kısım “…” ile kısalır (üzerine gelince tamamı görünür, tam liste hammadde kartında). “Ürün” sütunundaki sayıya tıklayınca hammaddenin kullanıldığı ürünler firma gruplarıyla ve üründeki oranıyla açılır.</li>
 <li><b>Hammadde kartı:</b> INCI tablosunun altında INCI’ler büyükten küçüğe düz metin olarak yazar (Kopyala ile alabilirsin). “Kullanıldığı ürünler” açılır bir gruptur; ürünler firmalara göre listelenir, tıklayınca ürün açılır.</li>
 <li><b>Yüzdeler:</b> Hammadde, formül ve INCI oranları en az 2 ondalıkla (90,00 · 0,50) gösterilir; gerekirse daha fazla basamak görünür (0,0015). Değerler girdiğin hassasiyetle saklanır. Basamak sayısını <b>Dosya ve ayarlar &gt; Ayarlar &gt; Yüzde gösterimi</b>’nden değiştirebilirsin.</li>
+<li><b>Kodlar tekildir:</b> Bir kod yalnızca bir hammaddeye (ambalajda bir ambalaja) ait olabilir. Kod alanına yazarken kod başka bir kayıtta varsa kırmızı uyarı ve “Kaydı aç” bağlantısı çıkar, kaydedilmez. Kod daha önce silinmiş, birleştirilmiş ya da değiştirilmiş bir kayda aitse turuncu uyarı çıkar; kaydederken eski kaydın adı ve tarihiyle onay istenir, istersen aynı kodla devam edersin. Excel aktarımında bu satırlar “kod önceden kullanılmış” etiketiyle görünür.</li>
 <li><b>Eksik bilgiler</b> (arama kutusunun yanı): kod, tedarikçi, INCI, oran toplamı, INCI kütüphanesinde olmayan INCI ve fonksiyonu eksik hammaddeleri süzer; her satırın altında neyin eksik olduğu yazar.</li>
 <li><b>Tekrarları bul ve birleştir:</b> adı ya da kodu aynı kayıtları gruplar. Korunacak kaydı seçip birleştirirsin; formüller, eski revizyonlar, Ar-Ge denemeleri ve tedarik kayıtları korunan kayda bağlanır. Kart içindeki <b>Birleştir</b> düğmesi tek tek birleştirme yapar.</li>
 <li><b>Kütüphane yedeği al / Yedekten yükle:</b> hammadde, ambalaj ve INCI kütüphanelerini birlikte yedekler.</li></ul>`},
@@ -9047,7 +9125,7 @@ const HELP=[
 <li><b>Listeleri yönetme:</b> “Renk, tür, birim ve materyal listeleri” düğmesi bütün seçim listelerini tek pencerede açar. Her kaydın yanında onu kullanan ambalaj sayısı yazar; hiç kullanılmayanlar soluk görünür. ✕ ile tek tek, “Kullanılmayan … kaydı sil” ile topluca silersin. Kullanılan bir kaydı silmek ambalajlardaki değeri değiştirmez, sadece listeden kaldırır. Eklediğin türün kontrol listesinde hangi kutucuğa sayılacağını da burada seçersin; hazır türler silinemez.</li>
 <li><b>Farklı renk/hacim kopyası</b> bir ambalajın benzerini hızlıca oluşturur.</li>
 <li>Excel sütunları: <code>Kod · Ambalaj Adı · Tür · Birim Hacim · Ağız Çapı · Renk · Materyal · Tedarikçi · Not</code>.</li>
-<li>Eksik bilgiler, tekrarları birleştirme ve kütüphane yedeği hammadde kütüphanesindeki gibi çalışır.</li></ul>
+<li>Eksik bilgiler, kod tekilliği ve silinmiş kod uyarısı, tekrarları birleştirme ve kütüphane yedeği hammadde kütüphanesindeki gibi çalışır.</li></ul>
 <p>Ambalajlar STE’deki CPSR işlerine de otomatik gelir (kapaklar “Kapatma/Dağıtım Sistemi”, etiket ve kutular “Diğer” grubunda).</p>`},
 
 {id:'urunler',t:'7. Ürünler ve formüller',go:'products',h:`
@@ -9105,13 +9183,20 @@ const HELP=[
 <p>Hammadde ve ambalaj satın alma süreci burada izlenir. Kalem; malzeme, miktar, ihtiyaç tarihi ve bağlı siparişle açılır (kontrol listesindeki “+ Tedarik” ile de).</p>
 <ul><li>Durumlar: <b>Teklif bekleniyor → Teklif alındı → Sipariş verildi → Teslim alındı</b> (ya da İptal).</li>
 <li><b>Teklif ekle</b>: tedarikçi, birim fiyat, para birimi, termin, minimum sipariş, geçerlilik ve ödeme şartı. En uygun teklifi <b>Seç</b>; seçilen teklif yeşil görünür.</li>
+<li><b>Döviz teklifleri ve KDV</b>: Para birimi USD ya da EUR seçilince <b>Kur</b> alanı açılır (1 USD = ? TL). Toplam tutar kurla çarpılıp <b>TL karşılığı</b> gösterilir. <b>KDV %</b> yazılırsa tutar KDV dahil (TL) olarak da gösterilir. Son girilen kur ve KDV oranı bir sonraki teklif için hazır gelir. Fiyatı yazarken formun altında tutar, TL karşılığı ve KDV dahil tutar anında hesaplanır. Farklı para birimlerinde teklif varsa TL karşılığına göre en ucuz olan “En düşük (TL)” etiketi alır. Karşılaştırma çıktısında ve Excel’de Kur, TL tutar, KDV ve KDV dahil sütunları yer alır.</li>
+<li><b>Teklifi düzenle</b>: teklif satırındaki ✎ ile tedarikçi, fiyat, para birimi, tarih, termin, minimum sipariş, geçerlilik, ödeme şartı ve not değiştirilebilir. Değişiklik eski ve yeni fiyatla işlem kaydına yazılır.</li>
+<li><b>Sipariş verildi</b> seçildiğinde (durum düğmesinden ya da Düzenle ekranından) kalemde teklif varsa hangi teklife sipariş verildiği sorulur; en düşük ya da önceden seçilmiş teklif hazır işaretli gelir, sipariş tarihi de girilebilir. “Teklif belirtmeden” seçeneği de vardır. Seçilen teklif yeşil ve “Sipariş verilen” etiketiyle görünür; detaydaki <b>değiştir</b> ile sonradan başka teklif seçilebilir.</li>
 <li><b>Önceki fiyat</b>: aynı malzemenin önceki teklifinden otomatik gelir ve güncel teklifle farkı ▲/▼ yüzde olarak gösterilir. İstersen <b>elle gir</b> ile önceki fiyatı kendin yazarsın.</li>
 <li><b>Karşılaştırmayı yazdır</b> teklifleri yan yana çıkarır.</li></ul>`},
 
 {id:'arge',t:'12. Ar-Ge',go:'rnd',h:`
 <p>Yeni ürün ve formül geliştirme projeleri. Proje; ad, kategori, müşteri firma (ya da iç proje), varsa değiştirilecek mevcut ürün, hedef tarih ve talep/hedefler (görünüm, koku, pH, viskozite, maliyet…) ile açılır.</p>
 <ul><li>Durumlar: Talep / fikir → Formülasyon → Numune gönderildi → Stabilite testi → Müşteri onayı bekleniyor → Onaylandı (ya da Müşteri reddetti / İptal).</li>
-<li><b>Denemeler (D1, D2…)</b>: formül, hazırlama adımları, yığın (g), pH, viskozite, görünüm, renk/koku, gözlem ve sonuç. Yeni deneme boş, mevcut üründen ya da bir önceki denemeden kopyalanarak başlatılabilir.</li>
+<li><b>Denemeler (D1, D2…)</b>: formül, hazırlama adımları, yığın (g), gözlem ve sonuç. Yeni deneme boş, mevcut üründen ya da bir önceki denemeden kopyalanarak başlatılabilir (kopyada hedef değerler de gelir).</li>
+<li><b>Fiziksel-kimyasal özellikler</b>: görünüm, renk, koku, pH, viskozite ve ölçüm koşulu, yoğunluk, kırılma indisi, kuru madde, emülsiyon tipi, santrifüj testi. Her biri için ölçüm sonucu ve hedef/spesifikasyon girilir. Deneme çıktısında bu tablo Hedef, Sonuç ve boş <b>Not</b> sütunuyla yer alır; girilmeyen değerler laboratuvarda elle doldurmak için boş kalır. Hangi özelliklerin çıktıda yer alacağını deneme formundaki <b>Çıktıda</b> kutucuklarıyla seçersin (varsayılan: görünüm, renk, koku, pH, viskozite ve değeri ya da hedefi girilenler). Çıktı tek A4 sayfaya sığacak şekilde düzenlenir: fiziksel-kimyasal tablo ile gözlem/stabilite/müşteri değerlendirmesi yan yana basılır, içerik çoksa yazı boyutu otomatik küçülür.</li>
+<li><b>Deneme ekranı açılır gruplar</b> hâlindedir: Fiziksel-kimyasal özellikler, Formül, INCI bileşimi, Notlar ve kayıtlar, Müşteri değerlendirmesi, Stabilite takibi. Başlığa tıklayınca açılır/kapanır; başlıkta kısa özet görünür. Açtığın gruplar oturum boyunca açık kalır.</li>
+<li><b>Notlar ve kayıtlar</b>: denemeye tarihli notlar eklenir (ekleyen kullanıcı da yazılır); çıktıda notlar ve elle not almak için boş satırlar yer alır.</li>
+<li><b>Faz sıralaması</b>: formülde (Ar-Ge denemesi ve Ürünler ve formüller) aynı fazdaki satırlar bir araya toplanır; fazlar A, B, C… sırasıyla, faz içinde hammaddeler % büyükten küçüğe sıralanır. Faz seçildiğinde satır yerine taşınır, kaydederken tüm formül sıralanır; ayrıca “⇅ Fazlara göre sırala” düğmesi vardır. Yalnızca sıranın değişmesi ürüne yeni revizyon açmaz.</li>
 <li><b>Stabilite takibi</b>: 25 °C, 40 °C, 4 °C, ışık, dondur-çöz koşullarında gün gün ölçüm ve “uygun / sorun var” kaydı.</li>
 <li><b>Müşteri değerlendirmesi</b>: Denemenin içinde numune gönderim ve yanıt tarihi, değerlendiren kişi, müşterinin kararı (değerlendirme bekleniyor, onayladı, revizyon istedi, reddetti, orijinal ürünle devam) ve kriterler (koku, renk, kıvam, görünüm, cilt hissi, etki, ambalaj, fiyat) için 👍/👎 ile yorum ve sonraki adım kaydedilir. “Teknik sonuç” (laboratuvarda başarılı mı) ile “müşteri kararı” ayrı tutulur; bir deneme teknik olarak başarılı olup müşteri tarafından reddedilebilir. Karar “Reddetti” ya da “Orijinal ürünle devam” olursa proje <b>Müşteri reddetti</b> olarak kapatılabilir; nedeni proje kartında “Proje sonucu” olarak görünür ve Ar-Ge listesinde ayrı sekmede listelenir. “Revizyon istedi” kararında tek tuşla o denemeden yeni deneme açılır, “Onayladı” kararında “Ürüne aktar” önerilir.</li>
 <li><b>Ürüne aktar</b>: başarılı denemeyi yeni ürün olarak açar ya da mevcut ürüne yeni revizyon olarak işler.</li>
@@ -9202,13 +9287,13 @@ function hideLogin(){document.getElementById('login').style.display='none';docum
 async function doLogin(){const un=document.getElementById('lg_u').value.trim(),pw=document.getElementById('lg_p').value,err=document.getElementById('lg_err');
   const u=activeUsers().find(x=>norm(x.username)===norm(un));const h=await hashPw(pw);
   if(!u||u.passHash!==h){err.textContent='Kullanıcı adı ya da şifre hatalı.';err.style.display='block';return}
-  err.style.display='none';document.getElementById('lg_p').value='';S.user=u;u.lastLogin=new Date().toISOString();DB.log.unshift({t:u.lastLogin,m:'Giriş yapıldı',u:u.name||u.username});S.dirty=true;scheduleSave();render();steSync()}
+  err.style.display='none';document.getElementById('lg_p').value='';S.user=u;S.steUnlocked=false;u.lastLogin=new Date().toISOString();DB.log.unshift({t:u.lastLogin,m:'Giriş yapıldı',u:u.name||u.username});S.dirty=true;scheduleSave();render();steSync()}
 async function lockNow(){
   if(!activeUsers().length){toast('Kilitlemek için önce bir kullanıcı (yönetici) hesabı oluştur.',true);if(isAdm())go('users');return}
   if(S.dirty){await saveNow(false);if(S.dirty&&!confirm('Değişiklikler kaydedilemedi. Yine de kilitlensin mi? (Kilit açılınca veriler yerinde olur, ama dosyaya henüz yazılmadı.)'))return}
   DB.log.unshift({t:new Date().toISOString(),m:'Sistem kilitlendi',u:S.user?(S.user.name||S.user.username):''});if(S.fileHandle){S.dirty=true;scheduleSave()}
-  S.user=null;closeModal();render();toast('Kaydedildi ve kilitlendi.')}
-function logout(){if(S.dirty&&S.fileHandle)saveNow(true);DB.log.unshift({t:new Date().toISOString(),m:'Çıkış yapıldı',u:S.user?(S.user.name||S.user.username):''});S.user=null;closeModal();S.view='panel';render()}
+  S.user=null;S.steUnlocked=false;closeModal();render();toast('Kaydedildi ve kilitlendi.')}
+function logout(){if(S.dirty&&S.fileHandle)saveNow(true);DB.log.unshift({t:new Date().toISOString(),m:'Çıkış yapıldı',u:S.user?(S.user.name||S.user.username):''});S.user=null;S.steUnlocked=false;closeModal();S.view='panel';render()}
 const usersView=()=>{
   const U=DB.users;
   return head('Kullanıcılar','Sistemi kimlerin kullanacağını ve hangi sayfaları göreceğini belirle.',`<button class="btn" onclick="importCpsrUsers()">CPSR kullanıcılarını aktar</button><button class="btn pri" onclick="userForm()">＋ Kullanıcı ekle</button>`)+
@@ -9218,7 +9303,7 @@ const usersView=()=>{
 };
 function userForm(id){
   const u=id?DB.users.find(x=>x.id===id):{role:DB.users.length?'kullanici':'yonetici',pages:PERM_PAGES.map(p=>p[0]),active:true};
-  ED={kind:'user',sig:u.sig||''};
+  ED={kind:'user',sig:u.sig||'',logo:u.logo||''};
   const first=!DB.users.length;
   openModal('usr'+(id||''),id?(u.name||u.username):(first?'Yönetici hesabı oluştur':'Yeni kullanıcı'),`<div class="fg">
     <label class="f"><span>Ad soyad *</span><input id="u_name" value="${esc(u.name||'')}"></label>
@@ -9229,10 +9314,14 @@ function userForm(id){
     <label class="f"><span>Durum</span><select id="u_active"><option value="1" ${u.active!==false?'selected':''}>Aktif</option><option value="0" ${u.active===false?'selected':''}>Pasif (giriş yapamaz)</option></select></label></div>
     <div class="sec" id="permBox" style="${u.role==='yonetici'?'display:none':''}"><h3>Görebileceği sayfalar</h3><p class="sub" style="margin-top:0">Genel bakış herkese açık. Dosya ve ayarlar ile Kullanıcılar sadece yöneticilere açık.</p><div class="permgrid">${PERM_PAGES.map(([k,l])=>`<label><input type="checkbox" class="perm" value="${k}" ${(u.pages||[]).includes(k)?'checked':''}> ${l}</label>`).join('')}</div></div>
     <div class="sec"><h3>İmza <label class="btn sm" style="cursor:pointer">İmza görseli yükle<input type="file" accept="image/*" style="display:none" onchange="sigAdd(this)"></label></h3><div id="sigBox"></div><p class="sub" style="margin:4px 0 0">Beyaz ya da şeffaf zeminli bir imza (veya imza + kaşe) görseli yükle. İmza; iş emri, reçete, proforma ve rapor çıktılarında “Hazırlayan” alanına, STE’de CPSR değerlendirici bölümüne ve STE sözleşmelerine eklenir.</p></div>
-    <details class="sec"><summary style="cursor:pointer;font-weight:600">STE / CPSR değerlendirici bilgileri</summary><p class="sub">CPSR raporlarında güvenlilik değerlendiricisi ve STE sözleşmelerinde sorumlu yönetici bilgisi olarak kullanılır.</p><div class="fg"><label class="f"><span>Meslek / unvan</span><input id="u_meslek" value="${esc(u.meslek||'')}" placeholder="Kimya mühendisi, eczacı…"></label><label class="f wide"><span>Yetkinlik (CPSR değerlendirici)</span><input id="u_yetkinlik" value="${esc(u.yetkinlik||'')}" placeholder="Güvenlilik değerlendirici yetkinliği"></label><label class="f"><span>Mezun olduğu okul</span><input id="u_mezunOkul" value="${esc(u.mezunOkul||'')}" placeholder=""></label><label class="f"><span>Diploma no</span><input id="u_diplomaNo" value="${esc(u.diplomaNo||'')}" placeholder=""></label><label class="f"><span>Doğum yeri ve tarihi</span><input id="u_dogumYeriTarihi" value="${esc(u.dogumYeriTarihi||'')}" placeholder=""></label><label class="f wide"><span>İkametgâh adresi</span><input id="u_ikametgahAdresi" value="${esc(u.ikametgahAdresi||'')}" placeholder=""></label><label class="f"><span>IBAN</span><input id="u_iban" value="${esc(u.iban||'')}" placeholder="TR.."></label><label class="f"><span>Meslek örgütü / sicil</span><input id="u_meslekOrgutu" value="${esc(u.meslekOrgutu||'')}" placeholder=""></label></div></details>`,
+    <div class="sec"><h3>STE şifresi</h3><p class="sub" style="margin-top:0">İsteğe bağlı. Tanımlanırsa bu kullanıcı STE bölümüne girerken giriş şifresine ek olarak bu şifreyi de girer.${u.stePassHash?' <b>Şu an STE şifresi tanımlı.</b>':''}</p><div class="fg"><label class="f"><span>${u.stePassHash?'Yeni STE şifresi (değiştirmeyeceksen boş bırak)':'STE şifresi'}</span><input id="u_stepw" type="password" autocomplete="new-password"></label><label class="f"><span>STE şifresi (tekrar)</span><input id="u_stepw2" type="password" autocomplete="new-password"></label><label class="f"><span>Ne zaman sorulsun</span><select id="u_steask"><option value="each">STE’ye her girişte</option><option value="once" ${u.steAsk==='once'?'selected':''}>Oturumda bir kez (kilitleyene kadar)</option></select></label>${u.stePassHash?'<div class="f"><span>&nbsp;</span><label style="display:flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" id="u_stepwdel" style="width:auto"> STE şifresini kaldır</label></div>':''}</div></div>
+    <details class="sec"><summary style="cursor:pointer;font-weight:600">STE / CPSR değerlendirici bilgileri</summary><p class="sub">CPSR raporlarında güvenlilik değerlendiricisi ve STE sözleşmelerinde sorumlu yönetici bilgisi olarak kullanılır.</p><div class="fg"><label class="f"><span>Meslek / unvan</span><input id="u_meslek" value="${esc(u.meslek||'')}" placeholder="Kimya mühendisi, eczacı…"></label><label class="f wide"><span>Yetkinlik (CPSR değerlendirici)</span><input id="u_yetkinlik" value="${esc(u.yetkinlik||'')}" placeholder="Güvenlilik değerlendirici yetkinliği"></label><label class="f"><span>Mezun olduğu okul</span><input id="u_mezunOkul" value="${esc(u.mezunOkul||'')}" placeholder=""></label><label class="f"><span>Diploma no</span><input id="u_diplomaNo" value="${esc(u.diplomaNo||'')}" placeholder=""></label><label class="f"><span>Doğum yeri ve tarihi</span><input id="u_dogumYeriTarihi" value="${esc(u.dogumYeriTarihi||'')}" placeholder=""></label><label class="f wide"><span>İkametgâh adresi</span><input id="u_ikametgahAdresi" value="${esc(u.ikametgahAdresi||'')}" placeholder=""></label><label class="f"><span>IBAN</span><input id="u_iban" value="${esc(u.iban||'')}" placeholder="TR.."></label><label class="f"><span>Meslek örgütü / sicil</span><input id="u_meslekOrgutu" value="${esc(u.meslekOrgutu||'')}" placeholder=""></label></div>
+    <div class="f wide" style="margin-top:8px"><span>Rapor logosu (CPSR raporlarının kapağında)</span><div class="logo-row" id="ulogoBox"></div><p class="sub" style="margin:4px 0 0">Bu kullanıcı CPSR işinde güvenlilik değerlendiricisi seçildiğinde raporda bu logo kullanılır; değerlendirici seçilmemişse giriş yapan kullanıcının logosu kullanılır.</p></div></details>`,
    `${id?`<button class="btn bad sp" onclick="delUser('${id}')">Sil</button>`:''}<button class="btn" onclick="closeModal()">Vazgeç</button><button class="btn pri" onclick="saveUser('${id||''}')">Kaydet</button>`);
-  sigRender();
+  sigRender();ulogoRender();
 }
+function ulogoRender(){const b=document.getElementById('ulogoBox');if(!b)return;b.innerHTML=`${ED.logo?`<img src="${ED.logo}" class="logo-prev" alt="Logo">`:'<span class="sub">Logo yüklenmedi</span>'}<label class="btn sm" style="cursor:pointer">${ED.logo?'Logoyu değiştir':'Logo yükle'}<input type="file" accept="image/*" style="display:none" onchange="ulogoAdd(this)"></label>${ED.logo?'<button class="btn sm bad" onclick="ED.logo=\'\';ulogoRender()">Kaldır</button>':''}`}
+function ulogoAdd(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{const img=new Image();img.onload=()=>{const sc=Math.min(1,400/img.width,400/img.height),c=document.createElement('canvas');c.width=Math.round(img.width*sc);c.height=Math.round(img.height*sc);c.getContext('2d').drawImage(img,0,0,c.width,c.height);ED.logo=c.toDataURL('image/png');ulogoRender()};img.onerror=()=>toast('Görsel okunamadı.',true);img.src=r.result};r.readAsDataURL(f);inp.value=''}
 function sigRender(){const b=document.getElementById('sigBox');if(!b)return;b.innerHTML=ED.sig?`<div class="sigprev"><img src="${ED.sig}" alt="İmza"><button class="btn sm bad" onclick="ED.sig='';sigRender()">Kaldır</button></div>`:'<div class="sub">İmza yüklenmedi.</div>'}
 function sigAdd(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{const img=new Image();img.onload=()=>{const sc=Math.min(1,600/img.width,220/img.height),c=document.createElement('canvas');c.width=Math.round(img.width*sc);c.height=Math.round(img.height*sc);c.getContext('2d').drawImage(img,0,0,c.width,c.height);ED.sig=c.toDataURL('image/png');sigRender()};img.onerror=()=>toast('Görsel okunamadı.',true);img.src=r.result};r.readAsDataURL(f);inp.value=''}
 async function saveUser(id){
@@ -9241,13 +9330,15 @@ async function saveUser(id){
   if(DB.users.some(x=>norm(x.username)===norm(g('username'))&&x.id!==id)){toast('Bu kullanıcı adı kullanılıyor.',true);return}
   const pw=document.getElementById('u_pw').value,pw2=document.getElementById('u_pw2').value;
   if(!id&&!pw){toast('Şifre gir.',true);return}if(pw&&pw!==pw2){toast('Şifreler eşleşmiyor.',true);return}if(pw&&pw.length<4){toast('Şifre en az 4 karakter olmalı.',true);return}
+  const spw=document.getElementById('u_stepw').value,spw2=document.getElementById('u_stepw2').value;if(spw&&spw!==spw2){toast('STE şifreleri eşleşmiyor.',true);return}if(spw&&spw.length<4){toast('STE şifresi en az 4 karakter olmalı.',true);return}
   const role=first?'yonetici':g('role'),active=g('active')==='1';
   const others=DB.users.filter(x=>x.id!==id&&x.role==='yonetici'&&x.active!==false);
   if(id&&!others.length&&(role!=='yonetici'||!active)){toast('En az bir aktif yönetici kalmalı.',true);return}
   const u=id?DB.users.find(x=>x.id===id):{id:uid(),created:new Date().toISOString()};
-  Object.assign(u,{name:g('name'),username:g('username'),role,active,pages:[...document.querySelectorAll('.perm:checked')].map(x=>x.value),sig:ED&&ED.kind==='user'?ED.sig:(u.sig||'')});
+  Object.assign(u,{name:g('name'),username:g('username'),role,active,pages:[...document.querySelectorAll('.perm:checked')].map(x=>x.value),sig:ED&&ED.kind==='user'?ED.sig:(u.sig||''),logo:ED&&ED.kind==='user'?ED.logo:(u.logo||'')});
   u.meslek=g('meslek');u.yetkinlik=g('yetkinlik');u.mezunOkul=g('mezunOkul');u.diplomaNo=g('diplomaNo');u.dogumYeriTarihi=g('dogumYeriTarihi');u.ikametgahAdresi=g('ikametgahAdresi');u.iban=g('iban');u.meslekOrgutu=g('meslekOrgutu');
   if(pw)u.passHash=await hashPw(pw);
+  if(spw)u.stePassHash=await hashPw(spw);else if(document.getElementById('u_stepwdel')?.checked)delete u.stePassHash;u.steAsk=g('steask');
   if(!id)DB.users.push(u);if(first||(S.user&&S.user.id===u.id))S.user=u;
   closeModal();touch(`Kullanıcı ${id?'güncellendi':'eklendi'}: ${u.username}`);steSync();if(first)toast('Yönetici hesabı oluşturuldu. Bu dosya bundan sonra şifreyle açılacak.');
 }
@@ -9288,7 +9379,7 @@ function steUserName(){return S.user?(S.user.name||S.user.username):''}
 function steSeenProducts(){return Array.isArray(DB.steSeen)?DB.steSeen:null}
 function steSetSeen(a){DB.steSeen=a;S.dirty=true;scheduleSave()}
 function steCurrentUsername(){return S.user?S.user.username:''}
-function steYkuUsers(){return DB.users.filter(u=>u.active!==false).map(u=>({kullaniciAdi:u.username,adSoyad:u.name||u.username,role:u.role==='yonetici'?'yonetici':'kayitli',passHash:u.passHash||'',imzaData:u.sig||'',meslek:u.meslek||'',yetkinlik:u.yetkinlik||'',mezunOkul:u.mezunOkul||'',diplomaNo:u.diplomaNo||'',dogumYeriTarihi:u.dogumYeriTarihi||'',ikametgahAdresi:u.ikametgahAdresi||'',iban:u.iban||'',meslekOrgutu:u.meslekOrgutu||''}))}
+function steYkuUsers(){return DB.users.filter(u=>u.active!==false).map(u=>({kullaniciAdi:u.username,adSoyad:u.name||u.username,role:u.role==='yonetici'?'yonetici':'kayitli',passHash:u.passHash||'',imzaData:u.sig||'',logoData:u.logo||'',meslek:u.meslek||'',yetkinlik:u.yetkinlik||'',mezunOkul:u.mezunOkul||'',diplomaNo:u.diplomaNo||'',dogumYeriTarihi:u.dogumYeriTarihi||'',ikametgahAdresi:u.ikametgahAdresi||'',iban:u.iban||'',meslekOrgutu:u.meslekOrgutu||''}))}
 function steAddMaterial(d){if(d.id&&mat(d.id))return d.id;const m={id:d.id||uid(),code:String(d.code||'').trim(),name:d.name||d.code||'Hammadde',components:(d.components||[]).map(c=>({inci:c.inci,pct:pn(c.pct),func:c.func||''})),func:'',supplier:d.supplier||'',note:d.note||''};syncMatInci(m);DB.materials.push(m);S.dirty=true;scheduleSave();return m.id}
 function steAddPack(d){if(d.id&&pack(d.id))return d.id;const T=packTypes(),ty=T.find(t=>norm(t)===norm(d.type))||guessPackType(d.name);const k={id:d.id||uid(),code:d.code||'',name:d.name||'Ambalaj',type:ty,volume:d.volume||'',neck:d.neck||'',color:d.color||'',material:d.material||'',supplier:d.supplier||'',note:d.note||'',images:d.images||[]};DB.packs.push(k);S.dirty=true;scheduleSave();return k.id}
 function steFillMaterialComps(id,comps){const m=mat(id);if(!m||(m.components||[]).length||!(comps||[]).length)return;m.components=comps.map(c=>({inci:c.inci,pct:pn(c.pct),func:c.func||''}));syncMatInci(m);S.dirty=true;scheduleSave()}
@@ -9511,7 +9602,7 @@ VIEWS.panel=()=>{
     dcard('sup','Açık tedarik kalemleri',` <button class="btn link" onclick="go('supply')">Tedarik</button>`,dlist(supO.map(x=>`<tr class="click" onclick="supplyDetail('${x.id}')"><td><b>${esc(supName(x))}</b><div class="sub">${fmtQ(x.qty)} ${esc(x.unit)}</div></td><td>${supPill(x.status)}</td><td class="r">${fmtD(x.needDate)}</td></tr>`),'Açık tedarik kalemi yok.')),
     dcard('late','Termini geçen siparişler','',dlist(late.slice(0,8).map(ordRow),'Termini geçen sipariş yok.')),
     dcard('rnd','Devam eden Ar-Ge projeleri',` <button class="btn link" onclick="go('rnd')">Ar-Ge</button>`,dlist(rndO.map(x=>`<tr class="click" onclick="rndDetail('${x.id}')"><td><b>${esc(x.name)}</b><div class="sub">${esc(x.no)}${x.firmId?', '+esc(firmName(x.firmId)):''}</div></td><td>${rndPill(x.status)}</td><td class="r">${x.trials.length} deneme</td></tr>`),'Devam eden Ar-Ge projesi yok.')),
-    dcard('ste','STE özeti',canSee('ste:x')?` <button class="btn link" onclick="go('ste:dashboard')">Genel bilgiler</button>`:'',canSee('ste:x')?`<div class="stats" style="margin:4px 0 0"><span><b>${(SL.firms||[]).length}</b>STE firması</span><span><b>${(st['cpsr-products']||[]).length}</b>CPSR işi</span><span><b>${steJobs}</b>açık yapılan iş</span><span><b>${fmtN(stePay)} ₺</b>bu ay tahsilat</span></div>`:'<div class="sub">STE yetkin yok.</div>'),
+    dcard('ste','STE özeti',canSee('ste:x')?` <button class="btn link" onclick="go('ste:dashboard')">Genel bilgiler</button>`:'',canSee('ste:x')&&steLocked()?'<div class="sub">🔒 STE şifreli. Özeti görmek için Genel bilgiler’e girip STE şifresini gir.</div>':canSee('ste:x')?`<div class="stats" style="margin:4px 0 0"><span><b>${(SL.firms||[]).length}</b>STE firması</span><span><b>${(st['cpsr-products']||[]).length}</b>CPSR işi</span><span><b>${steJobs}</b>açık yapılan iş</span><span><b>${fmtN(stePay)} ₺</b>bu ay tahsilat</span></div>`:'<div class="sub">STE yetkin yok.</div>'),
     dcard('log','Son işlemler',` <button class="btn link" onclick="go('log')">İşlem kaydı</button>`,dlist(DB.log.slice(0,8).map(l=>`<tr><td class="sub" style="white-space:nowrap">${new Date(l.t).toLocaleString('tr-TR',{dateStyle:'short',timeStyle:'short'})}</td><td>${esc(l.m)}</td></tr>`),'Kayıt yok.'))];
   return head('Genel bakış',esc(DB.settings.company)||'Proforma, formül ve sipariş takibi',`<button class="btn" id="dashEditBtn" onclick="dashEdit()">${S.dashEdit?'✓ Düzenlemeyi bitir':'⚙️ Kartları düzenle'}</button><button class="btn" onclick="proformaForm()">＋ Proforma gir</button><button class="btn pri" onclick="orderForm()">＋ Sipariş aç</button>`)+
   (welcome?`<div class="sec tw"><div class="empty"><b>Başlamak için kayıt dosyanı aç ya da yeni bir tane oluştur.</b><br>Sonra hammadde kütüphanesini ve firmaların ürün formüllerini Excel’den aktarabilirsin.<br><button class="btn pri" onclick="openFile()">Kayıt dosyası aç</button> <button class="btn" onclick="newFile()">Yeni kayıt dosyası</button></div></div>`:'')+
@@ -9641,14 +9732,17 @@ function exportNeeds(){
 VIEWS.file=()=>{
   const s=DB.settings;
   return head('Dosya ve ayarlar','Veriler tarayıcıda tutulmaz; yalnızca seçtiğin kayıt dosyasına yazılır.')+
-  `<div class="grid2"><div class="sec"><h3>Kayıt dosyası</h3><div class="tw" style="padding:14px">
+  `<div class="sec"><h3>Firma bilgileri</h3><div class="tw" style="padding:14px"><div class="fg cofg" style="margin:0">
+    <label class="f wide"><span>Firma adı (çıktılarda başlık)</span><input value="${esc(s.company)}" onchange="DB.settings.company=this.value;touch('Ayarlar güncellendi')"></label>
+    <div class="f wide"><span>Adres ve iletişim bilgileri</span><button type="button" class="coinfo-card" onclick="coForm()" title="Düzenlemek için tıkla">${coInfo().length?`<span class="coinfo-t">${coInfo().map(t=>esc(t)).join(' · ')}</span>`:'<span class="sub">Adres, telefon, e-posta, web ve vergi bilgileri girilmedi</span>'}<span class="coedit">Düzenle ›</span></button></div>
+    <div class="f wide"><span>Logo (çıktılarda firma adının yanında)</span><div class="logo-row">${s.logo?`<img src="${s.logo}" class="logo-prev" alt="Logo">`:'<span class="sub">Logo yüklenmedi</span>'}<button class="btn sm" onclick="document.getElementById('logoIn').click()">${s.logo?'Logoyu değiştir':'Logo yükle'}</button>${s.logo?'<button class="btn sm bad" onclick="removeLogo()">Kaldır</button>':''}</div></div>
+  </div></div></div>
+  <div class="grid2"><div class="sec"><h3>Kayıt dosyası</h3><div class="tw" style="padding:14px">
     <p style="margin-top:0"><b>${esc(S.fileName||'Henüz dosya seçilmedi')}</b><br><span class="sub">${S.fileHandle?'Değişiklikler bu dosyaya otomatik yazılıyor.':hasFS?'Dosya açınca değişiklikler otomatik kaydedilir.':'Bu cihazda (iPhone/iPad) Kaydet, dosyayı paylaşım menüsüyle verir: “Dosyalar’a Kaydet” ile bulut klasörüne aynı adla kaydet.'}</span></p>
     <div class="row-actions"><button class="btn pri" onclick="openFile()">Kayıt dosyası aç</button><button class="btn" onclick="saveNow()">Kaydet</button><button class="btn" onclick="saveAs()">Farklı kaydet</button><button class="btn" onclick="newFile()">Yeni kayıt dosyası</button></div>
     <p class="sub" style="margin-bottom:0">Yedek alma ve geri yükleme aşağıdaki “Yedekler” bölümünde: YKU, STE ve ikisini birlikte içeren tam yedek.</p>
   </div></div>
   <div class="sec"><h3>Ayarlar</h3><div class="tw" style="padding:14px"><div class="fg" style="margin:0">
-    <label class="f wide"><span>Firma adı (çıktılarda başlık)</span><input value="${esc(s.company)}" onchange="DB.settings.company=this.value;touch('Ayarlar güncellendi')"></label>
-    <div class="f wide"><span>Logo (çıktılarda firma adının yanında)</span><div class="logo-row">${s.logo?`<img src="${s.logo}" class="logo-prev" alt="Logo">`:'<span class="sub">Logo yüklenmedi</span>'}<button class="btn sm" onclick="document.getElementById('logoIn').click()">${s.logo?'Logoyu değiştir':'Logo yükle'}</button>${s.logo?'<button class="btn sm bad" onclick="removeLogo()">Kaldır</button>':''}</div></div>
     <label class="f"><span>Varsayılan para birimi</span><select onchange="DB.settings.currency=this.value;touch('Ayarlar güncellendi')">${CURS.map(c=>`<option ${c===s.currency?'selected':''}>${c}</option>`).join('')}</select></label>
     <label class="f"><span>Varsayılan KDV %</span><input inputmode="decimal" value="${numIn(s.kdv)}" onchange="DB.settings.kdv=pn(this.value);touch('Ayarlar güncellendi')"></label>
     <label class="f"><span>Yüzde (%) gösterimi: en az ondalık</span><select onchange="DB.settings.pctMin=+this.value;if((DB.settings.pctMax??6)<+this.value)DB.settings.pctMax=+this.value;touch('Yüzde gösterimi güncellendi')">${[0,1,2,3,4].map(n=>`<option ${n===(s.pctMin??2)?'selected':''} value="${n}">${n} basamak</option>`).join('')}</select></label>
@@ -9658,10 +9752,9 @@ VIEWS.file=()=>{
   <div class="sec"><h3>Yedekler</h3><p class="sub" style="margin-top:0">Beş yedek: yalnızca YKU, yalnızca STE, ikisi birlikte (tam yedek), yalnızca kütüphaneler ve yalnızca ürünler ve formüller. Her birinin kendi yedek klasörü olabilir; klasör seçersen kaydederken saatte bir otomatik yedek alınır. Hammadde ve ambalaj kütüphaneleri YKU’da tutulur ve STE yedeğine de kopyalanır. Kullanıcılar ve şifreler iki sistem için ortaktır ve iki yedekte de bulunur. Bir dosyayı açarken ya da geri yüklerken, dosyada YKU ve STE varsa hangisinin (ya da ikisinin) yükleneceğini seçebilirsin.</p>
   <div class="grid3">${[['ps','YKU (Proforma & Sipariş)','Firmalar, ürünler ve formüller, proformalar, siparişler, tedarik, Ar-Ge, kullanıcılar, ayarlar, hammadde ve ambalaj kütüphaneleri'],['ste','STE','STE firmaları, sözleşmeler, CPSR işler, yapılan işler, tahsilatlar, takvim, INCI kütüphanesi, kullanıcılar (+ hammadde ve ambalaj kopyası)'],['all','Tam (YKU + STE)','Kayıt dosyasının tamamı: YKU ve STE birlikte'],['lib','Kütüphaneler','Hammadde ve ambalaj kütüphaneleri (görseller, renk ve tür listeleri dahil) ve INCI kütüphanesi'],['prod','Ürünler ve formüller','Ürünler, formüller ve revizyon geçmişi; ürünlerin firmaları ve kullandığı hammadde/ambalaj']].map(([k,l,d])=>`<div class="tw" style="padding:14px"><p style="margin-top:0"><b>${l} yedeği</b><br><span class="sub">${d}</span></p>
     <p class="sub" style="margin:0 0 8px">${S['dir_'+k]?'Klasör: '+esc(S['dir_'+k].name):'Yedek klasörü seçilmedi (yedek dosya olarak indirilir)'}${S['last_'+k]?'. Son yedek: '+new Date(S['last_'+k]).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}):''}</p>
-    <div class="row-actions" style="margin-bottom:0">${window.showDirectoryPicker?`<button class="btn" onclick="pickPartDir('${k}')">Yedek klasörü seç</button>`:''}<button class="btn pri" onclick="partBackup('${k}')">Şimdi yedek al</button><button class="btn" onclick="partRestore('${k}')">Yedekten geri yükle</button></div></div>`).join('')}</div></div>
-  <div class="sec"><h3>STE / CPSR verisi</h3><div class="tw" style="padding:14px">${(()=>{const st=DB.ste||{},L=st['cpsr-libraries']||{},B=st['cpsr-business']||{};return steHasData()?`<p style="margin-top:0">Bu kayıt dosyasında: <b>${(L.firms||[]).length}</b> STE firması, <b>${(st['cpsr-products']||[]).length}</b> CPSR işi, <b>${(B.jobs||[]).length}</b> yapılan iş, <b>${(B.payments||[]).length}</b> tahsilat, <b>${(L.ingredients||[]).length}</b> INCI.</p>`:'<p style="margin-top:0">Henüz STE verisi yok. CPSR sistemindeki verilerini buraya bir kez aktar; sonra her şey bu kayıt dosyasında birlikte tutulur.</p>'})()}
+    <div class="row-actions" style="margin-bottom:0">${window.showDirectoryPicker?`<button class="btn" onclick="pickPartDir('${k}')">Yedek klasörü seç</button>`:''}<button class="btn pri" onclick="partBackup('${k}')">Şimdi yedek al</button><button class="btn" onclick="partRestore('${k}')">Yedekten geri yükle</button></div></div>`).join('')}<div class="tw" style="padding:14px"><p style="margin-top:0"><b>STE / CPSR verisi</b><br><span class="sub">CPSR sisteminden aktarma ve tarayıcı temizliği</span></p>${(()=>{const st=DB.ste||{},L=st['cpsr-libraries']||{},B=st['cpsr-business']||{};return steHasData()?`<p style="margin:0 0 8px" class="sub">Bu kayıt dosyasında: <b>${(L.firms||[]).length}</b> STE firması, <b>${(st['cpsr-products']||[]).length}</b> CPSR işi, <b>${(B.jobs||[]).length}</b> yapılan iş, <b>${(B.payments||[]).length}</b> tahsilat, <b>${(L.ingredients||[]).length}</b> INCI.</p>`:'<p style="margin:0 0 8px" class="sub">Henüz STE verisi yok. CPSR sistemindeki verilerini buraya bir kez aktar; sonra her şey bu kayıt dosyasında birlikte tutulur.</p>'})()}
     <div class="row-actions" style="margin-bottom:0"><button class="btn" onclick="steImportBrowser()">Bu tarayıcıdaki CPSR verisini al</button><button class="btn bad" onclick="steClearBrowser()">Tarayıcıdaki eski CPSR verisini sil</button><button class="btn" onclick="steImportFile()">CPSR yedek dosyasından (JSON) aktar</button><button class="btn" onclick="go('ste:firmalar')">STE sayfalarını aç</button></div>
-    <p class="sub" style="margin-bottom:0">“Bu tarayıcıdaki CPSR verisini al”, CPSR sistemini aynı bilgisayarda aynı tarayıcıyla açıyorsan eksiksiz aktarır (hammadde kütüphanesi dahil). Dosyadan aktarmada CPSR’nin “Tüm Veriyi Dışa Aktar” ya da kayıt dosyasını seç. Bu sistemdeki STE bölümü tarayıcıya hiçbir şey yazmaz; aktardıktan sonra eski CPSR’nin tarayıcıda bıraktığı veriyi “Tarayıcıdaki eski CPSR verisini sil” ile temizleyebilirsin.</p></div></div>
+    <p class="sub" style="margin-bottom:0">“Bu tarayıcıdaki CPSR verisini al”, CPSR sistemini aynı bilgisayarda aynı tarayıcıyla açıyorsan eksiksiz aktarır (hammadde kütüphanesi dahil). Dosyadan aktarmada CPSR’nin “Tüm Veriyi Dışa Aktar” ya da kayıt dosyasını seç. Bu sistemdeki STE bölümü tarayıcıya hiçbir şey yazmaz; aktardıktan sonra eski CPSR’nin tarayıcıda bıraktığı veriyi “Tarayıcıdaki eski CPSR verisini sil” ile temizleyebilirsin.</p></div></div></div>
   <div class="stats"><span><b>${DB.firms.length}</b>firma</span><span><b>${DB.materials.length}</b>hammadde</span><span><b>${DB.products.length}</b>ürün</span><span><b>${DB.proformas.length}</b>proforma</span><span><b>${DB.orders.length}</b>sipariş</span></div>`;
 };
 function logRows(){const a=DB.log.map(l=>({t:l.t,u:l.u||'',m:l.m,src:'ps'}));
@@ -9688,7 +9781,7 @@ function packForm(id){
   const k=id?pack(id):{};const v=f=>esc(k[f]||'');const used=id?packUsage(id):[];
   ED={kind:'pack',images:(k.images||[]).map(i=>({...i}))};
   openModal('pk'+(id||''),id?pkName(k):'Yeni ambalaj',`<div class="fg">
-    <label class="f"><span>Kod</span><input id="k_code" value="${v('code')}"></label>
+    <label class="f"><span>Kod</span><input id="k_code" value="${v('code')}" oninput="codeHint('pack',this,'${id||''}')" autocomplete="off"></label>
     <label class="f wide" style="grid-column:span 2"><span>Ambalaj adı *</span><input id="k_name" value="${v('name')}" placeholder="Kavanoz, airless şişe, kapak…"></label>
     <label class="f"><span>Tür <button type="button" class="btn link xsl" onclick="event.preventDefault();quickType()">+ yeni tür</button></span><select id="k_type">${(()=>{const T=packTypes(),cur=k.type||guessPackType(k.name||'');return (T.includes(cur)?T:[...T,cur]).map(t=>`<option ${t===cur?'selected':''}>${esc(t)}</option>`).join('')})()}</select></label>
     ${(()=>{const V=splitMeas(k.volume),N=splitMeas(k.neck);return `<label class="f"><span>Birim hacim <button type="button" class="btn link xsl" onclick="event.preventDefault();quickList('volUnits','hacim birimi','k_volu',VOL_UNITS)">+ yeni birim</button></span><span class="meas"><input id="k_voln" value="${esc(V.n)}" inputmode="decimal" placeholder="50"><select id="k_volu">${unitOpts(volUnits(),V.u||(k.volume?'':'ml'))}</select></span></label>
@@ -9710,15 +9803,16 @@ function pkImgAdd(inp){[...inp.files].forEach(f=>shrinkImage(f,900,d=>{ED.images
 function savePack(id){
   const g=f=>document.getElementById('k_'+f).value.trim();
   if(!g('name')){toast('Ambalaj adı gerekli.',true);return}
-  if(g('code')){const d=DB.packs.find(x=>x.code===g('code')&&x.id!==id);if(d){toast(`${g('code')} kodu zaten “${pkName(d)}” için kullanılıyor.`,true);return}}
+  if(!codeGate('pack',g('code'),id))return;const oldCode=id?pack(id).code:'',oldItem=id?{...pack(id)}:null;
   const k=id?pack(id):{id:uid()};['code','name','type','material','color','supplier','note'].forEach(f=>k[f]=g(f));k.volume=joinMeas(g('voln'),g('volu'));k.neck=joinMeas(g('neckn'),g('necku'));
   [['volUnits',VOL_UNITS,g('volu')],['neckUnits',NECK_UNITS,g('necku')],['materials',MATERIALS,k.material]].forEach(([key,d,val])=>{const L=DB.settings[key]||d;if(val&&!L.some(x=>norm(x)===norm(val)))DB.settings[key]=[...L,val]});
-  if(k.color&&!colorList().some(c=>norm(c)===norm(k.color)))DB.settings.colors=[...colorList(),k.color];k.images=ED&&ED.kind==='pack'?ED.images:(k.images||[]);
+  if(k.color&&!colorList().some(c=>norm(c)===norm(k.color)))DB.settings.colors=[...colorList(),k.color];
+  if(oldCode&&codeKey(oldCode)!==codeKey(k.code))rememberCode('pack',oldItem,'kodu “'+(k.code||'boş')+'” olarak değiştirildi');forgetCode('pack',k.code);k.images=ED&&ED.kind==='pack'?ED.images:(k.images||[]);
   if(!id)DB.packs.push(k);closeModal();touch(`Ambalaj ${id?'güncellendi':'eklendi'}: ${packLabel(k)}`);
 }
 function dupPack(id){const k={...pack(id),id:uid(),code:'',images:(pack(id).images||[]).map(i=>({...i,id:uid()}))};DB.packs.push(k);touch('Ambalaj kopyalandı: '+pkName(k));packForm(k.id);toast('Kopya açıldı; kodu, hacmi veya rengi değiştir.')}
 function delPack(id){if(DB.supplies.some(x=>x.kind==='pack'&&x.refId===id)){toast('Bu ambalaj Tedarik listesinde kullanılıyor; silinemez.',true);return}const u=packUsage(id);if(u.length){toast(`Bu ambalaj ${u.length} üründe kullanılıyor; silinemez.`,true);return}
-  if(!confirm('Ambalaj silinsin mi?'))return;const k=pack(id);DB.packs=DB.packs.filter(x=>x.id!==id);closeModal();touch('Ambalaj silindi: '+packLabel(k))}
+  if(!confirm('Ambalaj silinsin mi?'))return;const k=pack(id);rememberCode('pack',k,'silindi');DB.packs=DB.packs.filter(x=>x.id!==id);closeModal();touch('Ambalaj silindi: '+packLabel(k))}
 const PACK_COLS=[['code',/^(kod|code|stok kod|ambalaj kod)/],['type',/^(tür|tip|kategori|type)/],['name',/^(ambalaj ad|ambalaj$|ad$|adı$|malzeme|ürün ad|tanım)/],['volume',/^(birim hacim|hacim|kapasite|volume)/],['neck',/^(ağız|agiz|boyun|neck|çap|ölçü)/],['color',/^(renk|color)/],['material',/^(materyal|material|malzeme cinsi|hammadde cinsi)/],['supplier',/^(tedarik|supplier|üretici)/],['note',/^(not|açıklama|note)/]];
 function parsePackRows(rows){
   const txt=v=>v==null?'':String(v).replace(/\u00a0/g,' ').trim();
@@ -9733,11 +9827,12 @@ function parsePackRows(rows){
 function packImportPreview(list,src){
   let nw=0,up=0;list.forEach(d=>{findPack(d)?up++:nw++;if(d.include===undefined)d.include=true});ED={kind:'pkimp',list,src};
   openModal('pkimp','Ambalaj aktarımı',`<p style="margin-top:0">${esc(src)} içinde <b>${list.length}</b> satır bulundu: <b>${nw}</b> yeni ambalaj eklenecek, <b>${up}</b> mevcut ambalajın boş alanları doldurulacak.</p>
-   ${impBar('pack')}<div class="tw"><table class="t"><thead><tr><th>${impAllBox('pack')}</th><th>Kod</th><th>Ambalaj adı</th><th>Tür</th><th>Birim hacim</th><th>Ağız çapı</th><th>Renk</th><th>Tedarikçi</th><th></th></tr></thead><tbody>${list.slice(0,200).map((d,i)=>`<tr><td>${impRowBox('pack',i,d)}</td><td>${esc(d.code)}</td><td>${esc(d.name)}</td><td>${esc(d.type)}</td><td>${esc(d.volume)}</td><td>${esc(d.neck||'')}</td><td>${esc(d.color)}</td><td>${esc(d.supplier)}</td><td>${findPack(d)?'<span class="pill">Mevcut</span>':'<span class="pill ok">Yeni</span>'}</td></tr>`).join('')}</tbody></table></div>`,
+   ${impBar('pack')}<div class="tw"><table class="t"><thead><tr><th>${impAllBox('pack')}</th><th>Kod</th><th>Ambalaj adı</th><th>Tür</th><th>Birim hacim</th><th>Ağız çapı</th><th>Renk</th><th>Tedarikçi</th><th></th></tr></thead><tbody>${list.slice(0,200).map((d,i)=>`<tr><td>${impRowBox('pack',i,d)}</td><td>${esc(d.code)}</td><td>${esc(d.name)}</td><td>${esc(d.type)}</td><td>${esc(d.volume)}</td><td>${esc(d.neck||'')}</td><td>${esc(d.color)}</td><td>${esc(d.supplier)}</td><td>${findPack(d)?'<span class="pill">Mevcut</span>':delCodeInfo('pack',d.code)?`<span class="pill warn" title="${esc(delCodeInfo('pack',d.code).name)} — ${esc(delCodeInfo('pack',d.code).how)}">Yeni · kod önceden kullanılmış</span>`:'<span class="pill ok">Yeni</span>'}</td></tr>`).join('')}</tbody></table></div>`,
    `<button class="btn" onclick="closeModal()">Vazgeç</button><button class="btn pri" id="impGo" onclick="packImportCommit()">${list.length} satırı aktar</button>`,'wide');
   impUpd('pack');
 }
-function packImportCommit(){let n=0,u=0;const L=ED.list.filter(d=>d.include!==false);if(!L.length){toast('Aktarılacak ambalaj seçilmedi.',true);return}L.forEach(d=>{upsertPack(d).created?n++:u++});closeModal();touch(`Ambalaj aktarımı: ${n} yeni, ${u} mevcut`);toast(`${n} yeni ambalaj eklendi`)}
+function packImportCommit(){let n=0,u=0;const L=ED.list.filter(d=>d.include!==false);if(!L.length){toast('Aktarılacak ambalaj seçilmedi.',true);return}
+  {const re=L.filter(d=>!findPack(d)&&delCodeInfo('pack',d.code));if(re.length&&!confirm(`${re.length} yeni ambalajın kodu daha önce silinmiş/birleştirilmiş kayıtlarda kullanılmış (${re.slice(0,5).map(d=>d.code).join(', ')}${re.length>5?'…':''}).\n\nBu kodlarla yine de eklensin mi?`))return;re.forEach(d=>forgetCode('pack',d.code))}L.forEach(d=>{upsertPack(d).created?n++:u++});closeModal();touch(`Ambalaj aktarımı: ${n} yeni, ${u} mevcut`);toast(`${n} yeni ambalaj eklendi`)}
 function packPasteForm(){openModal('pkpaste','Excel’den kopyala-yapıştır',`<p class="sub" style="margin-top:0">Excel’de ambalaj satırlarını başlıkla birlikte kopyalayıp yapıştır. Başlık yoksa sütun sırası: Kod, Ambalaj Adı, Birim Hacim, Ağız Çapı, Renk, Tedarikçi. Tür (şişe, kapak, etiket…) addan tahmin edilir.</p><textarea id="kpaste" style="min-height:220px"></textarea>`,`<button class="btn" onclick="closeModal()">Vazgeç</button><button class="btn pri" onclick="packPasteGo()">Devam</button>`)}
 function packPasteGo(){const L=parsePackRows(document.getElementById('kpaste').value.split(/\r?\n/).map(l=>l.split('\t')));if(!L.length){toast('Satır bulunamadı.',true);return}packImportPreview(L,'Yapıştırılan veri')}
 function exportPacks(template){
@@ -9800,11 +9895,13 @@ function mergeMat(keepId,dropId){const k=mat(keepId),d=mat(dropId);if(!k||!d||k=
   DB.rnd.forEach(x=>x.trials.forEach(t=>t.formula.forEach(fx)));
   DB.supplies.forEach(z=>{if(z.kind==='mat'&&z.refId===dropId)z.refId=keepId});
   DB.orders.forEach(o=>o.lines.forEach(l=>{if(l.kgOv&&l.kgOv[dropId]!=null){if(l.kgOv[keepId]==null)l.kgOv[keepId]=l.kgOv[dropId];delete l.kgOv[dropId]}}));
+  if(d.code&&codeKey(d.code)!==codeKey(k.code))rememberCode('mat',d,'“'+(k.code?k.code+' – ':'')+k.name+'” ile birleştirildi');
   DB.materials=DB.materials.filter(m=>m.id!==dropId);return d}
 function mergePack(keepId,dropId){const k=pack(keepId),d=pack(dropId);if(!k||!d||k===d)return;
   ['code','type','volume','neck','color','supplier','note'].forEach(f=>{if(!k[f]&&d[f])k[f]=d[f]});
   DB.products.forEach(p=>{let seen=false;p.packaging=(p.packaging||[]).filter(x=>{if(x.packId===dropId)x.packId=keepId;if(x.packId===keepId){if(seen)return false;seen=true}return true})});
   DB.supplies.forEach(z=>{if(z.kind==='pack'&&z.refId===dropId)z.refId=keepId});
+  if(d.code&&codeKey(d.code)!==codeKey(k.code))rememberCode('pack',d,'“'+(k.code?k.code+' – ':'')+pkName(k)+'” ile birleştirildi');
   DB.packs=DB.packs.filter(x=>x.id!==dropId);return d}
 function mergeForm(kind,id){
   const isM=kind==='mat',it=isM?mat(id):pack(id),lab=isM?matLabel:packLabel,list=(isM?DB.materials:DB.packs).filter(x=>x.id!==id);
@@ -9841,6 +9938,19 @@ const RND_STATUS=['Talep / fikir','Formülasyon','Numune gönderildi','Stabilite
 const RND_OPEN=RND_STATUS.slice(0,5);
 const TRIAL_RES=['Değerlendiriliyor','Başarılı','Revize edilecek','Başarısız'];
 const STAB_COND=['25 °C','40 °C','4 °C','Işık','Dondur-çöz'];
+const PC_FIELDS=[['look','Görünüm','Beyaz, parlak krem'],['color','Renk',''],['odor','Koku',''],['ph','pH (25 °C)','5,0–6,0'],['visc','Viskozite (cP)','4000–6000'],['viscCond','Viskozite ölçüm koşulu','Mil / devir / °C'],['dens','Yoğunluk (g/ml)',''],['ri','Kırılma indisi',''],['solid','Kuru madde (%)',''],['emul','Emülsiyon tipi','Y/S, S/Y'],['centri','Santrifüj testi','3000 rpm, 30 dk: ayrışma yok']];
+const pcVal=(t,k)=>String(t?.[k]||'').trim();
+const PC_DEF=['look','color','odor','ph','visc'];
+const pcPrintKeys=t=>Array.isArray(t?.pcPrint)?t.pcPrint:PC_FIELDS.map(f=>f[0]).filter(k=>PC_DEF.includes(k)||pcVal(t,k)||t?.pcSpec?.[k]);
+function pcBrief(t){return [pcVal(t,'ph')?'pH '+pcVal(t,'ph'):'',pcVal(t,'visc')?pcVal(t,'visc')+' cP':'',pcVal(t,'look'),pcVal(t,'dens')?pcVal(t,'dens')+' g/ml':''].filter(Boolean).join(' · ')}
+function pcTable(t){const rows=PC_FIELDS.filter(([k])=>pcVal(t,k)||t.pcSpec?.[k]);if(!rows.length)return '<div class="sub">Henüz ölçüm girilmedi. “Düzenle” ile pH, viskozite, yoğunluk gibi değerleri ve hedeflerini girebilirsin.</div>';
+  return `<div class="tw"><table class="t"><thead><tr><th>Parametre</th><th>Sonuç</th><th>Hedef / spesifikasyon</th></tr></thead><tbody>${rows.map(([k,l])=>`<tr><td>${l}</td><td><b>${esc(pcVal(t,k)||'—')}</b></td><td class="sub">${esc(t.pcSpec?.[k]||'')}</td></tr>`).join('')}</tbody></table></div>`}
+/* ---- deneme notları ---- */
+function addTrialNote(rid,tid){const el=document.getElementById('tn_txt'),v=el.value.trim();if(!v){toast('Not yaz.',true);return}const t=rnd(rid).trials.find(z=>z.id===tid);
+  t.log=t.log||[];t.log.push({id:uid(),date:document.getElementById('tn_date').value||today(),by:S.user?(S.user.name||S.user.username):'',text:v});touch(`Ar-Ge ${rnd(rid).no} ${t.code}: not eklendi`);trialView(rid,tid)}
+function delTrialNote(rid,tid,nid){if(!confirm('Not silinsin mi?'))return;const t=rnd(rid).trials.find(z=>z.id===tid);t.log=(t.log||[]).filter(z=>z.id!==nid);touch(`Ar-Ge ${rnd(rid).no} ${t.code}: not silindi`);trialView(rid,tid)}
+const tnSorted=t=>[...(t.log||[])].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+function tvGrp(k,title,sub,body){S.tvOpen=S.tvOpen||new Set(['pc','fx']);return `<details class="grp tvg" ${S.tvOpen.has(k)?'open':''} ontoggle="this.open?S.tvOpen.add('${k}'):S.tvOpen.delete('${k}')"><summary><b>${title}</b><span class="sub">${sub||''}</span></summary><div class="tvb">${body}</div></details>`}
 const rnd=id=>DB.rnd.find(x=>x.id===id);
 function rndPill(st){return `<span class="pill ${st==='Onaylandı'?'ok':st==='İptal'||st==='Müşteri reddetti'?'bad':st==='Talep / fikir'?'warn':''}">${esc(st)}</span>`}
 /* ---- Müşteri değerlendirmesi ---- */
@@ -9920,7 +10030,7 @@ function rndDetail(id){
     <div class="sec"><h3>Durum</h3><div class="chips">${RND_STATUS.map(st=>`<button class="chip ${st===x.status?'on':''}" onclick="setRndStatus('${id}','${st}')">${st}</button>`).join('')}</div></div>
     <div class="sec"><h3>Denemeler <span class="sub">${x.trials.length}</span> <span><button class="btn sm" onclick="trialForm('${id}')">＋ Boş deneme</button>${lp&&lp.formula.length?` <button class="btn sm" onclick="trialForm('${id}',null,'prod')">＋ Mevcut formülden başla</button>`:''}</span></h3>
     ${x.trials.length?`<div class="tw"><table class="t"><thead><tr><th>Deneme</th><th>Tarih</th><th>Teknik sonuç</th><th>Müşteri</th><th>Gözlem</th><th class="r">Madde</th><th>Stabilite</th><th></th></tr></thead><tbody>${[...x.trials].reverse().map(t=>{const st=t.stab||[],bad=st.filter(z=>z.ok===false).length;
-      return `<tr class="click" onclick="trialView('${id}','${t.id}')"><td><b>${esc(t.code)}</b>${t.transferred?` <span class="pill ok">Ürüne aktarıldı</span>`:''}</td><td>${fmtD(t.date)}</td><td>${resPill(t.result)}</td><td>${evalPill(t.eval?.decision)}${evalCritTxt(t.eval,'-').length?`<div class="sub">👎 ${esc(evalCritTxt(t.eval,'-').join(', '))}</div>`:''}</td><td class="sub">${esc([t.ph?'pH '+t.ph:'',t.visc?t.visc+' cP':'',t.look].filter(Boolean).join(', ').slice(0,70))}</td><td class="r">${t.formula.length} <span class="${pctOkV(pctTotal(t))?'pct-ok':'pct-bad'}">%${fmtP(pctTotal(t))}</span></td><td>${st.length?`${st.length} ölçüm${bad?` <span class="pill bad">${bad} sorun</span>`:''}`:'<span class="sub">—</span>'}</td><td class="r" style="white-space:nowrap"><button class="btn sm" onclick="event.stopPropagation();trialForm('${id}',null,'${t.id}')">Kopyala</button></td></tr>`}).join('')}</tbody></table></div>`:'<div class="sub">Henüz deneme yok.</div>'}</div>`,
+      return `<tr class="click" onclick="trialView('${id}','${t.id}')"><td><b>${esc(t.code)}</b>${t.transferred?` <span class="pill ok">Ürüne aktarıldı</span>`:''}</td><td>${fmtD(t.date)}</td><td>${resPill(t.result)}</td><td>${evalPill(t.eval?.decision)}${evalCritTxt(t.eval,'-').length?`<div class="sub">👎 ${esc(evalCritTxt(t.eval,'-').join(', '))}</div>`:''}</td><td class="sub">${esc(pcBrief(t).slice(0,80))}</td><td class="r">${t.formula.length} <span class="${pctOkV(pctTotal(t))?'pct-ok':'pct-bad'}">%${fmtP(pctTotal(t))}</span></td><td>${st.length?`${st.length} ölçüm${bad?` <span class="pill bad">${bad} sorun</span>`:''}`:'<span class="sub">—</span>'}</td><td class="r" style="white-space:nowrap"><button class="btn sm" onclick="event.stopPropagation();trialForm('${id}',null,'${t.id}')">Kopyala</button></td></tr>`}).join('')}</tbody></table></div>`:'<div class="sub">Henüz deneme yok.</div>'}</div>`,
    `<button class="btn bad sp" onclick="delRnd('${id}')">Sil</button><button class="btn pri" onclick="rndForm('${id}')">Düzenle</button>`,'wide');
 }
 function setRndStatus(id,st){const x=rnd(id);x.status=st;touch(`Ar-Ge ${x.no}: ${st}`);rndDetail(id)}
@@ -9931,22 +10041,19 @@ function trialForm(rid,tid,from){
   if(!t&&from==='prod')src={formula:prod(x.productId).formula,steps:prod(x.productId).steps,notes:prod(x.productId).notes};
   else if(!t&&from)src=x.trials.find(z=>z.id===from);
   ED={kind:'trial',rid,tid:tid||null,formula:(src?.formula||[]).map(f=>({phase:f.phase||'',matText:matLabel(mat(f.matId)),pct:f.pct})),paste:false,pack:[]};
-  if(!ED.formula.length)ED.formula.push({phase:'A Fazı',matText:'',pct:''});
+  ED.formula=sortByPhase(ED.formula);if(!ED.formula.length)ED.formula.push({phase:'A Fazı',matText:'',pct:''});
   const code=t?.code||('D'+(x.trials.length+1));
   openModal('tf'+rid+(tid||''),t?`${x.name}, ${t.code} düzenle`:`${x.name}, yeni deneme ${code}`,`<div class="fg">
     <label class="f"><span>Deneme kodu</span><input id="t_code" value="${esc(code)}"></label>
     <label class="f"><span>Tarih</span><input type="date" id="t_date" value="${t?.date||today()}"></label>
     <label class="f"><span>Deneme yığını (g)</span><input id="t_batch" inputmode="decimal" value="${numIn(t?.batchG??500)}"></label>
     <label class="f"><span>Sonuç</span><select id="t_result">${TRIAL_RES.map(r=>`<option ${r===(t?.result||'Değerlendiriliyor')?'selected':''}>${r}</option>`).join('')}</select></label>
-    <label class="f"><span>pH</span><input id="t_ph" inputmode="decimal" value="${esc(t?.ph||'')}"></label>
-    <label class="f"><span>Viskozite (cP)</span><input id="t_visc" value="${esc(t?.visc||'')}"></label>
-    <label class="f"><span>Görünüm</span><input id="t_look" value="${esc(t?.look||'')}" placeholder="Beyaz, parlak krem"></label>
-    <label class="f"><span>Renk / koku</span><input id="t_color" value="${esc(t?.color||'')}"></label>
     <label class="f wide"><span>Gözlem ve değişiklik nedeni</span><textarea id="t_obs">${esc(t?.obs||(from&&from!=='prod'&&src?src.code+' denemesinden türetildi. ':''))}</textarea></label></div>
+    ${(()=>{const sp=t?.pcSpec||src?.pcSpec||{};return `<details class="grp tvg" open><summary><b>Fiziksel-kimyasal özellikler</b><span class="sub">ölçüm sonucu ve hedef değer; boş bırakılanlar çıktıda not almak için boş satır olarak gelir</span></summary><div class="tvb"><div class="tw"><table class="t ed pcf"><thead><tr><th title="Yazdırılan çıktıda yer alsın">Çıktıda</th><th>Parametre</th><th>Sonuç</th><th>Hedef / spesifikasyon</th></tr></thead><tbody>${PC_FIELDS.map(([k,l,ph])=>`<tr><td style="text-align:center;width:60px"><input type="checkbox" id="t_pp_${k}" style="width:auto;min-width:0" ${pcPrintKeys(t||{pcPrint:src?.pcPrint,pcSpec:sp}).includes(k)?'checked':''}></td><td>${l}</td><td><input id="t_${k}" oninput="if(this.value)document.getElementById('t_pp_${k}').checked=true" value="${esc(t?.[k]||'')}"${k==='color'&&t?.color&&!t?.odor?' title="Eski kayıt: renk / koku birlikte"':''}></td><td><input id="t_sp_${k}" oninput="if(this.value)document.getElementById('t_pp_${k}').checked=true" value="${esc(sp[k]||'')}" placeholder="${esc(ph)}"></td></tr>`).join('')}</tbody></table></div></div></details>`})()}
     <div class="sec"><h3>Formül <span id="pctTot"></span></h3><div id="compWrap"></div>
     <datalist id="matList">${DB.materials.map(m=>`<option value="${esc(matLabel(m))}">`).join('')}</datalist><datalist id="phList">${PHASES.map(z=>`<option value="${z}">`).join('')}</datalist>
     <div class="tw"><table class="t ed"><thead><tr><th>Faz</th><th>Hammadde (kütüphaneden ara ya da yaz)</th><th class="r">%</th><th></th></tr></thead><tbody id="fxRows"></tbody></table></div>
-    <div class="row-actions"><button class="btn sm" onclick="fxAdd()">＋ Satır ekle</button><button class="btn sm" onclick="ED.paste=!ED.paste;fxPasteBox()">Excel’den yapıştır</button></div><div id="pasteBox"></div></div>
+    <div class="row-actions"><button class="btn sm" onclick="fxAdd()">＋ Satır ekle</button><button class="btn sm" onclick="fxSort()" title="Aynı fazları bir araya toplar, faz içinde % büyükten küçüğe sıralar">⇅ Fazlara göre sırala</button><button class="btn sm" onclick="ED.paste=!ED.paste;fxPasteBox()">Excel’den yapıştır</button></div><div id="pasteBox"></div></div>
     <div class="fg"><label class="f wide"><span>Üretim / hazırlama adımları (her satıra bir adım)</span><textarea id="t_steps" style="min-height:110px">${esc((src?.steps||[]).join('\n'))}</textarea></label></div>`,
    `<button class="btn" onclick="${tid?`trialView('${rid}','${tid}')`:`rndDetail('${rid}')`}">Vazgeç</button><button class="btn pri" onclick="saveTrial()">Denemeyi kaydet</button>`,'wide');
   fxRender();
@@ -9954,22 +10061,26 @@ function trialForm(rid,tid,from){
 function saveTrial(){
   const g=k=>document.getElementById('t_'+k).value.trim(),x=rnd(ED.rid);
   if(!matReviewGate(ED.formula.filter(f=>f.matText.trim()).map(f=>f.matText),'saveTrial'))return;
-  const formula=ED.formula.filter(f=>f.matText.trim()||pn(f.pct)).map(f=>{const m=resolveMatMapped(f.matText);return m?{id:uid(),phase:f.phase.trim(),matId:m.id,pct:pn(f.pct)}:null}).filter(Boolean);
+  const formula=sortByPhase(ED.formula.filter(f=>f.matText.trim()||pn(f.pct))).map(f=>{const m=resolveMatMapped(f.matText);return m?{id:uid(),phase:phCanon(f.phase),matId:m.id,pct:pn(f.pct)}:null}).filter(Boolean);
   const t=ED.tid?x.trials.find(z=>z.id===ED.tid):{id:uid(),stab:[]};
-  Object.assign(t,{code:g('code')||'D'+(x.trials.length+1),date:g('date'),batchG:pn(g('batch')),result:g('result'),ph:g('ph'),visc:g('visc'),look:g('look'),color:g('color'),obs:g('obs'),formula,steps:g('steps').split('\n').map(z=>z.trim()).filter(Boolean)});
+  const pcSpec={};PC_FIELDS.forEach(([k])=>{t[k]=g(k);if(g('sp_'+k))pcSpec[k]=g('sp_'+k)});t.pcPrint=PC_FIELDS.map(f=>f[0]).filter(k=>document.getElementById('t_pp_'+k)?.checked);
+  Object.assign(t,{code:g('code')||'D'+(x.trials.length+1),date:g('date'),batchG:pn(g('batch')),result:g('result'),pcSpec,obs:g('obs'),formula,steps:g('steps').split('\n').map(z=>z.trim()).filter(Boolean)});
   if(!ED.tid){x.trials.push(t);if(x.status==='Talep / fikir')x.status='Formülasyon'}
   touch(`Ar-Ge ${x.no}: deneme ${t.code} ${ED.tid?'güncellendi':'eklendi'}`);if(formula.length&&!pctOkV(pctTotal(t)))toast(`Kaydedildi; formül toplamı %${fmtP(pctTotal(t))}.`);trialView(x.id,t.id);
 }
 const trialObj=(x,t)=>({id:'',name:`${x.name} – ${t.code}`,formula:t.formula,steps:t.steps||[],notes:t.obs||'',unitKg:x.unitKg||0,packaging:[]});
 function trialView(rid,tid){
   const x=rnd(rid),t=x.trials.find(z=>z.id===tid);if(!t)return rndDetail(rid);ED=null;const o=trialObj(x,t),st=t.stab||[];
-  openModal('tv'+tid,`${x.name}, ${t.code}`,`<div class="info"><div><small>Tarih</small>${fmtD(t.date)}</div><div><small>Teknik sonuç</small>${resPill(t.result)}</div><div><small>Müşteri</small>${evalPill(t.eval?.decision)}</div><div><small>pH</small>${esc(t.ph||'—')}</div><div><small>Viskozite</small>${t.visc?esc(t.visc)+' cP':'—'}</div><div><small>Görünüm</small>${esc(t.look||'—')}</div><div><small>Renk / koku</small>${esc(t.color||'—')}</div>${t.transferred?`<div><small>Ürüne aktarıldı</small><button class="btn link" onclick="productDetail('${t.transferred.productId}')">${esc(prod(t.transferred.productId)?.name||'?')} ${revTxt(t.transferred.rev)}</button></div>`:''}</div>
+  const ic=inciComp(t.formula).rows,nl=(t.log||[]).length,pcN=PC_FIELDS.filter(([k])=>pcVal(t,k)).length;
+  openModal('tv'+tid,`${x.name}, ${t.code}`,`<div class="info"><div><small>Tarih</small>${fmtD(t.date)}</div><div><small>Teknik sonuç</small>${resPill(t.result)}</div><div><small>Müşteri</small>${evalPill(t.eval?.decision)}</div><div><small>Yığın</small>${fmtQ(t.batchG)} g</div>${t.transferred?`<div><small>Ürüne aktarıldı</small><button class="btn link" onclick="productDetail('${t.transferred.productId}')">${esc(prod(t.transferred.productId)?.name||'?')} ${revTxt(t.transferred.rev)}</button></div>`:''}</div>
     ${t.obs?`<div class="brief">${esc(t.obs)}</div>`:''}
-    ${compBar(t.formula)}<div class="sec"><h3>Formül <span class="sub">${fmtQ(t.batchG)} g yığın için</span></h3>${recipeTable(o,null,{kg:pn(t.batchG)/1000})}${stepsHtml(o)}</div>
-    <div class="sec"><h3>INCI bileşimi</h3>${inciHtml(t.formula)}</div>
-    <div class="sec"><h3>Müşteri değerlendirmesi</h3>${evalHtml(rid,t)}</div>
-    <div class="sec"><h3>Stabilite takibi <span class="sub">${st.length} ölçüm</span></h3>${st.length?`<div class="tw"><table class="t"><thead><tr><th>Koşul</th><th class="r">Gün</th><th>Tarih</th><th>pH</th><th>Viskozite</th><th>Görünüm / not</th><th>Durum</th><th></th></tr></thead><tbody>${[...st].sort((a,b)=>a.cond.localeCompare(b.cond)||pn(a.day)-pn(b.day)).map(z=>`<tr><td>${esc(z.cond)}</td><td class="r">${fmtQ(z.day)}</td><td>${fmtD(z.date)}</td><td>${esc(z.ph||'')}</td><td>${esc(z.visc||'')}</td><td>${esc(z.note||'')}</td><td>${z.ok===false?'<span class="pill bad">Sorun var</span>':'<span class="pill ok">Uygun</span>'}</td><td><button class="btn sm" onclick="delStab('${rid}','${tid}','${z.id}')" aria-label="Sil">✕</button></td></tr>`).join('')}</tbody></table></div>`:''}
-    <div class="fg" style="margin-top:10px;align-items:end"><label class="f"><span>Koşul</span><select id="z_cond">${STAB_COND.map(c=>`<option>${c}</option>`).join('')}</select></label><label class="f"><span>Gün</span><input id="z_day" inputmode="numeric" placeholder="0, 7, 14, 30…"></label><label class="f"><span>Tarih</span><input type="date" id="z_date" value="${today()}"></label><label class="f"><span>pH</span><input id="z_ph" inputmode="decimal"></label><label class="f"><span>Viskozite</span><input id="z_visc"></label><label class="f wide" style="grid-column:span 2"><span>Görünüm / not</span><input id="z_note" placeholder="Faz ayrışması yok, renk sabit…"></label><label class="f"><span>Durum</span><select id="z_ok"><option value="1">Uygun</option><option value="0">Sorun var</option></select></label><button class="btn" onclick="addStab('${rid}','${tid}')">Ölçüm ekle</button></div></div>`,
+    <div class="tvgs">${tvGrp('pc','Fiziksel-kimyasal özellikler',pcN?`${pcN} ölçüm · ${esc(pcBrief(t))}`:'ölçüm girilmedi',pcTable(t))}
+    ${tvGrp('fx','Formül',`${t.formula.length} madde · %${fmtP(pctTotal(t))} · ${fmtQ(t.batchG)} g yığın için`,compBar(t.formula)+recipeTable(o,null,{kg:pn(t.batchG)/1000})+stepsHtml(o))}
+    ${tvGrp('inci','INCI bileşimi',`${ic.length} INCI`,inciHtml(t.formula))}
+    ${tvGrp('notes','Notlar ve kayıtlar',nl?`${nl} not · son: ${fmtD(tnSorted(t)[0].date)}`:'not yok',`${nl?`<div class="tnlist">${tnSorted(t).map(z=>`<div class="tn"><div class="sub">${fmtD(z.date)}${z.by?' · '+esc(z.by):''} <button class="btn link xsl" onclick="delTrialNote('${rid}','${tid}','${z.id}')">sil</button></div><div style="white-space:pre-wrap">${esc(z.text)}</div></div>`).join('')}</div>`:''}<div class="fg" style="align-items:end;margin-top:8px"><label class="f"><span>Tarih</span><input type="date" id="tn_date" value="${today()}"></label><label class="f wide" style="grid-column:span 3"><span>Not</span><textarea id="tn_txt" style="min-height:60px" placeholder="Ör. 2. gün renk hafif koyulaştı; parfüm %0,3’e düşürülecek."></textarea></label><button class="btn" onclick="addTrialNote('${rid}','${tid}')">Not ekle</button></div>`)}
+    ${tvGrp('eval','Müşteri değerlendirmesi',t.eval?esc(t.eval.decision):'girilmedi',evalHtml(rid,t))}
+    ${tvGrp('stab','Stabilite takibi',`${st.length} ölçüm${st.filter(z=>z.ok===false).length?' · '+st.filter(z=>z.ok===false).length+' sorun':''}`,`${st.length?`<div class="tw"><table class="t"><thead><tr><th>Koşul</th><th class="r">Gün</th><th>Tarih</th><th>pH</th><th>Viskozite</th><th>Görünüm / not</th><th>Durum</th><th></th></tr></thead><tbody>${[...st].sort((a,b)=>a.cond.localeCompare(b.cond)||pn(a.day)-pn(b.day)).map(z=>`<tr><td>${esc(z.cond)}</td><td class="r">${fmtQ(z.day)}</td><td>${fmtD(z.date)}</td><td>${esc(z.ph||'')}</td><td>${esc(z.visc||'')}</td><td>${esc(z.note||'')}</td><td>${z.ok===false?'<span class="pill bad">Sorun var</span>':'<span class="pill ok">Uygun</span>'}</td><td><button class="btn sm" onclick="delStab('${rid}','${tid}','${z.id}')" aria-label="Sil">✕</button></td></tr>`).join('')}</tbody></table></div>`:''}
+    <div class="fg" style="margin-top:10px;align-items:end"><label class="f"><span>Koşul</span><select id="z_cond">${STAB_COND.map(c=>`<option>${c}</option>`).join('')}</select></label><label class="f"><span>Gün</span><input id="z_day" inputmode="numeric" placeholder="0, 7, 14, 30…"></label><label class="f"><span>Tarih</span><input type="date" id="z_date" value="${today()}"></label><label class="f"><span>pH</span><input id="z_ph" inputmode="decimal"></label><label class="f"><span>Viskozite</span><input id="z_visc"></label><label class="f wide" style="grid-column:span 2"><span>Görünüm / not</span><input id="z_note" placeholder="Faz ayrışması yok, renk sabit…"></label><label class="f"><span>Durum</span><select id="z_ok"><option value="1">Uygun</option><option value="0">Sorun var</option></select></label><button class="btn" onclick="addStab('${rid}','${tid}')">Ölçüm ekle</button></div>`)}</div>`,
    `<button class="btn bad sp" onclick="delTrial('${rid}','${tid}')">Sil</button><button class="btn" onclick="rndDetail('${rid}')">Projeye dön</button><button class="btn" onclick="printTrial('${rid}','${tid}')">Yazdır</button><button class="btn" onclick="exportTrial('${rid}','${tid}')">Excel’e aktar</button><button class="btn" onclick="trialForm('${rid}','${tid}')">Düzenle</button><button class="btn pri" onclick="transferForm('${rid}','${tid}')">Ürüne aktar</button>`,'wide');
 }
 function exportTrial(rid,tid){const x=rnd(rid),t=x.trials.find(z=>z.id===tid);exportRecipes([{p:trialObj(x,t),qty:1,kg:pn(t.batchG)/1000,firmN:x.firmId?firmName(x.firmId):'Ar-Ge',sheet:t.code}],`arge-${x.no}-${t.code}.xlsx`)}
@@ -9996,14 +10107,21 @@ function doTransfer(rid,tid){
   t.transferred={productId:p.id,rev:p.rev,date:today()};t.result='Başarılı';x.productId=p.id;x.firmId=x.firmId||g('firm');if(RND_OPEN.includes(x.status))x.status='Onaylandı';
   touch(`Ar-Ge ${x.no} ${t.code} → ${p.name} ${revTxt(p.rev)}`);toast(`${p.name} ürününe ${revTxt(p.rev)} olarak aktarıldı.`);productDetail(p.id);
 }
-function printTrial(rid,tid){const x=rnd(rid),t=x.trials.find(z=>z.id===tid),o=trialObj(x,t),kg=pn(t.batchG)/1000,st=t.stab||[];let sum=0;
+function printTrial(rid,tid){const x=rnd(rid),t=x.trials.find(z=>z.id===tid),o=trialObj(x,t),kg=pn(t.batchG)/1000,st=t.stab||[],ev=t.eval,notes=tnSorted(t);let sum=0;
+  const pcs=PC_FIELDS.filter(([k])=>pcPrintKeys(t).includes(k)),inci=inciComp(o.formula).rows.map(e=>e.inci).join(', ');
   const rows=phaseGroups(o.formula).map(g=>(g.phase?`<tr class="phr"><th colspan="5">${esc(g.phase)}</th></tr>`:'')+g.items.map(f=>{const m=mat(f.matId),v=kg*pn(f.pct)/100;sum+=v;return `<tr><td>${esc(m?.code||'')}</td><td>${esc(m?.name||'')}</td><td>${esc(m?.inci||'')}</td><td class="r">${fmtP(f.pct)}</td><td class="r">${fmtN(v*1000,2)}</td></tr>`}).join('')).join('');
-  printDoc(`<div class="rcp">${pHead('Ar-Ge deneme formülü',x.no+', '+t.code)}<table class="hd"><tr><td><b>Proje:</b></td><td>${esc(x.name)}</td><td><b>Firma:</b></td><td>${x.firmId?esc(firmName(x.firmId)):'İç proje'}</td></tr><tr><td><b>Deneme:</b></td><td>${esc(t.code)} (${fmtD(t.date)})</td><td><b>Yığın:</b></td><td>${fmtQ(t.batchG)} g</td></tr><tr><td><b>pH / viskozite:</b></td><td>${esc(t.ph||'—')} / ${esc(t.visc||'—')}</td><td><b>Sonuç:</b></td><td>${esc(t.result||'')}</td></tr></table>
+  const right=[t.obs?`<h2>Gözlem</h2><p>${esc(t.obs)}</p>`:'',
+    st.length?`<h2>Stabilite</h2><table class="mt"><thead><tr><th>Koşul</th><th class="r">Gün</th><th>pH</th><th>Visk.</th><th>Durum / not</th></tr></thead><tbody>${[...st].sort((a,b)=>a.cond.localeCompare(b.cond)||pn(a.day)-pn(b.day)).map(z=>`<tr><td>${esc(z.cond)}</td><td class="r">${fmtQ(z.day)}</td><td>${esc(z.ph||'')}</td><td>${esc(z.visc||'')}</td><td>${z.ok===false?'<b>Sorun</b>':'Uygun'}${z.note?' · '+esc(z.note):''}</td></tr>`).join('')}</tbody></table>`:'',
+    ev?`<h2>Müşteri değerlendirmesi</h2><p><b>${esc(ev.decision)}</b>${ev.replied?` · ${fmtD(ev.replied)}`:''}${ev.person?` · ${esc(ev.person)}`:''}${evalCritTxt(ev,'+').length?`<br>👍 ${esc(evalCritTxt(ev,'+').join(', '))}`:''}${evalCritTxt(ev,'-').length?`<br>👎 ${esc(evalCritTxt(ev,'-').join(', '))}`:''}${ev.comment?`<br>${esc(ev.comment)}`:''}${ev.next?`<br><b>Sonraki adım:</b> ${esc(ev.next)}`:''}</p>`:''].join('');
+  const dens=o.formula.length+phaseGroups(o.formula).filter(g=>g.phase).length+o.steps.reduce((a,z)=>a+Math.ceil(z.length/110),0)+Math.max(pcs.length+1,(right?st.length+4+(ev?3:0)+(t.obs?Math.ceil(t.obs.length/55):0):0))+notes.reduce((a,z)=>a+Math.ceil(z.text.length/120),0)+Math.ceil(inci.length/150);
+  const cls=dens>60?'xdense':dens>44?'dense':'',blank=Math.max(1,(cls==='xdense'?1:cls==='dense'?2:4)-notes.length);
+  const pcHtml=pcs.length?`<h2>Fiziksel-kimyasal özellikler</h2><table class="mt pcn"><thead><tr><th style="width:30%">Parametre</th><th style="width:24%">Hedef</th><th style="width:20%">Sonuç</th><th>Not</th></tr></thead><tbody>${pcs.map(([k,l])=>`<tr><td>${l}</td><td>${esc(t.pcSpec?.[k]||'')}</td><td>${esc(pcVal(t,k))}</td><td></td></tr>`).join('')}</tbody></table>`:'';
+  printDoc(`<div class="rcp arge1 ${cls}">${pHead('Ar-Ge deneme formülü',x.no+', '+t.code)}<table class="hd"><tr><td><b>Proje:</b> ${esc(x.name)}</td><td><b>Firma:</b> ${x.firmId?esc(firmName(x.firmId)):'İç proje'}</td><td><b>Deneme:</b> ${esc(t.code)} (${fmtD(t.date)})</td><td><b>Yığın:</b> ${fmtQ(t.batchG)} g</td><td><b>Sonuç:</b> ${esc(t.result||'')}</td></tr></table>
   <table class="mt"><thead><tr><th>Kod</th><th>Hammadde</th><th>INCI</th><th class="r">%</th><th class="r">g</th></tr></thead><tbody>${rows}<tr><td></td><td colspan="2"><b>TOPLAM</b></td><td class="r"><b>${fmtP(pctTotal(o))}</b></td><td class="r"><b>${fmtN(sum*1000,2)}</b></td></tr></tbody></table>
-  ${o.steps.length?`<h2>Hazırlama</h2><ol>${o.steps.map(z=>`<li>${esc(z)}</li>`).join('')}</ol>`:''}${t.obs?`<h2>Gözlem</h2><p>${esc(t.obs)}</p>`:''}
-  ${st.length?`<h2>Stabilite</h2><table class="mt"><thead><tr><th>Koşul</th><th class="r">Gün</th><th>Tarih</th><th>pH</th><th>Viskozite</th><th>Not</th><th>Durum</th></tr></thead><tbody>${st.map(z=>`<tr><td>${esc(z.cond)}</td><td class="r">${fmtQ(z.day)}</td><td>${fmtD(z.date)}</td><td>${esc(z.ph||'')}</td><td>${esc(z.visc||'')}</td><td>${esc(z.note||'')}</td><td>${z.ok===false?'Sorun':'Uygun'}</td></tr>`).join('')}</tbody></table>`:''}
-  ${t.eval?`<h2>Müşteri değerlendirmesi</h2><p><b>Karar:</b> ${esc(t.eval.decision)}${t.eval.sent?` · Numune: ${fmtD(t.eval.sent)}`:''}${t.eval.replied?` · Yanıt: ${fmtD(t.eval.replied)}`:''}${t.eval.person?` · ${esc(t.eval.person)}`:''}</p>${evalCritTxt(t.eval,'+').length?`<p><b>Beğenilen:</b> ${esc(evalCritTxt(t.eval,'+').join(', '))}</p>`:''}${evalCritTxt(t.eval,'-').length?`<p><b>Beğenilmeyen:</b> ${esc(evalCritTxt(t.eval,'-').join(', '))}</p>`:''}${t.eval.comment?`<p>${esc(t.eval.comment)}</p>`:''}${t.eval.next?`<p><b>Sonraki adım:</b> ${esc(t.eval.next)}</p>`:''}`:''}
-  <h2>INCI listesi</h2><p>${esc(inciComp(o.formula).rows.map(e=>e.inci).join(', '))}</p>${sigFoot()}</div>`)}
+  ${o.steps.length?`<h2>Hazırlama</h2><ol>${o.steps.map(z=>`<li>${esc(z)}</li>`).join('')}</ol>`:''}
+  ${pcHtml||right?`<div class="two">${pcHtml?`<div>${pcHtml}</div>`:''}${right?`<div>${right}</div>`:''}</div>`:''}
+  ${inci?`<h2>INCI listesi</h2><p class="inci">${esc(inci)}</p>`:''}
+  <h2>Notlar</h2>${notes.map(z=>`<p><b>${fmtD(z.date)}${z.by?' · '+esc(z.by):''}:</b> ${esc(z.text)}</p>`).join('')}${'<div class="nl"></div>'.repeat(blank)}${sigFoot()}</div>`)}
 
 /* ============ TEDARİK ============ */
 const SUP_STATUS=['Teklif bekleniyor','Teklif alındı','Sipariş verildi','Teslim alındı','İptal'];
@@ -10014,7 +10132,7 @@ const supName=x=>{const it=supItem(x);return it?(x.kind==='pack'?packLabel(it):m
 function supPill(st){const c={'Teklif bekleniyor':'warn','Teklif alındı':'','Sipariş verildi':'','Teslim alındı':'ok','İptal':'bad'}[st];return `<span class="pill ${c||''}">${esc(st)}</span>`}
 function lowestByCur(q){const m={};(q||[]).forEach(z=>{if(!m[z.currency]||pn(z.price)<pn(m[z.currency].price))m[z.currency]=z});return m}
 function quoteBrief(x){const q=x.quotes||[];if(!q.length)return '<span class="sub">Teklif yok</span>';const sel=q.find(z=>z.selected);
-  if(sel)return `<b>${fmtN(sel.price)} ${sel.currency}/${x.unit}</b><div class="sub">Seçilen: ${esc(sel.supplier)}, ${fmtD(sel.date)}</div>`;
+  if(sel)return `<b>${fmtN(sel.price)} ${sel.currency}/${x.unit}</b>${qTxt(x,sel)?`<div class="sub">${esc(qTxt(x,sel))}</div>`:''}<div class="sub">${orderedQuote(x)===sel?'Sipariş verilen':'Seçilen'}: ${esc(sel.supplier)}, ${fmtD(sel.date)}</div>`;
   return Object.values(lowestByCur(q)).map(z=>`${fmtN(z.price)} ${z.currency}/${x.unit} <span class="sub">${esc(z.supplier)}, ${fmtD(z.date)}</span>`).join('<br>')+`<div class="sub">En düşük, ${q.length} teklif</div>`}
 function prevPrice(x){if(x.prevManual&&pn(x.prevManual.price))return{y:x,z:{...x.prevManual,selected:false,manual:true}};const rows=DB.supplies.filter(y=>y.id!==x.id&&y.kind===x.kind&&y.refId===x.refId).flatMap(y=>(y.quotes||[]).map(z=>({y,z})));if(!rows.length)return null;
   const sel=rows.filter(r=>r.z.selected),pool=sel.length?sel:rows;return pool.sort((a,b)=>(b.z.date||'').localeCompare(a.z.date||''))[0]}
@@ -10064,24 +10182,24 @@ function saveSupply(){
   if(!g('item')){toast('Malzeme seç.',true);return}if(!pn(g('qty'))){toast('Miktar gir.',true);return}
   const kind=g('kind'),it=kind==='pack'?resolvePackText(g('item')):(DB.materials.find(m=>matLabel(m)===g('item'))||resolveMatText(g('item')));
   const isNew=!ED.id,x=isNew?{id:uid(),no:nextNo('TD','supNext'),created:today(),quotes:[]}:sup(ED.id);
-  const st=g('status');stampSup(x,st);
+  let st=g('status');const pick=st==='Sipariş verildi'&&x.status!=='Sipariş verildi'&&(x.quotes||[]).length;if(pick)st=x.status;stampSup(x,st);
   Object.assign(x,{kind,refId:it.id,qty:pn(g('qty')),unit:g('unit'),needDate:g('need'),orderId:g('order'),status:st,note:g('note')});
   if(pn(g('pprice')))x.prevManual={...(x.prevManual||{}),price:pn(g('pprice')),currency:g('pcur'),date:g('pdate'),supplier:g('psup')};else delete x.prevManual;
-  if(isNew)DB.supplies.push(x);touch(`Tedarik ${isNew?'eklendi':'güncellendi'}: ${x.no} ${supName(x)}`);supplyDetail(x.id);
+  if(isNew)DB.supplies.push(x);touch(`Tedarik ${isNew?'eklendi':'güncellendi'}: ${x.no} ${supName(x)}`);if(pick)orderQuotePick(x.id);else supplyDetail(x.id);
 }
 function stampSup(x,st){if(st==='Sipariş verildi'&&!x.orderedAt)x.orderedAt=today();if(st==='Teslim alındı'&&!x.receivedAt)x.receivedAt=today();if(st!=='Teslim alındı')x.receivedAt=''}
 function supplyDetail(id){
-  const x=sup(id);if(!x)return closeModal();ED=null;const q=x.quotes||[],low=lowestByCur(q),o=ord(x.orderId),it=supItem(x);
+  const x=sup(id);if(!x)return closeModal();ED=null;const q=x.quotes||[],low=lowestByCur(q),lowTL=lowestTL(q),o=ord(x.orderId),it=supItem(x);
   openModal('sup'+id,`Tedarik ${x.no}`,`<div class="info">
     <div><small>Malzeme</small>${esc(supName(x))}</div><div><small>Tür</small>${x.kind==='pack'?'Ambalaj':'Hammadde'}</div><div><small>Miktar</small>${fmtQ(x.qty)} ${esc(x.unit)}</div><div><small>İhtiyaç tarihi</small>${fmtD(x.needDate)}</div>
-    <div><small>Sipariş</small>${o?`<button class="btn link" onclick="orderDetail('${o.id}')">${esc(o.no)}</button>`:'—'}</div><div><small>Önceki fiyat <button class="btn link xsl" onclick="prevForm('${id}')">${x.prevManual?'düzenle':'elle gir'}</button></small>${prevHtml(x)}</div>${it?.supplier?`<div><small>Kütüphanedeki tedarikçi</small>${esc(it.supplier)}</div>`:''}${x.orderedAt?`<div><small>Sipariş verildi</small>${fmtD(x.orderedAt)}</div>`:''}${x.receivedAt?`<div><small>Teslim alındı</small>${fmtD(x.receivedAt)}</div>`:''}</div>
+    <div><small>Sipariş</small>${o?`<button class="btn link" onclick="orderDetail('${o.id}')">${esc(o.no)}</button>`:'—'}</div><div><small>Önceki fiyat <button class="btn link xsl" onclick="prevForm('${id}')">${x.prevManual?'düzenle':'elle gir'}</button></small>${prevHtml(x)}</div>${it?.supplier?`<div><small>Kütüphanedeki tedarikçi</small>${esc(it.supplier)}</div>`:''}${x.orderedAt?`<div><small>Sipariş verildi</small>${fmtD(x.orderedAt)}</div>`:''}${SUP_ORDERED.includes(x.status)&&(x.quotes||[]).length?`<div><small>Sipariş verilen teklif <button class="btn link xsl" onclick="orderQuotePick('${id}')">değiştir</button></small>${(z=>z?`<b>${esc(z.supplier)}</b> · ${fmtN(z.price)} ${z.currency}/${esc(x.unit)}`:'<span class="sub">belirtilmedi</span>')(orderedQuote(x))}</div>`:''}${x.receivedAt?`<div><small>Teslim alındı</small>${fmtD(x.receivedAt)}</div>`:''}</div>
     ${x.note?`<p class="sub" style="margin-top:-6px">${esc(x.note)}</p>`:''}
     <div class="sec"><h3>Durum</h3><div class="chips">${SUP_STATUS.map(st=>`<button class="chip ${st===x.status?'on':''}" onclick="setSupStatus('${id}','${st}')">${st}</button>`).join('')}</div></div>
-    <div class="sec"><h3>Fiyat teklifleri <span class="sub">${q.length}</span></h3>${q.length?`<div class="tw"><table class="t"><thead><tr><th>Tedarikçi</th><th>Tarih</th><th class="r">Birim fiyat</th><th class="r">Tutar</th><th class="r">Termin</th><th class="r">Min. sipariş</th><th>Geçerlilik</th><th>Ödeme</th><th></th></tr></thead><tbody>${[...q].sort((a,b)=>a.currency.localeCompare(b.currency)||pn(a.price)-pn(b.price)).map(z=>`<tr class="${z.selected?'selq':''}"><td><b>${esc(z.supplier)}</b>${z.note?`<div class="sub">${esc(z.note)}</div>`:''}</td><td>${fmtD(z.date)}</td><td class="r">${fmtN(z.price)} ${z.currency}/${esc(x.unit)}${low[z.currency]===z&&q.length>1?' <span class="pill ok">En düşük</span>':''}</td><td class="r">${fmtM(pn(z.price)*pn(x.qty),z.currency)}</td><td class="r">${z.lead?esc(z.lead)+' gün':''}</td><td class="r">${z.moq?fmtQ(z.moq)+' '+esc(x.unit):''}</td><td>${z.valid?fmtD(z.valid)+(daysTo(z.valid)<0?' <span class="pill bad">Geçti</span>':''):''}</td><td>${esc(z.payment||'')}</td><td style="white-space:nowrap">${z.selected?`<button class="btn sm" onclick="selQuote('${id}','${z.id}',false)">Seçimi kaldır</button>`:`<button class="btn sm" onclick="selQuote('${id}','${z.id}',true)">Seç</button>`} <button class="btn sm" onclick="delQuote('${id}','${z.id}')" aria-label="Teklifi sil">✕</button></td></tr>`).join('')}</tbody></table></div>`:'<div class="sub">Henüz teklif girilmedi.</div>'}
+    <div class="sec"><h3>Fiyat teklifleri <span class="sub">${q.length}</span></h3>${q.length?`<div class="tw"><table class="t"><thead><tr><th>Tedarikçi</th><th class="r">Birim fiyat</th><th class="r">Tutar</th><th class="r">KDV dahil (TL)</th><th class="r">Termin</th><th class="r">Min. sipariş</th><th>Geçerlilik</th><th>Ödeme</th><th></th></tr></thead><tbody>${[...q].sort((a,b)=>a.currency.localeCompare(b.currency)||pn(a.price)-pn(b.price)).map(z=>`<tr class="${z.selected?'selq':''}"><td><b>${esc(z.supplier)}</b>${orderedQuote(x)===z?' <span class="pill ok">Sipariş verilen</span>':''}<div class="sub">${fmtD(z.date)}</div>${z.note?`<div class="sub">${esc(z.note)}</div>`:''}</td><td class="r">${fmtN(z.price)} ${z.currency}/${esc(x.unit)}${low[z.currency]===z&&q.filter(y=>y.currency===z.currency).length>1?' <span class="pill ok">En düşük</span>':''}</td><td class="r">${qAmtHtml(x,z)}${lowTL===z?' <span class="pill ok">En düşük (TL)</span>':''}</td><td class="r">${qGrossHtml(x,z)}</td><td class="r">${z.lead?esc(z.lead)+' gün':''}</td><td class="r">${z.moq?fmtQ(z.moq)+' '+esc(x.unit):''}</td><td>${z.valid?fmtD(z.valid)+(daysTo(z.valid)<0?' <span class="pill bad">Geçti</span>':''):''}</td><td>${esc(z.payment||'')}</td><td style="white-space:nowrap">${z.selected?`<button class="btn sm" onclick="selQuote('${id}','${z.id}',false)">Seçimi kaldır</button>`:`<button class="btn sm" onclick="selQuote('${id}','${z.id}',true)">Seç</button>`} <button class="btn sm" onclick="quoteForm('${id}','${z.id}')" title="Teklifi düzenle" aria-label="Teklifi düzenle">✎</button> <button class="btn sm" onclick="delQuote('${id}','${z.id}')" aria-label="Teklifi sil">✕</button></td></tr>`).join('')}</tbody></table></div>`:'<div class="sub">Henüz teklif girilmedi.</div>'}
     <h4 class="h4">Teklif ekle</h4><datalist id="supNames">${supplierNames().map(n=>`<option value="${esc(n)}">`).join('')}</datalist>
-    <div class="fg" style="align-items:end"><label class="f"><span>Tedarikçi *</span><input id="q_sup" list="supNames"></label><label class="f"><span>Birim fiyat (${esc(x.unit)} başına) *</span><input id="q_price" inputmode="decimal"></label><label class="f"><span>Para birimi</span><select id="q_cur">${CURS.map(c=>`<option ${c===DB.settings.currency?'selected':''}>${c}</option>`).join('')}</select></label><label class="f"><span>Teklif tarihi</span><input type="date" id="q_date" value="${today()}"></label><label class="f"><span>Termin (gün)</span><input id="q_lead" inputmode="numeric"></label><label class="f"><span>Min. sipariş (${esc(x.unit)})</span><input id="q_moq" inputmode="decimal"></label><label class="f"><span>Geçerlilik</span><input type="date" id="q_valid"></label><label class="f"><span>Ödeme şartı</span><input id="q_pay" placeholder="Peşin, 30 gün…"></label><label class="f wide"><span>Not</span><input id="q_note"></label><button class="btn pri" onclick="addQuote('${id}')">Teklifi ekle</button></div></div>
+    <div class="fg" style="align-items:end"><label class="f"><span>Tedarikçi *</span><input id="q_sup" list="supNames"></label><label class="f"><span>Birim fiyat (${esc(x.unit)} başına) *</span><input id="q_price" inputmode="decimal" oninput="qLive('q','${id}')"></label>${qFields('q',null,x)}<label class="f"><span>Teklif tarihi</span><input type="date" id="q_date" value="${today()}"></label><label class="f"><span>Termin (gün)</span><input id="q_lead" inputmode="numeric"></label><label class="f"><span>Min. sipariş (${esc(x.unit)})</span><input id="q_moq" inputmode="decimal"></label><label class="f"><span>Geçerlilik</span><input type="date" id="q_valid"></label><label class="f"><span>Ödeme şartı</span><input id="q_pay" placeholder="Peşin, 30 gün…"></label><label class="f wide"><span>Not</span><input id="q_note"></label><div class="qprev wide" id="q_prev"></div><button class="btn pri" onclick="addQuote('${id}')">Teklifi ekle</button></div></div>
     ${priceHistory(x.kind,x.refId,id)}`,
-    `<button class="btn bad sp" onclick="delSupply('${id}')">Sil</button><button class="btn" onclick="printSupply('${id}')">Karşılaştırmayı yazdır</button><button class="btn pri" onclick="supplyForm('${id}')">Düzenle</button>`,'wide');
+    `<button class="btn bad sp" onclick="delSupply('${id}')">Sil</button><button class="btn" onclick="printSupply('${id}')">Karşılaştırmayı yazdır</button><button class="btn pri" onclick="supplyForm('${id}')">Düzenle</button>`,'wide');qLive('q',id);
 }
 function prevForm(id){const x=sup(id),m=x.prevManual||{};
   openModal('pv'+id,'Önceki fiyatı elle gir',`<p class="sub" style="margin-top:0">${esc(supName(x))}. Elle girilen fiyat, sistemdeki eski tekliflerin yerine “önceki fiyat” olarak gösterilir. Fiyatı boşaltıp kaydedersen sistem yeniden eski tekliflerden hesaplar.</p>
@@ -10090,16 +10208,67 @@ function prevForm(id){const x=sup(id),m=x.prevManual||{};
 function savePrev(id){const x=sup(id),g=k=>document.getElementById('pv_'+k).value.trim();
   if(!pn(g('price')))delete x.prevManual;else x.prevManual={price:pn(g('price')),currency:g('cur'),date:g('date'),supplier:g('sup'),note:g('note')};
   touch(`Tedarik ${x.no}: önceki fiyat ${x.prevManual?fmtN(x.prevManual.price)+' '+x.prevManual.currency:'sistemden hesaplanacak'}`);supplyDetail(id)}
-function setSupStatus(id,st){const x=sup(id);stampSup(x,st);x.status=st;touch(`Tedarik ${x.no}: ${st}`);supplyDetail(id)}
+/* ---- Teklif: kur, TL karşılığı, KDV ---- */
+const fmtTL=n=>fmtN(n)+' TL',fmtR=n=>(+n||0).toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:4});
+function qCalc(x,z){const net=pn(z.price)*pn(x.qty),isTL=(z.currency||'TRY')==='TRY',rate=isTL?1:pn(z.rate),tl=rate?net*rate:null,kdv=pn(z.kdv);
+  return{net,isTL,rate,tl,kdv,kdvAmt:tl!=null?tl*kdv/100:null,gross:tl!=null?tl*(1+kdv/100):null,unitTL:rate?pn(z.price)*rate:null}}
+function qAmtHtml(x,z){const c=qCalc(x,z);return `${fmtM(c.net,z.currency)}${c.isTL?'':c.tl!=null?`<div class="sub">kur ${fmtR(c.rate)} → <b>${fmtTL(c.tl)}</b></div>`:'<div class="sub" style="color:var(--warn)">kur girilmedi</div>'}`}
+function qGrossHtml(x,z){const c=qCalc(x,z);if(c.tl==null)return '<span class="sub">kur gerekli</span>';if(!c.kdv)return `${fmtTL(c.tl)}<div class="sub">KDV girilmedi</div>`;
+  return `<b>${fmtTL(c.gross)}</b><div class="sub">%${fmtQ(c.kdv)} KDV ${fmtTL(c.kdvAmt)}</div>`}
+function qTxt(x,z){const c=qCalc(x,z);return [c.isTL?'':c.tl!=null?`kur ${fmtR(c.rate)} → ${fmtTL(c.tl)}`:'kur girilmedi',c.gross!=null&&c.kdv?`KDV dahil ${fmtTL(c.gross)}`:''].filter(Boolean).join(' · ')}
+/* TL karşılığına göre en ucuz teklif (farklı para birimleri karşılaştırılırken) */
+function lowestTL(q){const L=(q||[]).filter(z=>((z.currency||'TRY')==='TRY'||pn(z.rate))&&pn(z.price));if(new Set(L.map(z=>z.currency)).size<2)return null;return L.reduce((a,z)=>pn(z.price)*((z.currency==='TRY')?1:pn(z.rate))<pn(a.price)*((a.currency==='TRY')?1:pn(a.rate))?z:a)}
+function qFields(p,z,x){z=z||{};const cur=z.currency||DB.settings.currency||'TRY',lr=(DB.settings.lastRate||{})[cur]||'';
+  return `<label class="f"><span>Para birimi</span><select id="${p}_cur" onchange="qLive('${p}','${x.id}',true)">${CURS.map(c=>`<option ${c===cur?'selected':''}>${c}</option>`).join('')}</select></label><label class="f" id="${p}_rateW"><span>Kur (1 <span id="${p}_rateC">${cur}</span> = ? TL)</span><input id="${p}_rate" inputmode="decimal" value="${numIn(z.rate||(cur!=='TRY'?lr:''))}" oninput="qLive('${p}','${x.id}')"></label><label class="f"><span>KDV %</span><input id="${p}_kdv" inputmode="decimal" value="${numIn(z.id?(z.kdv??''):(z.kdv??DB.settings.lastQKdv??''))}" placeholder="20" oninput="qLive('${p}','${x.id}')"></label>`}
+function qLive(p,id,curChanged){const x=sup(id),el=k=>document.getElementById(p+'_'+k);if(!x||!el('cur'))return;const cur=el('cur').value;
+  el('rateW').style.display=cur==='TRY'?'none':'';el('rateC').textContent=cur;
+  if(curChanged&&cur!=='TRY'){const lr=(DB.settings.lastRate||{})[cur];el('rate').value=lr?numIn(lr):''}
+  const z={price:pn(el('price').value),currency:cur,rate:pn(el('rate').value),kdv:pn(el('kdv').value)},c=qCalc(x,z),box=el('prev');if(!box)return;
+  box.innerHTML=!z.price?'':`<b>Tutar:</b> ${fmtM(c.net,cur)}${c.isTL?'':c.tl!=null?` × ${fmtR(c.rate)} = <b>${fmtTL(c.tl)}</b>`:' · <span style="color:var(--warn)">TL karşılığı için kur gir</span>'}${c.tl!=null&&c.kdv?` · <b>KDV dahil:</b> ${fmtTL(c.gross)} <span class="sub">(%${fmtQ(c.kdv)} KDV ${fmtTL(c.kdvAmt)})</span>`:''}`}
+function qRead(p){const g=k=>document.getElementById(p+'_'+k).value.trim(),cur=g('cur'),rate=cur==='TRY'?'':(pn(g('rate'))||''),kdv=g('kdv')===''?'':pn(g('kdv'));
+  if(rate){DB.settings.lastRate={...(DB.settings.lastRate||{}),[cur]:rate}}if(kdv!=='')DB.settings.lastQKdv=kdv;return{currency:cur,rate,kdv}}
+function setSupStatus(id,st){const x=sup(id);if(st==='Sipariş verildi'&&(x.quotes||[]).length)return orderQuotePick(id);stampSup(x,st);x.status=st;touch(`Tedarik ${x.no}: ${st}`);supplyDetail(id)}
+const SUP_ORDERED=['Sipariş verildi','Teslim alındı'];
+const orderedQuote=x=>SUP_ORDERED.includes(x.status)&&x.orderedQuoteId?(x.quotes||[]).find(z=>z.id===x.orderedQuoteId)||null:null;
+function orderQuotePick(id){const x=sup(id),q=x.quotes||[],low=lowestByCur(q);
+  const pre=(q.find(z=>z.id===x.orderedQuoteId)||q.find(z=>z.selected)||lowestTL(q)||Object.values(low)[0]||q[0]||{}).id;
+  openModal('oqp'+id,`Tedarik ${x.no} · hangi teklife sipariş verildi?`,`<p class="sub" style="margin-top:0">${esc(supName(x))}, ${fmtQ(x.qty)} ${esc(x.unit)}. Siparişin verildiği teklifi seç; seçilen teklif yeşil işaretlenir ve listede “Sipariş verilen” olarak görünür.</p>
+   <div class="oqlist">${[...q].sort((a,b)=>a.currency.localeCompare(b.currency)||pn(a.price)-pn(b.price)).map(z=>`<label class="oq"><input type="radio" name="oq" value="${z.id}" ${z.id===pre?'checked':''}><span><b>${esc(z.supplier)}</b> · ${fmtN(z.price)} ${z.currency}/${esc(x.unit)} · ${fmtM(pn(z.price)*pn(x.qty),z.currency)}${low[z.currency]===z&&q.filter(y=>y.currency===z.currency).length>1?' <span class="pill ok">En düşük</span>':''}${lowestTL(q)===z?' <span class="pill ok">En düşük (TL)</span>':''}<div class="sub">${qTxt(x,z)?esc(qTxt(x,z))+' · ':''}${fmtD(z.date)}${z.lead?' · termin '+esc(z.lead)+' gün':''}${z.payment?' · '+esc(z.payment):''}${z.valid&&daysTo(z.valid)<0?' · <span class="pill bad">Geçerlilik geçti</span>':''}</div></span></label>`).join('')}
+   <label class="oq"><input type="radio" name="oq" value=""><span>Teklif belirtmeden sipariş verildi</span></label></div>
+   <div class="fg" style="margin-top:10px"><label class="f"><span>Sipariş tarihi</span><input type="date" id="oq_date" value="${x.orderedAt||today()}"></label></div>`,
+   `<button class="btn" onclick="supplyDetail('${id}')">Vazgeç</button><button class="btn pri" onclick="saveOrderQuote('${id}')">Sipariş verildi olarak kaydet</button>`);
+}
+function saveOrderQuote(id){const x=sup(id),r=document.querySelector('input[name="oq"]:checked'),qid=r?r.value:'';
+  x.orderedQuoteId=qid;if(qid)x.quotes.forEach(z=>z.selected=z.id===qid);
+  x.orderedAt=document.getElementById('oq_date').value||today();if(!SUP_ORDERED.includes(x.status))x.status='Sipariş verildi';x.receivedAt=x.status==='Teslim alındı'?x.receivedAt:'';
+  const z=qid&&x.quotes.find(z=>z.id===qid);touch(`Tedarik ${x.no}: sipariş verildi${z?` (${z.supplier}, ${fmtN(z.price)} ${z.currency})`:''}`);supplyDetail(id)}
+function quoteForm(id,qid){const x=sup(id),z=(x.quotes||[]).find(z=>z.id===qid);if(!z)return;
+  openModal('qe'+qid,`Teklifi düzenle · ${esc(z.supplier)}`,`<datalist id="supNames2">${supplierNames().map(n=>`<option value="${esc(n)}">`).join('')}</datalist><div class="fg">
+   <label class="f"><span>Tedarikçi *</span><input id="qe_sup" list="supNames2" value="${esc(z.supplier)}"></label>
+   <label class="f"><span>Birim fiyat (${esc(x.unit)} başına) *</span><input id="qe_price" inputmode="decimal" value="${numIn(z.price??'')}" oninput="qLive('qe','${id}')"></label>
+   ${qFields('qe',z,x)}
+   <label class="f"><span>Teklif tarihi</span><input type="date" id="qe_date" value="${z.date||''}"></label>
+   <label class="f"><span>Termin (gün)</span><input id="qe_lead" inputmode="numeric" value="${esc(z.lead||'')}"></label>
+   <label class="f"><span>Min. sipariş (${esc(x.unit)})</span><input id="qe_moq" inputmode="decimal" value="${numIn(z.moq??'')}"></label>
+   <label class="f"><span>Geçerlilik</span><input type="date" id="qe_valid" value="${z.valid||''}"></label>
+   <label class="f"><span>Ödeme şartı</span><input id="qe_pay" value="${esc(z.payment||'')}"></label>
+   <label class="f wide"><span>Not</span><input id="qe_note" value="${esc(z.note||'')}"></label><div class="qprev wide" id="qe_prev"></div></div>`,
+   `<button class="btn" onclick="supplyDetail('${id}')">Vazgeç</button><button class="btn pri" onclick="saveQuoteEdit('${id}','${qid}')">Kaydet</button>`);qLive('qe',id);
+}
+function saveQuoteEdit(id,qid){const g=k=>document.getElementById('qe_'+k).value.trim();
+  if(!g('sup')){toast('Tedarikçi adını gir.',true);return}if(!pn(g('price'))){toast('Birim fiyatı gir.',true);return}
+  const x=sup(id),z=x.quotes.find(z=>z.id===qid),old=fmtN(z.price)+' '+z.currency;
+  Object.assign(z,{supplier:g('sup'),price:pn(g('price')),...qRead('qe'),date:g('date'),lead:g('lead'),moq:pn(g('moq'))||'',valid:g('valid'),payment:g('pay'),note:g('note')});
+  touch(`Tedarik ${x.no}: ${z.supplier} teklifi düzenlendi (${old} → ${fmtN(z.price)} ${z.currency})`);supplyDetail(id)}
 function addQuote(id){
   const g=k=>document.getElementById('q_'+k).value.trim();
   if(!g('sup')){toast('Tedarikçi adını gir.',true);return}if(!pn(g('price'))){toast('Birim fiyatı gir.',true);return}
-  const x=sup(id);x.quotes=x.quotes||[];x.quotes.push({id:uid(),supplier:g('sup'),price:pn(g('price')),currency:g('cur'),date:g('date'),lead:g('lead'),moq:pn(g('moq'))||'',valid:g('valid'),payment:g('pay'),note:g('note'),selected:false});
+  const x=sup(id);x.quotes=x.quotes||[];x.quotes.push({id:uid(),supplier:g('sup'),price:pn(g('price')),...qRead('q'),date:g('date'),lead:g('lead'),moq:pn(g('moq'))||'',valid:g('valid'),payment:g('pay'),note:g('note'),selected:false});
   if(x.status==='Teklif bekleniyor')x.status='Teklif alındı';
   touch(`Tedarik ${x.no}: ${g('sup')} teklifi ${fmtN(pn(g('price')))} ${g('cur')}`);supplyDetail(id);
 }
-function selQuote(id,qid,v){const x=sup(id);x.quotes.forEach(z=>z.selected=v&&z.id===qid);const z=x.quotes.find(z=>z.id===qid);touch(`Tedarik ${x.no}: ${v?'seçilen teklif '+z.supplier:'teklif seçimi kaldırıldı'}`);supplyDetail(id)}
-function delQuote(id,qid){if(!confirm('Teklif silinsin mi?'))return;const x=sup(id);x.quotes=x.quotes.filter(z=>z.id!==qid);touch(`Tedarik ${x.no}: teklif silindi`);supplyDetail(id)}
+function selQuote(id,qid,v){const x=sup(id);x.quotes.forEach(z=>z.selected=v&&z.id===qid);if(SUP_ORDERED.includes(x.status))x.orderedQuoteId=v?qid:'';const z=x.quotes.find(z=>z.id===qid);touch(`Tedarik ${x.no}: ${v?'seçilen teklif '+z.supplier:'teklif seçimi kaldırıldı'}`);supplyDetail(id)}
+function delQuote(id,qid){if(!confirm('Teklif silinsin mi?'))return;const x=sup(id);x.quotes=x.quotes.filter(z=>z.id!==qid);if(x.orderedQuoteId===qid)x.orderedQuoteId='';touch(`Tedarik ${x.no}: teklif silindi`);supplyDetail(id)}
 function delSupply(id){const x=sup(id);if(!confirm(x.no+' ve teklifleri silinsin mi?'))return;DB.supplies=DB.supplies.filter(z=>z.id!==id);closeModal();touch('Tedarik silindi: '+x.no)}
 function priceHistory(kind,refId,exceptId){
   const rows=DB.supplies.filter(x=>x.kind===kind&&x.refId===refId).flatMap(x=>(x.quotes||[]).map(z=>({x,z}))).filter(r=>r.x.id!==exceptId).sort((a,b)=>(b.z.date||'').localeCompare(a.z.date||''));
@@ -10139,14 +10308,17 @@ function pickCommit(){
 }
 function printSupply(id){const x=sup(id),q=[...(x.quotes||[])].sort((a,b)=>a.currency.localeCompare(b.currency)||pn(a.price)-pn(b.price));
   printDoc(`<div class="rp">${pHead('Fiyat teklif karşılaştırması',x.no)}<p><b>${esc(supName(x))}</b> (${x.kind==='pack'?'Ambalaj':'Hammadde'}), ${fmtQ(x.qty)} ${esc(x.unit)}, ihtiyaç tarihi ${fmtD(x.needDate)}${ord(x.orderId)?', sipariş '+esc(ord(x.orderId).no):''}</p>
-  <table><thead><tr><th>Tedarikçi</th><th>Tarih</th><th class="r">Birim fiyat</th><th class="r">Tutar</th><th class="r">Termin</th><th class="r">Min. sipariş</th><th>Geçerlilik</th><th>Ödeme</th><th>Not</th></tr></thead><tbody>${q.map(z=>`<tr><td>${z.selected?'<b>✔ ':''}${esc(z.supplier)}${z.selected?'</b>':''}</td><td>${fmtD(z.date)}</td><td class="r">${fmtN(z.price)} ${z.currency}</td><td class="r">${fmtM(pn(z.price)*pn(x.qty),z.currency)}</td><td class="r">${z.lead?esc(z.lead)+' gün':''}</td><td class="r">${z.moq?fmtQ(z.moq):''}</td><td>${fmtD(z.valid)}</td><td>${esc(z.payment||'')}</td><td>${esc(z.note||'')}</td></tr>`).join('')||'<tr><td colspan="9">Teklif yok</td></tr>'}</tbody></table></div>`)}
+  <table><thead><tr><th>Tedarikçi</th><th>Tarih</th><th class="r">Birim fiyat</th><th class="r">Tutar</th><th class="r">Kur</th><th class="r">TL tutar</th><th class="r">KDV</th><th class="r">KDV dahil (TL)</th><th class="r">Termin</th><th class="r">Min. sipariş</th><th>Geçerlilik</th><th>Ödeme</th><th>Not</th></tr></thead><tbody>${q.map(z=>`<tr><td>${z.selected?'<b>✔ ':''}${esc(z.supplier)}${z.selected?'</b>':''}</td><td>${fmtD(z.date)}</td><td class="r">${fmtN(z.price)} ${z.currency}</td><td class="r">${fmtM(pn(z.price)*pn(x.qty),z.currency)}</td>${(c=>`<td class="r">${c.isTL?'':c.rate?fmtR(c.rate):'—'}</td><td class="r">${c.tl!=null?fmtTL(c.tl):''}</td><td class="r">${c.kdv?'%'+fmtQ(c.kdv):''}</td><td class="r">${c.gross!=null&&c.kdv?'<b>'+fmtTL(c.gross)+'</b>':''}</td>`)(qCalc(x,z))}<td class="r">${z.lead?esc(z.lead)+' gün':''}</td><td class="r">${z.moq?fmtQ(z.moq):''}</td><td>${fmtD(z.valid)}</td><td>${esc(z.payment||'')}</td><td>${esc(z.note||'')}</td></tr>`).join('')||'<tr><td colspan="13">Teklif yok</td></tr>'}</tbody></table></div>`)}
 function exportSupplies(){
-  const sh=newSheet('Tedarik');const H=['No','Tür','Kod','Malzeme','Miktar','Birim','İhtiyaç tarihi','Sipariş','Durum','Tedarikçi','Teklif tarihi','Birim fiyat','Para birimi','Tutar','Termin (gün)','Min. sipariş','Geçerlilik','Ödeme','Seçilen','Önceki fiyat','Önceki para birimi','Önceki tarih','Önceki tedarikçi'];
-  sh.cols=[13,10,14,34,10,7,12,13,16,24,12,12,8,14,10,10,12,16,9,12,10,12,24];H.forEach((h,i)=>put(sh,colLetter(i)+'1',h,XS.h));let r=2;
+  const sh=newSheet('Tedarik');const H=['No','Tür','Kod','Malzeme','Miktar','Birim','İhtiyaç tarihi','Sipariş','Durum','Tedarikçi','Teklif tarihi','Birim fiyat','Para birimi','Tutar','Termin (gün)','Min. sipariş','Geçerlilik','Ödeme','Seçilen','Önceki fiyat','Önceki para birimi','Önceki tarih','Önceki tedarikçi','Kur','TL tutar','KDV %','KDV dahil (TL)'];
+  sh.cols=[13,10,14,34,10,7,12,13,16,24,12,12,8,14,10,10,12,16,9,12,10,12,24,10,14,7,15];H.forEach((h,i)=>put(sh,colLetter(i)+'1',h,XS.h));let r=2;
   DB.supplies.forEach(x=>{const it=supItem(x),base=[x.no,x.kind==='pack'?'Ambalaj':'Hammadde',it?.code||'',it?(x.kind==='pack'?pkName(it):it.name):'',pn(x.qty),x.unit,x.needDate?fmtD(x.needDate):'',ord(x.orderId)?.no||'',x.status];
     const qs=(x.quotes||[]).length?x.quotes:[null],pv=prevPrice(x);
     qs.forEach(z=>{const row=base.concat(z?[z.supplier,z.date?fmtD(z.date):'',pn(z.price),z.currency,null,z.lead||'',z.moq||'',z.valid?fmtD(z.valid):'',z.payment||'',z.selected?'Evet':'']:['','','','','','','','','','']).concat(pv?[pn(pv.z.price),pv.z.currency,pv.z.date?fmtD(pv.z.date):'',pv.z.supplier]:['','','','']);
-      row.forEach((v,i)=>{const ref=colLetter(i)+r;if(i===13&&z)put(sh,ref,pn(z.price)*pn(x.qty),XS.p,`E${r}*L${r}`);else put(sh,ref,v??'',typeof v==='number'?XS.p:XS.c)});r++})});
+      row.forEach((v,i)=>{const ref=colLetter(i)+r;if(i===13&&z)put(sh,ref,pn(z.price)*pn(x.qty),XS.p,`E${r}*L${r}`);else put(sh,ref,v??'',typeof v==='number'?XS.p:XS.c)});
+      if(z){const c=qCalc(x,z),X=colLetter(23),Y=colLetter(24),Z=colLetter(25),A=colLetter(26);put(sh,X+r,c.isTL?1:(c.rate||''),c.isTL||c.rate?XS.p:XS.c);
+        if(c.tl!=null)put(sh,Y+r,c.tl,XS.p,`N${r}*${X}${r}`);else put(sh,Y+r,'',XS.c);put(sh,Z+r,z.kdv===''||z.kdv==null?'':pn(z.kdv),XS.p);if(c.tl!=null)put(sh,A+r,c.gross,XS.p,`${Y}${r}*(1+${Z}${r}/100)`);else put(sh,A+r,'',XS.c)}
+      r++})});
   downloadXlsx([sh],'tedarik-'+today()+'.xlsx');
 }
 
@@ -10283,11 +10455,11 @@ function rpTable(d,plain){
   return plain?tb:`<div class="tw">${tb}</div>`;
 }
 VIEWS.reports=()=>{
-  const d=reportData(S.rpTab);
+  const d=['ste','stemissing'].includes(S.rpTab)&&steLocked()?{sub:'STE raporları şifreli',rows:[]}:reportData(S.rpTab);
   return head('Raporlar',esc(d.sub),`<select style="width:auto;min-width:200px" onchange="S.rpFirm=this.value;renderMain()"><option value="">Tüm firmalar</option>${firmsSorted().map(f=>`<option value="${f.id}" ${S.rpFirm===f.id?'selected':''}>${esc(f.name)}</option>`).join('')}</select>${d.years?`<select style="width:auto" onchange="S.rpYear=this.value;renderMain()">${(d.years.length?d.years:[d.year]).map(y=>`<option ${y===d.year?'selected':''}>${y}</option>`).join('')}</select>`:''}<button class="btn" onclick="rpAll(true)">Tümünü aç</button><button class="btn" onclick="rpAll(false)">Tümünü kapat</button><button class="btn" onclick="rpExcel()" ${d.rows.length?'':'disabled'}>Excel’e aktar</button><button class="btn pri" onclick="rpPrint()" ${d.rows.length?'':'disabled'}>Yazdır</button>`)+
   `<div class="tabs">${RP_TABS.filter(([k])=>(k!=='ste'||canSee('ste:raporlar'))&&(k!=='stemissing'||canSee('ste:x'))).map(([k,l])=>`<button class="${S.rpTab===k?'on':''}" onclick="rpTabClick('${k}')">${l}</button>`).join('')}</div>`+
   (d.note?`<details class="rnote ${d.note.warn?'warn':''}"><summary>${esc(d.note.label)}</summary><div class="rnote-l">${d.note.items.map(([n,v])=>`<span>${esc(n)}${v?` <b>${esc(v)}</b>`:''}</span>`).join('')}</div></details>`:'')+
-  (S.rpTab==='check'?checkView():d.rows.length?rpTable(d):`<div class="tw"><div class="empty">Bu raporda gösterilecek kayıt yok.</div></div>`);
+  (['ste','stemissing'].includes(S.rpTab)&&steLocked()?steLockBox():S.rpTab==='check'?checkView():d.rows.length?rpTable(d):`<div class="tw"><div class="empty">Bu raporda gösterilecek kayıt yok.</div></div>`);
 };
 function steOpenRec(kind,id){const pg={urun:'urunler',inci:'hammadde',soz:'sozlesmeler',is:'isler'}[kind]||'urunler';go('ste:'+pg);steEnsure().then(ok=>{if(ok)setTimeout(()=>{try{steWin().__yku.open(kind,id)}catch(e){console.warn(e)}},60)})}
 function rpTabClick(k){if(k==='ste'){go('ste:raporlar');return}S.rpTab=k;if(S.view!=='reports')go('reports');else renderMain()}
@@ -10352,7 +10524,7 @@ function materialForm(id){
   const m=id?mat(id):{};const v=k=>esc(m[k]||'');const used=id?matUsage(id):[];
   ED={kind:'mat',comps:(m.components||[]).map(c=>({...c}))};if(!ED.comps.length)ED.comps.push({inci:'',pct:100,func:''});
   openModal('mat'+(id||''),id?m.name:'Yeni hammadde',`<div class="fg">
-    <label class="f"><span>Kod</span><input id="m_code" value="${v('code')}"></label>
+    <label class="f"><span>Kod</span><input id="m_code" value="${v('code')}" oninput="codeHint('mat',this,'${id||''}')" autocomplete="off"></label>
     <label class="f wide" style="grid-column:span 2"><span>Hammadde adı *</span><input id="m_name" value="${v('name')}"></label>
     <label class="f"><span>Fonksiyon</span><input id="m_func" value="${v('func')}"></label>
     <label class="f"><span>Tedarikçi</span><input id="m_supplier" value="${v('supplier')}"></label>
@@ -10374,13 +10546,29 @@ function mcTot(){const t=ED.comps.reduce((a,c)=>a+pn(c.pct),0);{const el=documen
 function mcPaste(){const b=document.getElementById('mcPasteBox');if(b.innerHTML){b.innerHTML='';return}b.innerHTML=`<div class="tw" style="padding:12px"><p class="sub" style="margin-top:0">Excel’den “INCI” ve “%” sütunlarını (istersen fonksiyon da) kopyalayıp yapıştır.</p><textarea id="mcTxt" style="min-height:110px"></textarea><div class="row-actions" style="margin-bottom:0"><button class="btn sm pri" onclick="mcImport()">Aktar</button></div></div>`}
 function mcImport(){const L=document.getElementById('mcTxt').value.split(/\r?\n/).map(l=>l.split('\t').map(x=>x.trim())).filter(c=>c[0]&&!/^inci/i.test(c[0]));if(!L.length){toast('Satır bulunamadı.',true);return}
   ED.comps=L.map(c=>{const pi=c.findIndex((x,i)=>i>0&&/\d/.test(x)&&/^[\d.,%\s]+$/.test(x));return{inci:c[0],pct:pi>0?pn(c[pi]):(L.length===1?100:''),func:c.find((x,i)=>i>0&&i!==pi&&x)||''}});document.getElementById('mcPasteBox').innerHTML='';mcRender()}
+/* ---- Kod tekilliği ve silinmiş kod kaydı ---- */
+const codeKey=c=>norm(String(c||'')).replace(/\s+/g,'');
+function codeOwner(kind,code,exceptId){const k=codeKey(code);if(!k)return null;return (kind==='mat'?DB.materials:DB.packs).find(x=>x.id!==exceptId&&codeKey(x.code)===k)||null}
+function delCodeInfo(kind,code){const k=codeKey(code);return k?((DB.delCodes||{})[kind]||{})[k]||null:null}
+function rememberCode(kind,item,how){const c=String(item&&item.code||'').trim();if(!c)return;DB.delCodes=DB.delCodes||{mat:{},pack:{}};DB.delCodes[kind]=DB.delCodes[kind]||{};
+  DB.delCodes[kind][codeKey(c)]={code:c,name:kind==='mat'?item.name:pkName(item),at:today(),how:how||'silindi',by:S.user?(S.user.name||S.user.username):''}}
+function forgetCode(kind,code){const k=codeKey(code);if(k&&DB.delCodes&&DB.delCodes[kind])delete DB.delCodes[kind][k]}
+function codeHint(kind,inp,exceptId){const b=inp.parentElement.querySelector('.codehint')||inp.insertAdjacentElement('afterend',Object.assign(document.createElement('div'),{className:'codehint'}));const c=inp.value.trim();
+  const o=codeOwner(kind,c,exceptId),d=!o&&delCodeInfo(kind,c);
+  b.className='codehint '+(o?'bad':d?'warn':'');b.innerHTML=o?`⛔ Bu kod “${esc(kind==='mat'?o.name:pkName(o))}” kaydına ait. <a onclick="${kind==='mat'?`materialForm('${o.id}')`:`packForm('${o.id}')`}">Kaydı aç</a>`:d?`⚠️ Bu kod daha önce “${esc(d.name)}” için kullanılmış ve ${fmtD(d.at)} tarihinde ${esc(d.how)}. Kaydederken onay istenecek.`:''}
+function codeGate(kind,code,exceptId){const c=String(code||'').trim();if(!c)return true;const o=codeOwner(kind,c,exceptId);
+  if(o){toast(`“${c}” kodu zaten “${kind==='mat'?o.name:pkName(o)}” kaydına ait. Bir kod yalnızca bir ${kind==='mat'?'hammaddeye':'ambalaja'} verilebilir.`,true);return false}
+  const cur=exceptId?(kind==='mat'?mat(exceptId):pack(exceptId)):null;if(cur&&codeKey(cur.code)===codeKey(c))return true;
+  const d=delCodeInfo(kind,c);if(d&&!confirm(`“${c}” kodu daha önce “${d.name}” için kullanılmış ve ${fmtD(d.at)} tarihinde ${d.how}${d.by?' ('+d.by+')':''}.\n\nBu kodu yine de bu ${kind==='mat'?'hammaddeye':'ambalaja'} vermek istiyor musun?`))return false;
+  return true}
 function saveMaterial(id){
   const g=k=>document.getElementById('m_'+k).value.trim();
   if(!g('name')){toast('Hammadde adı gerekli.',true);return}
-  if(g('code')){const d=DB.materials.find(x=>x.code===g('code')&&x.id!==id);if(d){toast(`${g('code')} kodu zaten “${d.name}” için kullanılıyor.`,true);return}}
+  if(!codeGate('mat',g('code'),id))return;const oldCode=id?mat(id).code:'';
   const m=id?mat(id):{id:uid()};['code','name','func','supplier','note'].forEach(k=>m[k]=g(k));
   m.components=ED.comps.filter(c=>(c.inci||'').trim()).map(c=>({inci:c.inci.trim(),pct:pn(c.pct),func:(c.func||'').trim()}));syncMatInci(m);
   if(m.components.length&&!pctOkV(compTotal(m)))toast(`Kaydedildi; INCI oranları toplamı %${fmtP(compTotal(m))}.`);
+  if(oldCode&&codeKey(oldCode)!==codeKey(m.code))rememberCode('mat',{code:oldCode,name:m.name},'kodu “'+(m.code||'boş')+'” olarak değiştirildi');forgetCode('mat',m.code);
   if(!id)DB.materials.push(m);closeModal();touch(`Hammadde ${id?'güncellendi':'eklendi'}: ${matLabel(m)}`);
   const M=steIngMap(),nw=m.components.filter(c=>!M.has(norm(c.inci))).map(c=>({inci:c.inci,fonksiyon:c.func}));
   if(nw.length)steAddIngs(nw).then(n=>{if(n)toast(`${n} yeni INCI, INCI kütüphanesine eklendi`)});
@@ -10388,7 +10576,7 @@ function saveMaterial(id){
 function delMaterial(id){if(DB.rnd.some(x=>x.trials.some(t=>t.formula.some(f=>f.matId===id)))){toast('Bu hammadde bir Ar-Ge denemesinde kullanılıyor; silinemez.',true);return}
   if(DB.products.some(p=>(p.revisions||[]).some(r=>r.formula.some(f=>f.matId===id)))){toast('Bu hammadde bir ürünün eski revizyonunda kayıtlı; silinemez.',true);return}
   if(DB.supplies.some(x=>x.kind==='mat'&&x.refId===id)){toast('Bu hammadde Tedarik listesinde kullanılıyor; silinemez.',true);return}const u=matUsage(id);if(u.length){toast(`Bu hammadde ${u.length} üründe kullanılıyor; silinemez.`,true);return}
-  if(!confirm('Hammadde silinsin mi?'))return;const m=mat(id);DB.materials=DB.materials.filter(x=>x.id!==id);closeModal();touch('Hammadde silindi: '+matLabel(m))}
+  if(!confirm('Hammadde silinsin mi?'))return;const m=mat(id);rememberCode('mat',m,'silindi');DB.materials=DB.materials.filter(x=>x.id!==id);closeModal();touch('Hammadde silindi: '+matLabel(m))}
 
 /* ---- Hammadde Excel aktarımı ---- */
 const MAT_COLS=[['code',/^(kod|code|hammadde kod|stok kod)/],['name',/^(hammadde ad|hammadde$|ad$|adı$|ticari|ürün ad|malzeme)/],['pct',/^(%|inci %|ıncı %|inci oran|ıncı oran|yüzde|oran|bileşen %|bileşen oran|içerik %)/],['inci',/^(inci|ıncı)/],['func',/^(fonksiyon|function|görev|işlev)/],['supplier',/^(tedarik|supplier|firma|üretici)/],['note',/^(not|açıklama|note)/]];
@@ -10414,11 +10602,12 @@ function matImportPreview(list,src){
   list.forEach(d=>{if(d.include===undefined)d.include=true});ED={kind:'matimp',list,src};
   const ct=d=>d.components.map(c=>`${esc(c.inci)}${c.pct!==''?` <span class="sub">%${fmtP(c.pct)}</span>`:''}`).join('<br>');
   openModal('matimp','Hammadde aktarımı',`<p style="margin-top:0">${esc(src)} içinde <b>${list.length}</b> hammadde bulundu: <b>${nw}</b> yeni eklenecek, <b>${up}</b> mevcut hammaddenin INCI bileşenleri dosyadakiyle güncellenecek, diğer boş alanları doldurulacak.</p>
-   ${impBar('mat')}<div class="tw"><table class="t"><thead><tr><th>${impAllBox('mat')}</th><th>Kod</th><th>Ad</th><th>INCI bileşenleri</th><th class="r">Toplam %</th><th></th></tr></thead><tbody>${list.slice(0,200).map((d,i)=>{const t=d.components.reduce((a,c)=>a+pn(c.pct),0);return `<tr><td>${impRowBox('mat',i,d)}</td><td>${esc(d.code)}</td><td>${esc(d.name)}</td><td>${ct(d)||'<span class="sub">—</span>'}</td><td class="r ${d.components.length&&!pctOkV(t)?'pct-bad':''}">${d.components.length?fmtP(t):''}</td><td>${findMat(d.code,d.name)?'<span class="pill">Mevcut</span>':'<span class="pill ok">Yeni</span>'}</td></tr>`}).join('')}</tbody></table></div>${list.length>200?`<p class="sub">İlk 200 hammadde gösteriliyor; toplu seçim düğmeleri hepsine uygulanır.</p>`:''}`,
+   ${impBar('mat')}<div class="tw"><table class="t"><thead><tr><th>${impAllBox('mat')}</th><th>Kod</th><th>Ad</th><th>INCI bileşenleri</th><th class="r">Toplam %</th><th></th></tr></thead><tbody>${list.slice(0,200).map((d,i)=>{const t=d.components.reduce((a,c)=>a+pn(c.pct),0);return `<tr><td>${impRowBox('mat',i,d)}</td><td>${esc(d.code)}</td><td>${esc(d.name)}</td><td>${ct(d)||'<span class="sub">—</span>'}</td><td class="r ${d.components.length&&!pctOkV(t)?'pct-bad':''}">${d.components.length?fmtP(t):''}</td><td>${findMat(d.code,d.name)?'<span class="pill">Mevcut</span>':delCodeInfo('mat',d.code)?`<span class="pill warn" title="${esc(delCodeInfo('mat',d.code).name)} — ${esc(delCodeInfo('mat',d.code).how)}">Yeni · kod önceden kullanılmış</span>`:'<span class="pill ok">Yeni</span>'}</td></tr>`}).join('')}</tbody></table></div>${list.length>200?`<p class="sub">İlk 200 hammadde gösteriliyor; toplu seçim düğmeleri hepsine uygulanır.</p>`:''}`,
    `<button class="btn" onclick="closeModal()">Vazgeç</button><button class="btn pri" id="impGo" onclick="matImportCommit()">${list.length} hammaddeyi aktar</button>`,'wide');
   impUpd('mat');
 }
-function matImportCommit(){let n=0,u=0;const L=ED.list.filter(d=>d.include!==false);if(!L.length){toast('Aktarılacak hammadde seçilmedi.',true);return}L.forEach(d=>{const r=upsertMat(d);r.created?n++:u++});closeModal();touch(`Hammadde aktarımı: ${n} yeni, ${u} mevcut`);toast(`${n} yeni hammadde eklendi`);
+function matImportCommit(){let n=0,u=0;const L=ED.list.filter(d=>d.include!==false);if(!L.length){toast('Aktarılacak hammadde seçilmedi.',true);return}
+  {const re=L.filter(d=>!findMat(d.code,d.name)&&delCodeInfo('mat',d.code));if(re.length&&!confirm(`${re.length} yeni hammaddenin kodu daha önce silinmiş/birleştirilmiş kayıtlarda kullanılmış (${re.slice(0,5).map(d=>d.code).join(', ')}${re.length>5?'…':''}).\n\nBu kodlarla yine de eklensin mi? (Hayır dersen önizlemede bu satırların işaretini kaldırabilirsin.)`))return;re.forEach(d=>forgetCode('mat',d.code))}L.forEach(d=>{const r=upsertMat(d);r.created?n++:u++});closeModal();touch(`Hammadde aktarımı: ${n} yeni, ${u} mevcut`);toast(`${n} yeni hammadde eklendi`);
   const M=steIngMap(),seen=new Set(),nw=[];L.forEach(d=>(d.components||[]).forEach(c=>{const k=norm(c.inci);if(k&&!M.has(k)&&!seen.has(k)){seen.add(k);nw.push({inci:c.inci,fonksiyon:c.func||''})}}));
   if(nw.length)steAddIngs(nw).then(k=>{if(k)toast(`${n} yeni hammadde; ${k} yeni INCI, INCI kütüphanesine eklendi`)})}
 function matPasteForm(){
@@ -10574,7 +10763,7 @@ function pdKg(v){ED.kg=String(v).trim()===''?null:pn(v);document.getElementById(
 function productForm(id){
   const p=id?prod(id):null;
   ED={kind:'product',id:id||null,formula:(p?.formula||[]).map(f=>({phase:f.phase||'',matText:matLabel(mat(f.matId)),pct:f.pct})),pack:(p?.packaging||[]).map(k=>({packText:packLabel(pack(k.packId)),perUnit:k.perUnit})),paste:false};
-  if(!ED.formula.length)ED.formula.push({phase:'A Fazı',matText:'',pct:''});
+  ED.formula=sortByPhase(ED.formula);if(!ED.formula.length)ED.formula.push({phase:'A Fazı',matText:'',pct:''});
   const v=k=>esc(p?.[k]??'');const fid=p?.firmId||S.prFirm||'';
   openModal('prod'+(id||''),id?'Ürünü düzenle':'Yeni ürün',`<div class="fg">
     <label class="f wide" style="grid-column:span 2"><span>Firma *</span><select id="p_firm"><option value="">Firma seç…</option>${firmsSorted().map(f=>`<option value="${f.id}" ${fid===f.id?'selected':''}>${esc(f.name)}</option>`).join('')}</select></label>
@@ -10588,7 +10777,7 @@ function productForm(id){
     <div class="sec"><h3>Formül <span id="pctTot"></span></h3><div id="compWrap"></div>
     <datalist id="matList">${DB.materials.map(m=>`<option value="${esc(matLabel(m))}">`).join('')}</datalist><datalist id="phList">${PHASES.map(x=>`<option value="${x}">`).join('')}</datalist>
     <div class="tw"><table class="t ed"><thead><tr><th>Faz</th><th>Hammadde (kütüphaneden ara ya da yaz)</th><th class="r">%</th><th></th></tr></thead><tbody id="fxRows"></tbody></table></div>
-    <div class="row-actions"><button class="btn sm" onclick="fxAdd()">＋ Satır ekle</button><button class="btn sm" onclick="ED.paste=!ED.paste;fxPasteBox()">Excel’den yapıştır</button></div><div id="pasteBox"></div></div>
+    <div class="row-actions"><button class="btn sm" onclick="fxAdd()">＋ Satır ekle</button><button class="btn sm" onclick="fxSort()" title="Aynı fazları bir araya toplar, faz içinde % büyükten küçüğe sıralar">⇅ Fazlara göre sırala</button><button class="btn sm" onclick="ED.paste=!ED.paste;fxPasteBox()">Excel’den yapıştır</button></div><div id="pasteBox"></div></div>
     <div class="sec"><h3>Ambalaj <button class="btn sm" onclick="closeModal();go('packs')">Ambalaj kütüphanesi</button></h3><datalist id="pkList">${[...DB.packs].sort((a,b)=>packLabel(a).localeCompare(packLabel(b),'tr')).map(k=>`<option value="${esc(packLabel(k))}">`).join('')}</datalist>
     <div class="tw"><table class="t ed"><thead><tr><th>Ambalaj (kütüphaneden ara ya da yaz)</th><th>Birim hacim / renk</th><th class="r">1 ürün için adet</th><th></th></tr></thead><tbody id="pkRows"></tbody></table></div>
     <div class="row-actions"><button class="btn sm" onclick="ED.pack.push({packText:'',perUnit:1});pkRender()">＋ Ambalaj ekle</button><span class="sub">Kütüphanede olmayan bir ad yazarsan kütüphaneye yeni ambalaj olarak eklenir.</span></div></div>
@@ -10599,13 +10788,16 @@ function productForm(id){
 }
 function fxRender(){
   document.getElementById('fxRows').innerHTML=ED.formula.map((f,i)=>`<tr>
-    <td><input style="width:100px" list="phList" value="${esc(f.phase)}" oninput="ED.formula[${i}].phase=this.value"></td>
+    <td><input style="width:100px" list="phList" value="${esc(f.phase)}" oninput="ED.formula[${i}].phase=this.value" onchange="fxSort(ED.formula[${i}])"></td>
     <td><input style="min-width:260px" list="matList" value="${esc(f.matText)}" oninput="ED.formula[${i}].matText=this.value;fxTot()"></td>
     <td><input class="w-pct" style="text-align:right" inputmode="decimal" value="${f.pct===''||f.pct==null?'':fmtP(f.pct)}" oninput="ED.formula[${i}].pct=pn(this.value);fxTot()"></td>
     <td style="white-space:nowrap"><button class="btn sm" onclick="fxMove(${i},-1)" aria-label="Yukarı">↑</button><button class="btn sm" onclick="ED.formula.splice(${i},1);fxRender()" aria-label="Satırı sil">✕</button></td></tr>`).join('');
   fxTot();
 }
 function pkRender(){document.getElementById('pkRows').innerHTML=ED.pack.length?ED.pack.map((k,i)=>{const L=DB.packs.find(x=>packLabel(x)===k.packText);return `<tr><td><input style="min-width:300px" list="pkList" value="${esc(k.packText)}" oninput="ED.pack[${i}].packText=this.value" onchange="pkRender()"></td><td class="sub">${L?esc([L.volume,L.color].filter(Boolean).join(', ')||'—'):k.packText?'Yeni ambalaj':''}</td><td><input class="w-pct" style="text-align:right" inputmode="decimal" value="${numIn(k.perUnit)}" oninput="ED.pack[${i}].perUnit=pn(this.value)"></td><td><button class="btn sm" onclick="ED.pack.splice(${i},1);pkRender()" aria-label="Sil">✕</button></td></tr>`}).join(''):'<tr><td colspan="4" class="sub">Ambalaj tanımlı değil.</td></tr>'}
+function fxSort(focusObj){const used=f=>String(f.matText||'').trim()||pn(f.pct),filled=ED.formula.filter(used),empty=ED.formula.filter(f=>!used(f));
+  ED.formula=[...sortByPhase(filled),...empty];fxRender();
+  if(focusObj){const i=ED.formula.indexOf(focusObj);document.querySelectorAll('#fxRows tr')[i]?.querySelectorAll('input')[1]?.focus()}}
 function fxMove(i,d){const j=i+d;if(j<0||j>=ED.formula.length)return;[ED.formula[i],ED.formula[j]]=[ED.formula[j],ED.formula[i]];fxRender()}
 function fxTot(){
   const t=ED.formula.reduce((a,f)=>a+pn(f.pct),0),ok=pctOkV(t);
@@ -10663,7 +10855,7 @@ function saveProduct(){
   const dup=DB.products.find(q=>q.firmId===g('firm')&&norm(q.name)===norm(g('name'))&&q.id!==ED.id);if(dup){toast('Bu firmada aynı adlı ürün zaten var.',true);return}
   if(!matReviewGate(ED.formula.filter(f=>f.matText.trim()).map(f=>f.matText),'saveProduct'))return;
   const before=DB.materials.length;
-  const formula=ED.formula.filter(f=>f.matText.trim()||pn(f.pct)).map(f=>{const m=resolveMatMapped(f.matText);return m?{id:uid(),phase:f.phase.trim(),matId:m.id,pct:pn(f.pct)}:null}).filter(Boolean);
+  const formula=sortByPhase(ED.formula.filter(f=>f.matText.trim()||pn(f.pct))).map(f=>{const m=resolveMatMapped(f.matText);return m?{id:uid(),phase:phCanon(f.phase),matId:m.id,pct:pn(f.pct)}:null}).filter(Boolean);
   const p=ED.id?prod(ED.id):{id:uid(),rev:0,revisions:[],revDate:today(),revNote:'İlk kayıt'};
   const revved=applyRevision(p,{unitKg:pn(g('unit')),formula,steps:g('steps').split('\n').map(s=>s.trim()).filter(Boolean),notes:g('notes')},document.getElementById('p_revnote')?.value.trim());
   Object.assign(p,{firmId:g('firm'),name:g('name'),code:g('code'),version:g('version'),note:g('note'),custPack:document.getElementById('p_custPack').checked,packaging:ED.pack.filter(k=>k.packText.trim()).map(k=>({id:uid(),packId:resolvePackText(k.packText).id,perUnit:pn(k.perUnit)||1})),steps:g('steps').split('\n').map(s=>s.trim()).filter(Boolean),notes:g('notes')});
@@ -10890,10 +11082,16 @@ function toggleCancel(id){const o=ord(id);if(!o.cancelled&&!confirm('Sipariş ip
 function delOrder(id){const o=ord(id);if(!confirm(o.no+' silinsin mi? Bu işlem geri alınamaz.'))return;DB.orders=DB.orders.filter(x=>x.id!==id);DB.supplies.forEach(x=>{if(x.orderId===id)x.orderId=''});DB.proformas.forEach(p=>{if(p.orderId===id){p.orderId='';p.status='Onaylandı';p.completedAt=''}});closeModal();touch('Sipariş silindi: '+o.no)}
 
 /* ============ YAZDIRMA ============ */
-function sigHtml(){const u=S.user;if(!u)return '';return `<div class="psig">${u.sig?`<img src="${u.sig}" alt="">`:''}<div><b>${esc(u.name||u.username)}</b>${u.meslek?`<br>${esc(u.meslek)}`:''}</div></div>`}
+function sigHtml(){const u=S.user;if(!u)return '';return `<div class="psig"><div><b>${esc(u.name||u.username)}</b>${u.meslek?`<br>${esc(u.meslek)}`:''}</div>${u.sig?`<img src="${u.sig}" alt="">`:''}</div>`}
 function sigFoot(){const h=sigHtml();return h?`<div class="psigfoot"><span>Hazırlayan</span>${h}</div>`:''}
 function printDoc(h){document.getElementById('print').innerHTML=h;setTimeout(()=>window.print(),50)}
-function pHead(title,sub){const L=DB.settings.logo;return `<div class="phd">${L?`<img src="${L}" alt="">`:''}${DB.settings.company?`<div class="co">${esc(DB.settings.company)}</div>`:''}<div class="tt"><h1>${esc(title)}</h1>${sub?`<div>${esc(sub)}</div>`:''}</div></div>`}
+function coInfo(){const s=DB.settings;return [s.coAddr,[s.coPhone?'Tel: '+s.coPhone:'',s.coEmail,s.coWeb].filter(Boolean).join(' · '),[s.coTaxOffice?s.coTaxOffice+' V.D.':'',s.coTaxNo?'No: '+s.coTaxNo:''].filter(Boolean).join(' ')].filter(Boolean)}
+const CO_FIELDS=[['coAddr','Adres','wide','Mahalle, cadde/sokak, no, ilçe / il'],['coPhone','Telefon','',''],['coEmail','E-posta','',''],['coWeb','Web sitesi','',''],['coTaxOffice','Vergi dairesi','',''],['coTaxNo','Vergi no / MERSİS no','','']];
+function coForm(){const s=DB.settings;openModal('coinfo','Firma adres ve iletişim bilgileri',`<p class="sub" style="margin-top:0">Bu bilgiler proforma, iş emri, reçete ve diğer çıktıların başlığında firma adının altına yazılır.</p><div class="fg">${CO_FIELDS.map(([k,l,w,ph])=>`<label class="f ${w}"><span>${l}</span>${k==='coAddr'?`<textarea id="co_${k}" style="min-height:64px" placeholder="${ph}">${esc(s[k]||'')}</textarea>`:`<input id="co_${k}" value="${esc(s[k]||'')}" placeholder="${ph}">`}</label>`).join('')}</div>`,
+  `<button class="btn" onclick="closeModal()">Vazgeç</button><button class="btn pri" onclick="coSave()">Kaydet</button>`)}
+function coSave(){CO_FIELDS.forEach(([k])=>{DB.settings[k]=document.getElementById('co_'+k).value.trim().replace(/\s*\n\s*/g,', ')});closeModal();touch('Firma adres ve iletişim bilgileri güncellendi');renderMain()}
+function steCompanyLogo(){return DB.settings.logo||''}
+function pHead(title,sub){const L=DB.settings.logo,ci=coInfo();return `<div class="phd">${L?`<img src="${L}" alt="">`:''}${DB.settings.company||ci.length?`<div class="co">${esc(DB.settings.company||'')}${ci.map(t=>`<div class="coi">${esc(t)}</div>`).join('')}</div>`:''}<div class="tt"><h1>${esc(title)}</h1>${sub?`<div>${esc(sub)}</div>`:''}</div></div>`}
 function pLines(lines,cur,deliv){const c=calc(lines);return `<table><thead><tr><th>#</th><th>Ürün</th><th class="r">Miktar</th>${deliv?'<th class="r">Teslim</th>':''}<th class="r">Birim fiyat</th><th class="r">İsk.</th><th class="r">KDV</th><th class="r">Tutar</th></tr></thead><tbody>${lines.map((l,i)=>`<tr><td>${i+1}</td><td>${esc(l.desc)}</td><td class="r">${fmtQ(l.qty)} ${esc(l.unit)}</td>${deliv?`<td class="r">${fmtQ(l.delivered||0)}</td>`:''}<td class="r">${fmtN(l.price)}</td><td class="r">${pn(l.disc)?'%'+fmtQ(l.disc):''}</td><td class="r">%${fmtQ(l.kdv)}</td><td class="r">${fmtN(pn(l.qty)*pn(l.price)*(1-pn(l.disc)/100))}</td></tr>`).join('')}</tbody></table>
   <table style="width:auto;margin-left:auto"><tr><td>Ara toplam</td><td class="r">${fmtM(c.gross,cur)}</td></tr>${c.disc?`<tr><td>İskonto</td><td class="r">−${fmtM(c.disc,cur)}</td></tr>`:''}<tr><td>KDV</td><td class="r">${fmtM(c.kdv,cur)}</td></tr><tr><td><b>Genel toplam</b></td><td class="r"><b>${fmtM(c.total,cur)}</b></td></tr></table>`}
 function pRecipe(x,first,sub){
@@ -10926,45 +11124,34 @@ function logoChosen(inp){const f=inp.files[0];if(!f)return;const r=new FileReade
     DB.settings.logo=d;inp.value='';touch('Logo güncellendi')};img.onerror=()=>toast('Bu görsel okunamadı. PNG veya JPG dene.',true);img.src=r.result};
   r.readAsDataURL(f)}
 function removeLogo(){if(!confirm('Logo kaldırılsın mı?'))return;DB.settings.logo='';touch('Logo kaldırıldı')}
-/* =========================================================================
-   iPHONE / MOBİL DESTEK
-   Telefonda (dosyaya doğrudan yazma desteği olmayan tarayıcılarda) tüm veriler
-   her değişiklikte cihazın kendi veritabanına da (IndexedDB) yazılır. Uygulama
-   kapansa ya da iOS onu arka planda sonlandırsa bile bir sonraki açılışta son
-   çalışma kaldığı yerden yüklenir. Buluta yedek için yine "Kaydet" kullanılır.
-========================================================================= */
+/* ===== iPHONE / MOBİL DESTEK =====
+   iPhone'da dosyaya otomatik kayıt (File System Access) yok. Çalışma, cihazın kendi
+   deposunda (IndexedDB) her değişiklikte saklanır; uygulama yeniden açıldığında geri yüklenir.
+   Buluttaki yedek dosya için yine "Kaydet / Yedek" kullanılır. */
 const DEV_ON=!hasFS;
 let devReady=false,devTimer=null,devLast='';
 function devDb(){return new Promise((res,rej)=>{const q=indexedDB.open('yku_ps_device',1);q.onupgradeneeded=e=>e.target.result.createObjectStore('kv');q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)})}
 async function devGet(){const db=await devDb();return new Promise((res,rej)=>{const r=db.transaction('kv').objectStore('kv').get('state');r.onsuccess=()=>res(r.result||null);r.onerror=()=>rej(r.error)})}
 async function devPut(v){const db=await devDb();return new Promise((res,rej)=>{const t=db.transaction('kv','readwrite');t.objectStore('kv').put(v,'state');t.oncomplete=()=>res();t.onerror=()=>rej(t.error)})}
-function devFlush(){
-  if(!DEV_ON||!devReady)return;clearTimeout(devTimer);devTimer=null;
+function devFlush(){if(!DEV_ON||!devReady)return;clearTimeout(devTimer);devTimer=null;
   try{const txt=payload(),key=txt.length+'|'+S.dirty+'|'+(S.fileName||'');
     if(txt===devLast.txt&&key===devLast.key)return;
     devLast={txt,key};devPut({txt,fileName:S.fileName||'',dirty:!!S.dirty,at:Date.now()}).catch(e=>console.warn('Cihaz kaydı başarısız',e));
-  }catch(e){console.warn('Cihaz kaydı başarısız',e)}
-}
+  }catch(e){console.warn('Cihaz kaydı başarısız',e)}}
 function devQueue(){if(!DEV_ON||!devReady)return;clearTimeout(devTimer);devTimer=setTimeout(devFlush,700)}
-if(DEV_ON){
-  const _render=render,_renderSide=renderSide;
+if(DEV_ON){const _render=render,_renderSide=renderSide;
   render=function(){const r=_render.apply(this,arguments);devQueue();return r};
   renderSide=function(){const r=_renderSide.apply(this,arguments);devQueue();return r};
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')devFlush()});
-  window.addEventListener('pagehide',devFlush);
-}
+  window.addEventListener('pagehide',devFlush);}
 try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
-if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){
-  window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(e=>console.warn('SW kaydı başarısız',e)));
-}
+if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(e=>console.warn('SW kaydı başarısız',e)));}
 (async function mobileBoot(){
-  if(DEV_ON){
-    try{const rec=await devGet();
+  if(DEV_ON){try{const rec=await devGet();
       if(rec&&rec.txt){loadText(rec.txt);S.fileName=rec.fileName||'';S.dirty=!!rec.dirty;S.lastSaved=null;
         setTimeout(()=>toast('Bu cihazdaki son çalışmanız yüklendi'+(rec.dirty?' — buluta yedek için Kaydet\'e dokunun':'')),300)}
     }catch(e){console.warn('Cihaz kaydı okunamadı',e)}
-    devReady=true;
-  }
+    devReady=true;}
   render();
 })();
 </script>
