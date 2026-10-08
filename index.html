@@ -10,7 +10,7 @@
 <meta name="theme-color" content="#2E5B61">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
-<title>YKU Proforma & Sipariş Takip v62</title>
+<title>YKU Proforma & Sipariş Takip v64</title>
 <style>
 :root{
   --zebra:#F6F8F7;--sb:rgba(22,36,42,.18);--sbh:rgba(22,36,42,.34);
@@ -353,6 +353,10 @@ div.f>span:first-child{font-size:13px;color:var(--muted);font-weight:500}
 .stelock h2{margin:8px 0 4px;font-size:19px}
 .stelock form{display:flex;flex-direction:column;gap:10px;margin-top:14px}
 .stelock input{text-align:center}
+.dupg{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:10px}
+.dupo{display:flex;gap:8px;align-items:baseline;padding:4px 0 4px 22px;cursor:pointer}
+.sigask{background:#fff;border-radius:8px;padding:10px;display:flex;justify-content:center}
+.sigask img{max-height:90px;max-width:100%;object-fit:contain}
 .mrev{border:1px solid var(--warn);background:var(--warn-bg);border-radius:var(--r);padding:12px 14px;margin-bottom:14px}
 .modal .mbody>.mrev h3{margin:0 0 6px;color:var(--warn)}
 .mrev-i{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin:8px 0}
@@ -547,6 +551,7 @@ ol.steps li{margin-bottom:5px}
   #print .psigfoot>span{color:#555;margin-bottom:2px}
   #print table.sig td{width:33%;height:11mm;vertical-align:top;font-size:8pt}
   #print .rp table{font-size:8.5pt}
+  #print .rp tfoot td{background:#eee;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   #print tr.grph td{background:#e6e6e6;font-weight:700;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   #print tr.subt td{font-weight:600}
   #print .hd td{border:none;padding:1px 6px 1px 0}
@@ -560,7 +565,7 @@ ol.steps li{margin-bottom:5px}
 <div id="app">
   <aside class="side">
     <div class="brand">
-      <div><b>Proforma & Sipariş</b><span>YKU Cosmetic v62</span></div>
+      <div><b>Proforma & Sipariş</b><span>YKU Cosmetic v64</span></div>
       <span class="mobile-save" id="mUser"></span><button class="btn sm pri mobile-save" onclick="saveNow()">Kaydet</button>
     </div>
     <nav class="nav" id="nav"></nav>
@@ -9076,6 +9081,7 @@ const HELP=[
 <h4>Roller ve yetkiler</h4>
 <ul><li><b>Yönetici:</b> her şeyi görür; Kullanıcılar ile Dosya ve ayarlar yalnızca yöneticiye açıktır.</li>
 <li><b>Kullanıcı:</b> yalnızca işaretlediğin sayfaları görür (Firmalar, STE, Proformalar, Siparişler, Ürünler, Tedarik, Ar-Ge, Raporlar, kütüphaneler, İşlem kaydı). Genel bakış ve bu kılavuz herkese açıktır.</li>
+<li><b>Yazdırırken imza:</b> imzası olan bir kullanıcı yazdırdığında “İmzalı yazdır / İmzasız yazdır” sorulur; “Bu seçimi hatırla” ile bir daha sorulmaz. Tercih Dosya ve ayarlar &gt; Ayarlar &gt; <b>Yazdırırken imza</b> (her seferinde sor / her zaman ekle / hiç ekleme) ile değiştirilir. İmzasız çıktıda ad ve unvan kalır, yalnızca imza görseli basılmaz.</li>
 <li>Kullanıcıyı <b>Pasif</b> yaparak girişini kapatabilirsin. En az bir aktif yönetici her zaman kalmalıdır.</li></ul>
 <h4>İmza ve değerlendirici bilgileri</h4>
 <p>Kullanıcı kartında <b>İmza</b> bölümünden beyaz ya da şeffaf zeminli imza/kaşe görseli yükle. İmza; iş emri, reçete, proforma, kontrol listesi, rapor ve Ar-Ge çıktılarında “Hazırlayan” alanına, <b>adın altına</b> basılır (CPSR raporunda değerlendirici tablosunda adın altındaki İmza satırına). <b>Rapor logosu</b> da değerlendirici bilgileri bölümünden yüklenir. CPSR raporunun kapağı için üç kaynak vardır: işte seçilen değerlendiricinin logosu, giriş yapan kullanıcının logosu ve Dosya ve ayarlar’daki firma logosu. Birden fazlası varsa CPSR işinin <b>Değerlendirici</b> sekmesindeki “Rapor kapağındaki logo” bölümünden hangisinin kullanılacağını seçersin; seçim o işe kaydedilir. Seçim yapılmamışsa bu sıradaki ilk logo kullanılır. <b>STE / CPSR değerlendirici bilgileri</b> (meslek, yetkinlik, okul, diploma no vb.) CPSR raporlarında güvenlilik değerlendiricisi, STE sözleşmelerinde sorumlu yönetici bilgisi olarak kullanılır.</p>
@@ -9098,7 +9104,8 @@ const HELP=[
 <p>Proforma ve siparişlerin bağlandığı firmalar burada tutulur. Firma türü (müşteri, tedarikçi, fason üretici) ve iletişim, vergi bilgileri girilir.</p>
 <ul><li><b>Ana firma:</b> Bir firma başka bir firmanın bağlı firması olabilir. Bağlı firmaya sipariş açarken ana firmanın ürünleri de listede çıkar (“Ana firma: X” grubunda).</li>
 <li><b>STE firmalarına kopyala:</b> Firma kartının altındaki düğme firmayı STE firmalarına aktarır. Rolü (ürün sahibi/sorumlu kişi, üretici, danışmanlık müşterisi) seçersin; cari, üretici ve danışmanlık kodları otomatik verilir. Firma STE’de zaten varsa rol eklenir, boş bilgiler doldurulur. Kopyalanan firmanın listede “STE” etiketi olur.</li>
-<li>Bağlı firması olan bir firma, önce bağlı firmaları başka yere alınmadan silinemez.</li></ul>`},
+<li>Bağlı firması olan bir firma, önce bağlı firmaları başka yere alınmadan silinemez.</li>
+<li><b>Tedarikçiler sekmesi:</b> “Tedarikçi” türündeki firmalarla birlikte hammadde, ambalaj ve fiyat tekliflerinde <b>elle yazılmış</b> bütün tedarikçi adlarını tek listede gösterir; her biri için kaç hammadde, ambalaj ve teklifte geçtiği ve son teklif tarihi yazar. Firma kaydı olmayanlar “Elle yazılmış” etiketiyle görünür; tıklayınca nerelerde geçtiğini görür, <b>Tedarikçi firması olarak ekle</b> ile kaydedersin (ya da hepsini tek seferde ekle). Tedarikçi firma kartında “Tedarik ettikleri” bölümü vardır. Firma adını değiştirirsen eski adla yazılmış hammadde/ambalaj/teklifleri yeni adla güncelleme önerilir. Tedarikçi yazılan her alan (hammadde, ambalaj, teklif, önceki fiyat) artık <b>listeden seçimlidir</b>: yazdıkça tedarikçiler süzülür; listede yoksa “＋ yeni tedarikçi olarak ekle” ile Tedarikçi türünde firma olarak eklenir. <b>Birleştirme:</b> Tedarikçiler sekmesindeki “Aynı / benzer adlıları bul ve birleştir” büyük-küçük harf, noktalama ve Ltd. Şti., A.Ş., San. Tic. gibi ekleri yok sayarak aynı görünen tedarikçileri gruplar; her grupta kalacak adı seçip birleştirirsin. Tek tek birleştirmek için tedarikçi kartındaki “Başka tedarikçiyle birleştir”i kullan. Birleştirmede bütün hammadde, ambalaj ve teklif kayıtları kalan ada aktarılır, firma kayıtları tek kayıtta toplanır.</li></ul>`},
 
 {id:'hammadde',t:'5. Hammadde kütüphanesi',go:'materials',h:`
 <p>Bütün hammaddeler tek bir kütüphanede, YKU tarafında tutulur. Ürün formülleri, Ar-Ge denemeleri ve STE’deki CPSR işleri hammaddeleri buradan alır. STE kendi kopyasını tutmaz.</p>
@@ -9162,7 +9169,8 @@ const HELP=[
 <p>Aşamalar bölümünde her ürünün altındaki <b>Üretim / eksik</b> düğmesine bas: ilk üretimde çıkan adedi, tarihi ve eksik nedenini (fire, kazan kaybı vb.) yaz. Sipariş adedinden az çıktıysa eksik otomatik hesaplanır ve ürünün yanında turuncu “Eksik … adet” görünür; ürünü “Eksik tamamlama” aşamasına almayı önerir. Eksik için yapılan ek üretimleri <b>＋ Tamamlama ekle</b> ile (tarih, adet, parti no, not) kaydet. Eksik sıfırlanınca “Üretim tam” olur ve ürünü Kalite kontrole geçirmeyi önerir. Eksik yoksa “Eksik tamamlama” aşaması atlanabilir.</p>
 <ul><li><b>Aşamalar (ürün bazlı)</b> bölümünde ürünün satırındaki aşamaya tıkla. <b>Tüm ürünler</b> satırı hepsini aynı aşamaya alır.</li>
 <li><b>Aşama notu</b> (parti no, irsaliye no vb.) aşama değişikliğiyle birlikte <b>Aşama geçmişi</b>ne yazılır.</li>
-<li>Siparişin aşaması en geride kalan ürünün aşamasıdır. Bütün ürünler “Teslim edildi” olunca sipariş tamamlanır.</li></ul>
+<li>Siparişin aşaması en geride kalan ürünün aşamasıdır. Bütün ürünler “Teslim edildi” olunca sipariş tamamlanır.</li>
+<li><b>Yazdır</b> (sayfanın sağ üstü): o an seçili filtre ve aramadaki siparişleri liste olarak basar: sipariş no, tarih, firma, ürünler ve aşamaları, termin (geciken gün), durum, tutar ve bakiye; altta para birimine göre toplamlar.</li></ul>
 <h4>Kalemler, teslimat ve ödemeler</h4>
 <ul><li><b>Teslim edilen</b> alanına teslim ettiğin miktarı yaz; kalan ve “Sipariş eksikleri” raporu buna göre hesaplanır.</li>
 <li>Ödemeleri sipariş detayından gir; bakiye otomatik hesaplanır.</li></ul>
@@ -9182,6 +9190,7 @@ const HELP=[
 {id:'tedarik',t:'11. Tedarik',go:'supply',h:`
 <p>Hammadde ve ambalaj satın alma süreci burada izlenir. Kalem; malzeme, miktar, ihtiyaç tarihi ve bağlı siparişle açılır (kontrol listesindeki “+ Tedarik” ile de).</p>
 <ul><li>Durumlar: <b>Teklif bekleniyor → Teklif alındı → Sipariş verildi → Teslim alındı</b> (ya da İptal).</li>
+<li>Tekliflerdeki tedarikçi adları Firmalar → <b>Tedarikçiler</b> sekmesinde toplanır.</li>
 <li><b>Teklif ekle</b>: tedarikçi, birim fiyat, para birimi, termin, minimum sipariş, geçerlilik ve ödeme şartı. En uygun teklifi <b>Seç</b>; seçilen teklif yeşil görünür.</li>
 <li><b>Döviz teklifleri ve KDV</b>: Para birimi USD ya da EUR seçilince <b>Kur</b> alanı açılır (1 USD = ? TL). Toplam tutar kurla çarpılıp <b>TL karşılığı</b> gösterilir. <b>KDV %</b> yazılırsa KDV dahil tutar hem teklifin kendi para biriminde (ör. 132,00 USD) hem de kur girildiyse TL olarak gösterilir. Son girilen kur ve KDV oranı bir sonraki teklif için hazır gelir. Fiyatı yazarken formun altında tutar, TL karşılığı ve KDV dahil tutar anında hesaplanır. Farklı para birimlerinde teklif varsa TL karşılığına göre en ucuz olan “En düşük (TL)” etiketi alır. Karşılaştırma çıktısında ve Excel’de Kur, TL tutar, KDV ve KDV dahil sütunları yer alır.</li>
 <li><b>Teklifi düzenle</b>: teklif satırındaki ✎ ile tedarikçi, fiyat, para birimi, tarih, termin, minimum sipariş, geçerlilik, ödeme şartı ve not değiştirilebilir. Değişiklik eski ve yeni fiyatla işlem kaydına yazılır.</li>
@@ -9636,11 +9645,26 @@ function listPF(){
 VIEWS.orders=()=>{
   const f=S.orFilter;
   const chips=[['open','Açık'],['late','Termini geçen'],['done','Teslim edilen (aylık)'],['all','Tümü'],['cancel','İptal']];
-  return head('Siparişler','Aşama, termin, teslimat ve tahsilat takibi',`<input type="search" class="search" placeholder="No, firma veya ürün ara" value="${esc(S.q.or||'')}" oninput="S.q.or=this.value;document.getElementById('list').innerHTML=listOR()"><button class="btn pri" onclick="orderForm()">＋ Sipariş aç</button>`)+
+  return head('Siparişler','Aşama, termin, teslimat ve tahsilat takibi',`<input type="search" class="search" placeholder="No, firma veya ürün ara" value="${esc(S.q.or||'')}" oninput="S.q.or=this.value;document.getElementById('list').innerHTML=listOR()"><button class="btn" onclick="printOrderList()">Yazdır</button><button class="btn pri" onclick="orderForm()">＋ Sipariş aç</button>`)+
   `<div class="chips" style="margin-bottom:12px">${chips.map(([k,l])=>`<button class="chip ${f===k?'on':''}" onclick="S.orFilter='${k}';renderMain()">${l}</button>`).join('')}<select style="width:auto" onchange="S.orFilter=this.value===''?'open':+this.value;renderMain()"><option value="">Ürün aşamasına göre…</option>${STAGES.map((s,i)=>`<option value="${i}" ${f===i?'selected':''}>${s}</option>`).join('')}</select></div><div id="list">${listOR()}</div>`;
 };
 function orRows(rows){return `<div class="tw"><table class="t"><thead><tr><th>Sipariş</th><th>Firma</th><th>Aşama</th><th>Termin</th><th class="r">Tutar</th><th class="r">Bakiye</th></tr></thead><tbody>${rows.map(o=>{const t=calc(o.lines).total,paid=(o.payments||[]).reduce((a,x)=>a+pn(x.amount),0);
   return `<tr class="click" onclick="orderDetail('${o.id}')"><td><b>${esc(o.no)}</b><div class="sub">${esc(pf(o.proformaId)?.ref||'')} ${fmtD(o.date)}</div></td><td>${esc(firmName(o.firmId))}</td><td>${o.cancelled?'<span class="pill bad">İptal</span>':o.lines.map(l=>`<div class="lst">${dots(l.stage??0)} <span class="sub">${esc(String(l.desc).slice(0,28))}: ${STAGES[l.stage??0]}</span></div>`).join('')}${o.completedAt?`<div class="sub">Teslim ${fmtD(o.completedAt)}</div>`:''}</td><td>${fmtD(o.dueDate)}<div>${duePill(o)}</div></td><td class="r">${fmtM(t,o.currency)}</td><td class="r">${t-paid>0.005?fmtM(t-paid,o.currency):'<span class="pill ok">Kapandı</span>'}</td></tr>`}).join('')}</tbody></table></div>`}
+function orFiltered(){const f=S.orFilter,q=norm(S.q.or);
+  return DB.orders.filter(o=>{
+    if(f==='open'&&!isOpen(o))return false;if(f==='late'&&!isLate(o))return false;if(f==='done'&&!(o.stage>=DONE&&!o.cancelled))return false;if(f==='cancel'&&!o.cancelled)return false;
+    if(typeof f==='number'&&(o.cancelled||!o.lines.some(l=>(l.stage??0)===f)))return false;
+    return !q||norm([o.no,firmName(o.firmId),pf(o.proformaId)?.ref,...o.lines.map(l=>l.desc)].join(' ')).includes(q);
+  }).sort((a,b)=>(a.dueDate||'9999').localeCompare(b.dueDate||'9999'))}
+function printOrderList(){const rows=orFiltered(),f=S.orFilter;if(!rows.length){toast('Yazdırılacak sipariş yok.',true);return}
+  const lab=typeof f==='number'?'Ürün aşaması: '+STAGES[f]:({open:'Açık siparişler',late:'Termini geçen siparişler',done:'Teslim edilen siparişler',all:'Tüm siparişler',cancel:'İptal edilen siparişler'})[f]||'Siparişler';
+  const tot={};
+  const body=rows.map((o,i)=>{const t=calc(o.lines).total,paid=(o.payments||[]).reduce((a,x)=>a+pn(x.amount),0),c=o.currency||'TRY';tot[c]=tot[c]||{t:0,b:0,n:0};tot[c].n++;tot[c].t+=t;tot[c].b+=Math.max(0,t-paid);
+    const dd=o.dueDate&&!o.cancelled&&o.stage<DONE?daysTo(o.dueDate):null;
+    return `<tr><td>${i+1}</td><td><b>${esc(o.no)}</b>${pf(o.proformaId)?.ref?`<br>${esc(pf(o.proformaId).ref)}`:''}</td><td>${fmtD(o.date)}</td><td>${esc(firmName(o.firmId))}</td><td>${o.lines.map(l=>`${esc(l.desc)} × ${fmtQ(l.qty)} ${esc(l.unit||'')}${o.cancelled?'':` <i>(${STAGES[l.stage??0]})</i>`}`).join('<br>')}</td><td>${fmtD(o.dueDate)}${dd!=null&&dd<0?`<br><b>${-dd} gün geçti</b>`:''}</td><td>${o.cancelled?'İptal':o.stage>=DONE?'Teslim edildi'+(o.completedAt?' '+fmtD(o.completedAt):''):STAGES[o.stage]}</td><td class="r">${fmtM(t,c)}</td><td class="r">${t-paid>0.005?fmtM(t-paid,c):'Kapandı'}</td></tr>`}).join('');
+  printDoc(`<div class="rp">${pHead('Sipariş listesi',lab+(S.q.or?` · arama: “${S.q.or}”`:'')+' · '+new Date().toLocaleDateString('tr-TR'))}
+  <table><thead><tr><th>#</th><th>Sipariş</th><th>Tarih</th><th>Firma</th><th>Ürünler (aşama)</th><th>Termin</th><th>Durum</th><th class="r">Tutar</th><th class="r">Bakiye</th></tr></thead><tbody>${body}</tbody>
+  <tfoot>${Object.entries(tot).map(([c,v])=>`<tr><td colspan="7" class="r"><b>Toplam (${c}) · ${v.n} sipariş</b></td><td class="r"><b>${fmtM(v.t,c)}</b></td><td class="r"><b>${fmtM(v.b,c)}</b></td></tr>`).join('')}</tfoot></table>${sigFoot()}</div>`)}
 function listOR(){
   const f=S.orFilter,q=norm(S.q.or);
   const rows=DB.orders.filter(o=>{
@@ -9700,7 +9724,8 @@ function listMT(){
 }
 
 /* ---- Firmalar ---- */
-VIEWS.firms=()=>head('Firmalar','Ürünler firmaya göre tutulur. Ana firması seçilen firma, ana firmanın ürünlerinden de sipariş verebilir.',`<input type="search" class="search" placeholder="Firma ara" value="${esc(S.q.fi||'')}" oninput="S.q.fi=this.value;document.getElementById('list').innerHTML=listFI()"><button class="btn pri" onclick="firmForm()">＋ Firma ekle</button>`)+`<div id="list">${listFI()}</div>`;
+VIEWS.firms=()=>{const t=S.fiTab||'all',sa=supAll();return head('Firmalar','Ürünler firmaya göre tutulur. Ana firması seçilen firma, ana firmanın ürünlerinden de sipariş verebilir.',`<input type="search" class="search" placeholder="${t==='sup'?'Tedarikçi ara':'Firma ara'}" value="${esc(S.q.fi||'')}" oninput="S.q.fi=this.value;document.getElementById('list').innerHTML=S.fiTab==='sup'?listSUP():listFI()"><button class="btn pri" onclick="firmForm()">＋ Firma ekle</button>`)+
+  `<div class="tabs"><button class="${t==='all'?'on':''}" onclick="S.fiTab='all';renderMain()">Tüm firmalar <span class="sub">${DB.firms.length}</span></button><button class="${t==='sup'?'on':''}" onclick="S.fiTab='sup';renderMain()">Tedarikçiler <span class="sub">${sa.length}</span>${sa.some(v=>!v.firm)?` <span class="pill warn" title="Firma kaydı olmayan, elle yazılmış tedarikçi">${sa.filter(v=>!v.firm).length} elle</span>`:''}</button></div><div id="list">${t==='sup'?listSUP():listFI()}</div>`};
 function listFI(){
   const q=norm(S.q.fi);
   const all=firmsSorted(),match=f=>!q||norm([f.name,f.contact,f.type,firm(f.parentId)?.name].join(' ')).includes(q);
@@ -9744,6 +9769,7 @@ VIEWS.file=()=>{
   </div></div>
   <div class="sec"><h3>Ayarlar</h3><div class="tw" style="padding:14px"><div class="fg" style="margin:0">
     <label class="f"><span>Varsayılan para birimi</span><select onchange="DB.settings.currency=this.value;touch('Ayarlar güncellendi')">${CURS.map(c=>`<option ${c===s.currency?'selected':''}>${c}</option>`).join('')}</select></label>
+    <label class="f"><span>Yazdırırken imza</span><select onchange="DB.settings.sigPrint=this.value;touch('Yazdırma imza tercihi güncellendi')">${[['ask','Her seferinde sor'],['yes','Her zaman ekle'],['no','Hiç ekleme']].map(([k,l])=>`<option value="${k}" ${(s.sigPrint||'ask')===k?'selected':''}>${l}</option>`).join('')}</select></label>
     <label class="f"><span>Varsayılan KDV %</span><input inputmode="decimal" value="${numIn(s.kdv)}" onchange="DB.settings.kdv=pn(this.value);touch('Ayarlar güncellendi')"></label>
     <label class="f"><span>Yüzde (%) gösterimi: en az ondalık</span><select onchange="DB.settings.pctMin=+this.value;if((DB.settings.pctMax??6)<+this.value)DB.settings.pctMax=+this.value;touch('Yüzde gösterimi güncellendi')">${[0,1,2,3,4].map(n=>`<option ${n===(s.pctMin??2)?'selected':''} value="${n}">${n} basamak</option>`).join('')}</select></label>
     <label class="f"><span>Gerekirse en fazla</span><select onchange="DB.settings.pctMax=Math.max(+this.value,DB.settings.pctMin??2);touch('Yüzde gösterimi güncellendi')">${[2,3,4,5,6,7,8].map(n=>`<option ${n===(s.pctMax??6)?'selected':''} value="${n}">${n} basamak</option>`).join('')}</select></label>
@@ -9788,7 +9814,7 @@ function packForm(id){
     <label class="f"><span>Ağız çapı <button type="button" class="btn link xsl" onclick="event.preventDefault();quickList('neckUnits','ağız çapı birimi','k_necku',NECK_UNITS)">+ yeni birim</button></span><span class="meas"><input id="k_neckn" value="${esc(N.n)}" placeholder="24"><select id="k_necku">${unitOpts(neckUnits(),N.u)}</select></span></label>`})()}
     <label class="f"><span>Materyal <button type="button" class="btn link xsl" onclick="event.preventDefault();quickList('materials','materyal','k_material',MATERIALS)">+ yeni materyal</button></span><select id="k_material">${unitOpts(matyList(),k.material||'')}</select></label>
     <label class="f"><span>Renk <button type="button" class="btn link xsl" onclick="event.preventDefault();quickColor()">+ yeni renk</button></span><input id="k_color" list="colorList" value="${v('color')}"><datalist id="colorList">${colorList().map(c=>`<option value="${esc(c)}">`).join('')}</datalist></label>
-    <label class="f"><span>Tedarikçi</span><input id="k_supplier" value="${v('supplier')}"></label>
+    <label class="f"><span>Tedarikçi</span>${supCbx('k_supplier',k.supplier)}</label>
     <label class="f wide"><span>Not</span><input id="k_note" value="${v('note')}"></label></div>
     <div class="sec"><h3>Görseller <span class="sub" id="pkImgCount"></span> <label class="btn sm" style="cursor:pointer">＋ Görsel ekle<input type="file" accept="image/*" multiple style="display:none" onchange="pkImgAdd(this)"></label></h3><div class="pkimgs" id="pkImgs"></div><p class="sub" style="margin:4px 0 0">Ürün fotoğrafı, teknik çizim ya da tedarikçi kataloğundan görüntü. Görseller küçültülerek kayıt dosyasına eklenir ve STE’deki CPSR ambalaj kayıtlarına da aktarılır.</p></div>
     ${id?`<div class="sec"><h3>Kullanıldığı ürünler <span class="sub">${used.length}</span></h3>${used.length?used.map(p=>`<button class="btn sm" style="margin:0 6px 6px 0" onclick="productDetail('${p.id}')">${esc(p.name)} <span class="sub">${esc(firmName(p.firmId))}</span></button>`).join(''):'<div class="sub">Hiçbir üründe kullanılmıyor.</div>'}</div>${priceHistory('pack',id)}`:''}`,
@@ -10170,7 +10196,7 @@ function supplyForm(id){
     <label class="f"><span>Önceki birim fiyat (elle, isteğe bağlı)</span><input id="s_pprice" inputmode="decimal" value="${numIn(x.prevManual?.price??'')}"></label>
     <label class="f"><span>Önceki fiyat para birimi</span><select id="s_pcur">${CURS.map(c=>`<option ${c===(x.prevManual?.currency||DB.settings.currency)?'selected':''}>${c}</option>`).join('')}</select></label>
     <label class="f"><span>Önceki fiyat tarihi</span><input type="date" id="s_pdate" value="${x.prevManual?.date||''}"></label>
-    <label class="f"><span>Önceki tedarikçi</span><input id="s_psup" value="${esc(x.prevManual?.supplier||'')}"></label>
+    <label class="f"><span>Önceki tedarikçi</span>${supCbx('s_psup',x.prevManual?.supplier)}</label>
     <label class="f wide"><span>Not</span><input id="s_note" value="${esc(x.note||'')}"></label></div>
     <p class="sub">Kütüphanede olmayan bir ad yazarsan ilgili kütüphaneye yeni kayıt olarak eklenir.</p>`,
     `<button class="btn" onclick="${id?`supplyDetail('${id}')`:'closeModal()'}">Vazgeç</button><button class="btn pri" onclick="saveSupply()">Kaydet</button>`);
@@ -10197,13 +10223,13 @@ function supplyDetail(id){
     <div class="sec"><h3>Durum</h3><div class="chips">${SUP_STATUS.map(st=>`<button class="chip ${st===x.status?'on':''}" onclick="setSupStatus('${id}','${st}')">${st}</button>`).join('')}</div></div>
     <div class="sec"><h3>Fiyat teklifleri <span class="sub">${q.length}</span></h3>${q.length?`<div class="tw"><table class="t"><thead><tr><th>Tedarikçi</th><th class="r">Birim fiyat</th><th class="r">Tutar</th><th class="r">KDV dahil</th><th class="r">Termin</th><th class="r">Min. sipariş</th><th>Geçerlilik</th><th>Ödeme</th><th></th></tr></thead><tbody>${[...q].sort((a,b)=>a.currency.localeCompare(b.currency)||pn(a.price)-pn(b.price)).map(z=>`<tr class="${z.selected?'selq':''}"><td><b>${esc(z.supplier)}</b>${orderedQuote(x)===z?' <span class="pill ok">Sipariş verilen</span>':''}<div class="sub">${fmtD(z.date)}</div>${z.note?`<div class="sub">${esc(z.note)}</div>`:''}</td><td class="r">${fmtN(z.price)} ${z.currency}/${esc(x.unit)}${low[z.currency]===z&&q.filter(y=>y.currency===z.currency).length>1?' <span class="pill ok">En düşük</span>':''}</td><td class="r">${qAmtHtml(x,z)}${lowTL===z?' <span class="pill ok">En düşük (TL)</span>':''}</td><td class="r">${qGrossHtml(x,z)}</td><td class="r">${z.lead?esc(z.lead)+' gün':''}</td><td class="r">${z.moq?fmtQ(z.moq)+' '+esc(x.unit):''}</td><td>${z.valid?fmtD(z.valid)+(daysTo(z.valid)<0?' <span class="pill bad">Geçti</span>':''):''}</td><td>${esc(z.payment||'')}</td><td style="white-space:nowrap">${z.selected?`<button class="btn sm" onclick="selQuote('${id}','${z.id}',false)">Seçimi kaldır</button>`:`<button class="btn sm" onclick="selQuote('${id}','${z.id}',true)">Seç</button>`} <button class="btn sm" onclick="quoteForm('${id}','${z.id}')" title="Teklifi düzenle" aria-label="Teklifi düzenle">✎</button> <button class="btn sm" onclick="delQuote('${id}','${z.id}')" aria-label="Teklifi sil">✕</button></td></tr>`).join('')}</tbody></table></div>`:'<div class="sub">Henüz teklif girilmedi.</div>'}
     <h4 class="h4">Teklif ekle</h4><datalist id="supNames">${supplierNames().map(n=>`<option value="${esc(n)}">`).join('')}</datalist>
-    <div class="fg" style="align-items:end"><label class="f"><span>Tedarikçi *</span><input id="q_sup" list="supNames"></label><label class="f"><span>Birim fiyat (${esc(x.unit)} başına) *</span><input id="q_price" inputmode="decimal" oninput="qLive('q','${id}')"></label>${qFields('q',null,x)}<label class="f"><span>Teklif tarihi</span><input type="date" id="q_date" value="${today()}"></label><label class="f"><span>Termin (gün)</span><input id="q_lead" inputmode="numeric"></label><label class="f"><span>Min. sipariş (${esc(x.unit)})</span><input id="q_moq" inputmode="decimal"></label><label class="f"><span>Geçerlilik</span><input type="date" id="q_valid"></label><label class="f"><span>Ödeme şartı</span><input id="q_pay" placeholder="Peşin, 30 gün…"></label><label class="f wide"><span>Not</span><input id="q_note"></label><div class="qprev wide" id="q_prev"></div><button class="btn pri" onclick="addQuote('${id}')">Teklifi ekle</button></div></div>
+    <div class="fg" style="align-items:end"><label class="f"><span>Tedarikçi *</span>${supCbx('q_sup','')}</label><label class="f"><span>Birim fiyat (${esc(x.unit)} başına) *</span><input id="q_price" inputmode="decimal" oninput="qLive('q','${id}')"></label>${qFields('q',null,x)}<label class="f"><span>Teklif tarihi</span><input type="date" id="q_date" value="${today()}"></label><label class="f"><span>Termin (gün)</span><input id="q_lead" inputmode="numeric"></label><label class="f"><span>Min. sipariş (${esc(x.unit)})</span><input id="q_moq" inputmode="decimal"></label><label class="f"><span>Geçerlilik</span><input type="date" id="q_valid"></label><label class="f"><span>Ödeme şartı</span><input id="q_pay" placeholder="Peşin, 30 gün…"></label><label class="f wide"><span>Not</span><input id="q_note"></label><div class="qprev wide" id="q_prev"></div><button class="btn pri" onclick="addQuote('${id}')">Teklifi ekle</button></div></div>
     ${priceHistory(x.kind,x.refId,id)}`,
     `<button class="btn bad sp" onclick="delSupply('${id}')">Sil</button><button class="btn" onclick="printSupply('${id}')">Karşılaştırmayı yazdır</button><button class="btn pri" onclick="supplyForm('${id}')">Düzenle</button>`,'wide');qLive('q',id);
 }
 function prevForm(id){const x=sup(id),m=x.prevManual||{};
   openModal('pv'+id,'Önceki fiyatı elle gir',`<p class="sub" style="margin-top:0">${esc(supName(x))}. Elle girilen fiyat, sistemdeki eski tekliflerin yerine “önceki fiyat” olarak gösterilir. Fiyatı boşaltıp kaydedersen sistem yeniden eski tekliflerden hesaplar.</p>
-   <div class="fg"><label class="f"><span>Birim fiyat (${esc(x.unit)} başına)</span><input id="pv_price" inputmode="decimal" value="${numIn(m.price??'')}"></label><label class="f"><span>Para birimi</span><select id="pv_cur">${CURS.map(c=>`<option ${c===(m.currency||DB.settings.currency)?'selected':''}>${c}</option>`).join('')}</select></label><label class="f"><span>Tarih</span><input type="date" id="pv_date" value="${m.date||''}"></label><label class="f"><span>Tedarikçi</span><input id="pv_sup" list="pvNames" value="${esc(m.supplier||'')}"><datalist id="pvNames">${supplierNames().map(n=>`<option value="${esc(n)}">`).join('')}</datalist></label><label class="f wide"><span>Not</span><input id="pv_note" value="${esc(m.note||'')}" placeholder="Ör. 2025 faturası"></label></div>`,
+   <div class="fg"><label class="f"><span>Birim fiyat (${esc(x.unit)} başına)</span><input id="pv_price" inputmode="decimal" value="${numIn(m.price??'')}"></label><label class="f"><span>Para birimi</span><select id="pv_cur">${CURS.map(c=>`<option ${c===(m.currency||DB.settings.currency)?'selected':''}>${c}</option>`).join('')}</select></label><label class="f"><span>Tarih</span><input type="date" id="pv_date" value="${m.date||''}"></label><label class="f"><span>Tedarikçi</span>${supCbx('pv_sup',m.supplier)}</label><label class="f wide"><span>Not</span><input id="pv_note" value="${esc(m.note||'')}" placeholder="Ör. 2025 faturası"></label></div>`,
    `<button class="btn" onclick="supplyDetail('${id}')">Vazgeç</button><button class="btn pri" onclick="savePrev('${id}')">Kaydet</button>`)}
 function savePrev(id){const x=sup(id),g=k=>document.getElementById('pv_'+k).value.trim();
   if(!pn(g('price')))delete x.prevManual;else x.prevManual={price:pn(g('price')),currency:g('cur'),date:g('date'),supplier:g('sup'),note:g('note')};
@@ -10245,7 +10271,7 @@ function saveOrderQuote(id){const x=sup(id),r=document.querySelector('input[name
   const z=qid&&x.quotes.find(z=>z.id===qid);touch(`Tedarik ${x.no}: sipariş verildi${z?` (${z.supplier}, ${fmtN(z.price)} ${z.currency})`:''}`);supplyDetail(id)}
 function quoteForm(id,qid){const x=sup(id),z=(x.quotes||[]).find(z=>z.id===qid);if(!z)return;
   openModal('qe'+qid,`Teklifi düzenle · ${esc(z.supplier)}`,`<datalist id="supNames2">${supplierNames().map(n=>`<option value="${esc(n)}">`).join('')}</datalist><div class="fg">
-   <label class="f"><span>Tedarikçi *</span><input id="qe_sup" list="supNames2" value="${esc(z.supplier)}"></label>
+   <label class="f"><span>Tedarikçi *</span>${supCbx('qe_sup',z.supplier)}</label>
    <label class="f"><span>Birim fiyat (${esc(x.unit)} başına) *</span><input id="qe_price" inputmode="decimal" value="${numIn(z.price??'')}" oninput="qLive('qe','${id}')"></label>
    ${qFields('qe',z,x)}
    <label class="f"><span>Teklif tarihi</span><input type="date" id="qe_date" value="${z.date||''}"></label>
@@ -10490,6 +10516,7 @@ function firmForm(id){
     <label class="f"><span>Vergi no</span><input id="f_taxNo" value="${v('taxNo')}"></label>
     <label class="f wide"><span>Adres</span><textarea id="f_address">${v('address')}</textarea></label>
     <label class="f wide"><span>Not</span><textarea id="f_note">${v('note')}</textarea></label></div>
+    ${id&&(f.type==='Tedarikçi'||(()=>{const u=supUsage(f.name);return u.mats.length||u.packs.length||u.quotes.length})())?`<div class="sec"><h3>Tedarik ettikleri <button class="btn sm" data-n="${esc(f.name)}" onclick="supMergeForm(this.dataset.n)">Başka tedarikçiyle birleştir</button></h3>${supUseHtml(f.name)}</div>`:''}
     ${id?`<div class="sec"><h3>Ürünleri <span class="sub">${ps.length}</span> <button class="btn sm" onclick="S.xlsFirm='${id}';pickXlsx('prod')">Excel’den ürün aktar</button></h3>${ps.length?`<div class="tw"><table class="t"><tbody>${ps.map(p=>`<tr class="click" onclick="productDetail('${p.id}')"><td><b>${esc(p.name)}</b></td><td>${p.unitKg?fmtQ(p.unitKg*1000)+' g':''}</td><td class="r">${p.formula.length} madde</td></tr>`).join('')}</tbody></table></div>`:'<div class="sub">Bu firmaya ait ürün yok.</div>'}</div>
     ${anc.length?`<div class="sec"><h3>Ana firmadan sipariş verebileceği ürünler</h3>${anc.map(a=>`<p class="sub" style="margin:4px 0">${esc(a.name)}: ${firmProducts(a.id).length} ürün</p>`).join('')}<button class="btn sm" onclick="firmForm('${anc[0].id}')">${esc(anc[0].name)} kartını aç</button></div>`:''}
     ${kids.length?`<div class="sec"><h3>Bağlı firmalar <span class="sub">${kids.length}</span></h3><p class="sub" style="margin-top:0">Bu firmalar ${esc(f.name)} ürünlerinden sipariş verebilir.</p>${kids.map(k=>`<button class="btn sm" style="margin:0 6px 6px 0" onclick="firmForm('${k.id}')">${esc(k.name)}</button>`).join('')}</div>`:''}`:''}`,
@@ -10506,11 +10533,64 @@ async function steCopyFirm(id){const f=firm(id),roles={sahip:document.getElement
   if(!roles.sahip&&!roles.uretici&&!roles.danismanlik){toast('En az bir rol seç.',true);return}
   await steEnsure();let r;try{r=steWin().__yku.copyFirm({unvan:f.name,adres:f.address||'',vergiNo:[f.taxOffice,f.taxNo].filter(Boolean).join(' / '),tel:f.phone||'',email:f.email||'',yetkili:f.contact||'',overwrite:!!document.getElementById('sr_over')?.checked},roles,f.steFirmId)}catch(e){toast('Kopyalanamadı: '+e.message,true);return}
   f.steFirmId=r.id;touch(`${f.name} STE firmalarına ${r.isNew?'kopyalandı':'güncellendi'}`);toast(`${f.name} STE firmalarına ${r.isNew?'eklendi':'güncellendi'}${r.codes.length?' ('+r.codes.join(', ')+')':''}`);firmForm(id)}
+/* ---- Tedarikçiler: kayıtlı firmalar + elle yazılmış adlar tek listede ---- */
+function supUsage(name){const k=norm(name);if(!k)return{mats:[],packs:[],quotes:[]};return{mats:DB.materials.filter(m=>norm(m.supplier)===k),packs:DB.packs.filter(p=>norm(p.supplier)===k),quotes:DB.supplies.flatMap(x=>(x.quotes||[]).filter(z=>norm(z.supplier)===k).map(z=>({x,z})))}}
+function supAll(){const m=new Map();const add=(n,f)=>{n=String(n||'').trim();if(!n)return;const k=norm(n);if(!m.has(k))m.set(k,{name:n,firm:null});if(f)Object.assign(m.get(k),{firm:f,name:f.name})};
+  DB.firms.filter(f=>f.type==='Tedarikçi').forEach(f=>add(f.name,f));
+  DB.materials.forEach(x=>add(x.supplier));DB.packs.forEach(x=>add(x.supplier));DB.supplies.forEach(x=>(x.quotes||[]).forEach(z=>add(z.supplier)));
+  m.forEach(v=>{if(!v.firm){const f=DB.firms.find(f=>norm(f.name)===norm(v.name));if(f)v.firm=f}});
+  return [...m.values()].map(v=>({...v,u:supUsage(v.name)})).sort((a,b)=>a.name.localeCompare(b.name,'tr'))}
+function supCbx(id,value){return cbxHtml(id,value||'','Tedarikçi ara ya da yeni ekle…',{
+  items:()=>supAll().map(v=>({label:v.name,sub:v.firm?(v.firm.type==='Tedarikçi'?'Tedarikçi':'Firma: '+v.firm.type):'Elle yazılmış (firma kaydı yok)',rank:v.firm?0:1,extra:v.firm?[v.firm.contact,v.firm.phone].join(' '):''})),
+  pick:()=>{},match:t=>supAll().find(v=>norm(v.name)===norm(t))?.name,clear:()=>{const i=document.getElementById(id);if(i)i.dataset.sel=''},
+  extra:(q,R)=>q&&!supAll().some(v=>norm(v.name)===norm(q))?[{label:`＋ “${q}” yeni tedarikçi olarak ekle`,act:t=>{const f={id:uid(),name:t,type:'Tedarikçi',parentId:'',contact:'',phone:'',email:'',taxOffice:'',taxNo:'',address:'',note:''};DB.firms.push(f);const i=document.getElementById(id);if(i){i.value=t;i.dataset.sel=t}S.dirty=true;scheduleSave();toast(`“${t}” tedarikçi olarak Firmalar’a eklendi.`)}}]:[]})}
+function supDl(id){return `<datalist id="${id}">${supplierNames().map(n=>`<option value="${esc(n)}">`).join('')}</datalist>`}
+function listSUP(){const q=norm(S.q.fi),L=supAll().filter(v=>!q||norm(v.name).includes(q)),un=L.filter(v=>!v.firm);
+  if(!L.length)return `<div class="tw"><div class="empty">${q?'Aramaya uyan tedarikçi yok.':'Henüz tedarikçi yok. Firma eklerken türünü “Tedarikçi” seç ya da hammadde/ambalaj kartında tedarikçi adı yaz.'}</div></div>`;
+  const dg=supDupGroups().length;
+  return `<div class="row-actions" style="margin-top:-4px"><button class="btn sm" onclick="supDupForm()">Aynı / benzer adlıları bul ve birleştir${dg?` <span class="pill warn">${dg} grup</span>`:''}</button></div>${un.length?`<div class="mrev" style="margin-bottom:12px"><b>${un.length} tedarikçi yalnızca elle yazılmış</b> (hammadde, ambalaj ya da teklif kartlarında), firma kaydı yok. <button class="btn sm pri" onclick="supAddAll()">Hepsini “Tedarikçi” firması olarak ekle</button></div>`:''}
+  <div class="tw"><table class="t"><thead><tr><th>Tedarikçi</th><th>Kayıt</th><th class="r">Hammadde</th><th class="r">Ambalaj</th><th class="r">Teklif</th><th>Son teklif</th></tr></thead><tbody>${L.map(v=>{const lq=v.u.quotes.map(r=>r.z.date||'').sort().pop();
+    return `<tr class="click" data-n="${esc(v.name)}" onclick="supDetail(this.dataset.n)"><td><b>${esc(v.name)}</b>${v.firm?.phone||v.firm?.email?`<div class="sub">${esc([v.firm.phone,v.firm.email].filter(Boolean).join(' / '))}</div>`:''}</td><td>${v.firm?(v.firm.type==='Tedarikçi'?'<span class="pill ok">Firma kaydı</span>':`<span class="pill">Firma: ${esc(v.firm.type)}</span>`):'<span class="pill warn">Elle yazılmış</span>'}</td><td class="r">${v.u.mats.length||''}</td><td class="r">${v.u.packs.length||''}</td><td class="r">${v.u.quotes.length||''}</td><td>${lq?fmtD(lq):''}</td></tr>`}).join('')}</tbody></table></div>`}
+function supUseHtml(name){const u=supUsage(name);if(!u.mats.length&&!u.packs.length&&!u.quotes.length)return '<div class="sub">Bu ad hiçbir hammadde, ambalaj ya da teklifte geçmiyor.</div>';
+  return `${u.mats.length?`<h4 class="h4">Hammaddeler <span class="sub">${u.mats.length}</span></h4><div class="tw"><table class="t"><tbody>${u.mats.map(m=>`<tr class="click" onclick="materialForm('${m.id}')"><td>${esc(matLabel(m))}</td></tr>`).join('')}</tbody></table></div>`:''}
+  ${u.packs.length?`<h4 class="h4">Ambalajlar <span class="sub">${u.packs.length}</span></h4><div class="tw"><table class="t"><tbody>${u.packs.map(k=>`<tr class="click" onclick="packForm('${k.id}')"><td>${esc(packLabel(k))}</td></tr>`).join('')}</tbody></table></div>`:''}
+  ${u.quotes.length?`<h4 class="h4">Fiyat teklifleri <span class="sub">${u.quotes.length}</span></h4><div class="tw"><table class="t"><tbody>${u.quotes.sort((a,b)=>(b.z.date||'').localeCompare(a.z.date||'')).map(({x,z})=>`<tr class="click" onclick="supplyDetail('${x.id}')"><td>${esc(x.no)} · ${esc(supName(x))}</td><td>${fmtD(z.date)}</td><td class="r">${fmtN(z.price)} ${z.currency}/${esc(x.unit)}</td><td>${orderedQuote(x)===z?'<span class="pill ok">Sipariş verilen</span>':z.selected?'<span class="pill">Seçilen</span>':''}</td></tr>`).join('')}</tbody></table></div>`:''}`}
+function supDetail(name){const f=DB.firms.find(x=>norm(x.name)===norm(name));if(f)return firmForm(f.id);
+  openModal('supd'+norm(name).replace(/\W/g,''),name,`<div class="mrev" style="margin-top:0">Bu tedarikçinin firma kaydı yok; adı yalnızca aşağıdaki kartlarda elle yazılmış. Firma olarak eklersen iletişim bilgilerini girebilir, Firmalar’da ve tedarikçi listelerinde görebilirsin.</div>${supUseHtml(name)}`,
+   `<button class="btn" onclick="closeModal()">Kapat</button><button class="btn" data-n="${esc(name)}" onclick="supMergeForm(this.dataset.n)">Başka tedarikçiyle birleştir</button><button class="btn pri" data-n="${esc(name)}" onclick="supAddFirm(this.dataset.n)">Tedarikçi firması olarak ekle</button>`,'wide')}
+const SUP_STOP=new Set(['ltd','şti','sti','limited','şirketi','sirketi','aş','as','a','ş','s','san','sanayi','sanayii','tic','ticaret','ve','dış','dis','ith','ihr','ithalat','ihracat','paz','pazarlama','co','inc','gmbh','llc','kimya','kozmetik']);
+const supKey=n=>norm(n).replace(/[.,'’"&()\-\/]+/g,' ').split(/\s+/).filter(w=>w&&!SUP_STOP.has(w)).join(' ')||norm(n);
+function supMerge(drop,keep){if(norm(drop)===norm(keep))return;const u=supUsage(drop);let n=0;
+  u.mats.forEach(m=>{m.supplier=keep;n++});u.packs.forEach(k=>{k.supplier=keep;n++});u.quotes.forEach(r=>{r.z.supplier=keep;n++});
+  DB.supplies.forEach(x=>{if(x.prevManual&&norm(x.prevManual.supplier)===norm(drop)){x.prevManual.supplier=keep;n++}});
+  const fd=DB.firms.find(f=>norm(f.name)===norm(drop)),fk=DB.firms.find(f=>f!==fd&&norm(f.name)===norm(keep));
+  if(fd&&fk){['contact','phone','email','taxOffice','taxNo','address','note','parentId'].forEach(k=>{if(!fk[k]&&fd[k])fk[k]=fd[k]});if(fd.note&&fk.note&&fd.note!==fk.note&&!fk.note.includes(fd.note))fk.note+='\n'+fd.note;
+    const rf=o=>{if(o.firmId===fd.id)o.firmId=fk.id};DB.products.forEach(rf);DB.proformas.forEach(rf);DB.orders.forEach(rf);DB.rnd.forEach(rf);DB.firms.forEach(f=>{if(f.parentId===fd.id)f.parentId=fk.id});
+    if(fd.steFirmId&&!fk.steFirmId)fk.steFirmId=fd.steFirmId;DB.firms=DB.firms.filter(f=>f!==fd)}
+  else if(fd&&!fk){fd.name=keep}
+  return n}
+function supMergeForm(name){const L=supAll().filter(v=>norm(v.name)!==norm(name)),k=supKey(name);L.sort((a,b)=>(supKey(b.name)===k)-(supKey(a.name)===k)||a.name.localeCompare(b.name,'tr'));
+  openModal('supm','Tedarikçi birleştir: '+name,`<p class="sub" style="margin-top:0">“${esc(name)}” adıyla yazılmış bütün hammadde, ambalaj, teklif ve önceki fiyat kayıtları seçtiğin tedarikçiye aktarılır. İkisinin de firma kaydı varsa boş bilgiler tamamlanır ve “${esc(name)}” firma kaydı silinir.</p>
+   <label class="f"><span>Birleştirilecek (kalacak) tedarikçi</span><select id="supm_t">${L.map(v=>`<option value="${esc(v.name)}">${esc(v.name)}${supKey(v.name)===k?' (benzer ad)':''}${v.firm?'':' · elle yazılmış'}</option>`).join('')}</select></label>`,
+   `<button class="btn" onclick="closeModal()">Vazgeç</button><button class="btn pri" data-n="${esc(name)}" onclick="supMergeDo(this.dataset.n,document.getElementById('supm_t').value)">Birleştir</button>`)}
+function supMergeDo(drop,keep){if(!keep)return;if(!confirm(`“${drop}” → “${keep}” olarak birleştirilsin mi? Bu işlem geri alınamaz.`))return;const n=supMerge(drop,keep);closeModal();touch(`Tedarikçi birleştirildi: ${drop} → ${keep} (${n} kayıt)`);toast(`Birleştirildi; ${n} kayıt “${keep}” adına aktarıldı.`)}
+function supDupGroups(){const g={};supAll().forEach(v=>{(g[supKey(v.name)]=g[supKey(v.name)]||[]).push(v)});return Object.values(g).filter(a=>a.length>1)}
+function supDupForm(){const G=supDupGroups();
+  openModal('supdup','Aynı / benzer adlı tedarikçiler',G.length?`<p class="sub" style="margin-top:0">Büyük-küçük harf, noktalama ve “Ltd. Şti., A.Ş., San. Tic.” gibi ekler yok sayılarak aynı görünen tedarikçiler gruplandı. Her grupta kalacak adı seç; diğerleri ona birleştirilir. Birleştirmek istemediğin grubun işaretini kaldır.</p>${G.map((a,gi)=>{const best=[...a].sort((x,y)=>(!!y.firm-!!x.firm)||((y.u.mats.length+y.u.packs.length+y.u.quotes.length)-(x.u.mats.length+x.u.packs.length+x.u.quotes.length)))[0];
+     return `<div class="dupg"><label style="display:flex;gap:8px;align-items:center;font-weight:600"><input type="checkbox" class="supdg" data-g="${gi}" checked style="width:auto"> Grup ${gi+1}</label>${a.map(v=>`<label class="dupo"><input type="radio" name="supdg${gi}" value="${esc(v.name)}" ${v===best?'checked':''} style="width:auto"> <b>${esc(v.name)}</b> <span class="sub">${v.firm?'firma kaydı':'elle yazılmış'} · ${v.u.mats.length} hammadde, ${v.u.packs.length} ambalaj, ${v.u.quotes.length} teklif</span></label>`).join('')}</div>`}).join('')}`:'<div class="sub">Aynı ya da benzer adlı tedarikçi bulunamadı. Farklı yazılmış ama aynı olan iki tedarikçiyi, listeden birine tıklayıp “Birleştir” ile tek tek birleştirebilirsin.</div>',
+   `<button class="btn" onclick="closeModal()">Kapat</button>${G.length?'<button class="btn pri" onclick="supDupDo()">Seçilenleri birleştir</button>':''}`,'wide')}
+function supDupDo(){const G=supDupGroups();let n=0,g=0;document.querySelectorAll('.supdg:checked').forEach(c=>{const a=G[+c.dataset.g],keep=document.querySelector(`input[name="supdg${c.dataset.g}"]:checked`)?.value;if(!a||!keep)return;g++;a.forEach(v=>{if(norm(v.name)!==norm(keep))n+=supMerge(v.name,keep)||0})});
+  closeModal();if(g){touch(`${g} tedarikçi grubu birleştirildi (${n} kayıt)`);toast(`${g} grup birleştirildi.`)}}
+function supAddFirm(name){let f=DB.firms.find(x=>norm(x.name)===norm(name));if(!f){f={id:uid(),name:String(name).trim(),type:'Tedarikçi',parentId:'',contact:'',phone:'',email:'',taxOffice:'',taxNo:'',address:'',note:''};DB.firms.push(f);touch('Tedarikçi firma eklendi: '+f.name)}firmForm(f.id)}
+function supAddAll(){const un=supAll().filter(v=>!v.firm);if(!un.length)return;if(!confirm(`${un.length} tedarikçi “Tedarikçi” türünde firma olarak eklensin mi?\n\n${un.slice(0,12).map(v=>v.name).join(', ')}${un.length>12?'…':''}`))return;
+  un.forEach(v=>DB.firms.push({id:uid(),name:v.name,type:'Tedarikçi',parentId:'',contact:'',phone:'',email:'',taxOffice:'',taxNo:'',address:'',note:''}));touch(`${un.length} tedarikçi firma olarak eklendi`);toast(`${un.length} tedarikçi Firmalar’a eklendi.`)}
 function saveFirm(id){
   const g=k=>document.getElementById('f_'+k).value.trim();
   if(!g('name')){toast('Firma adı gerekli.',true);return}
-  const o=id?firm(id):{id:uid()};
+  const o=id?firm(id):{id:uid()},oldName=id?o.name:'';
+  if(DB.firms.some(x=>x.id!==id&&norm(x.name)===norm(g('name')))&&!confirm(`“${g('name')}” adında başka bir firma var. Yine de kaydedilsin mi?`))return;
   ['name','type','parentId','contact','phone','email','taxOffice','taxNo','address','note'].forEach(k=>o[k]=g(k));
+  if(oldName&&norm(oldName)!==norm(o.name)){const u=supUsage(oldName),n=u.mats.length+u.packs.length+u.quotes.length;if(n&&confirm(`Firma adı değişti. Tedarikçi olarak “${oldName}” yazılı ${n} kayıt (hammadde, ambalaj, teklif) yeni adla güncellensin mi?`)){u.mats.forEach(m=>m.supplier=o.name);u.packs.forEach(k=>k.supplier=o.name);u.quotes.forEach(r=>r.z.supplier=o.name)}}
   if(id&&o.parentId&&(o.parentId===id||firmDescIds(id).has(o.parentId))){toast('Bir firma kendi bağlı firmasını ana firma seçemez.',true);return}
   if(!id)DB.firms.push(o);closeModal();touch(`Firma ${id?'güncellendi':'eklendi'}: ${o.name}`);
 }
@@ -10528,7 +10608,7 @@ function materialForm(id){
     <label class="f"><span>Kod</span><input id="m_code" value="${v('code')}" oninput="codeHint('mat',this,'${id||''}')" autocomplete="off"></label>
     <label class="f wide" style="grid-column:span 2"><span>Hammadde adı *</span><input id="m_name" value="${v('name')}"></label>
     <label class="f"><span>Fonksiyon</span><input id="m_func" value="${v('func')}"></label>
-    <label class="f"><span>Tedarikçi</span><input id="m_supplier" value="${v('supplier')}"></label>
+    <label class="f"><span>Tedarikçi</span>${supCbx('m_supplier',m.supplier)}</label>
     <label class="f wide"><span>Not</span><input id="m_note" value="${v('note')}"></label></div>
     <div class="sec"><h3>INCI bileşenleri <span id="mcTot"></span></h3><p class="sub" style="margin-top:0">INCI adını yazmaya başlayınca STE’deki INCI kütüphanesinden öneriler gelir. Kütüphanede olmayan bir INCI yazarsan kaydederken INCI kütüphanesine eklenir. Karışım hammaddede her INCI’yi ve hammadde içindeki oranını yaz; tek bileşenli ise %100.</p><datalist id="inciLib">${inciDatalist()}</datalist>
     <div class="tw"><table class="t ed"><thead><tr><th>INCI adı</th><th class="r">% (hammadde içinde)</th><th>Fonksiyon</th><th></th></tr></thead><tbody id="mcRows"></tbody></table></div>
@@ -10896,7 +10976,7 @@ function cbxRender(q){const box=cbxBoxEl(),inp=document.getElementById(cbxCur);i
   const H=Math.min(320,box.scrollHeight);if(below<H+12&&r.top>below){box.style.top=(r.top-H-4)+'px'}else box.style.top=(r.bottom+3)+'px';box.style.maxHeight=Math.max(160,Math.min(320,below>r.top?below-16:r.top-16))+'px';
   const on=box.querySelector('.cbx-o.on');if(on){if(on.offsetTop<box.scrollTop)box.scrollTop=on.offsetTop;else if(on.offsetTop+on.offsetHeight>box.scrollTop+box.clientHeight)box.scrollTop=on.offsetTop+on.offsetHeight-box.clientHeight}}
 function cbxClose(){const b=document.getElementById('cbxBox');if(b)b.style.display='none';cbxCur=null}
-function cbxBlur(id){if(cbxCur!==id)return;const cfg=CBX[id],inp=document.getElementById(id);cbxClose();if(inp&&cfg){if(!inp.value.trim()&&cfg.clear)cfg.clear();else if(inp.value!==inp.dataset.sel&&cfg.revert!==false)inp.value=inp.dataset.sel||''}}
+function cbxBlur(id){if(cbxCur!==id)return;const cfg=CBX[id],inp=document.getElementById(id);cbxClose();if(inp&&cfg){if(!inp.value.trim()&&cfg.clear)cfg.clear();else if(inp.value!==inp.dataset.sel&&cfg.revert!==false){const mm=cfg.match&&cfg.match(inp.value.trim());if(mm){inp.value=mm;inp.dataset.sel=mm}else inp.value=inp.dataset.sel||''}}}
 function cbxPick(i){const id=cbxCur,cfg=CBX[id],it=cbxRes[i],inp=document.getElementById(id);if(!it||!cfg)return;cbxClose();
   if(it.special){it.act(inp?inp.value.trim():'');return}if(inp){inp.value=it.label;inp.dataset.sel=it.label}cfg.pick(it)}
 function cbxKey(e,id){const open=cbxCur===id&&document.getElementById('cbxBox')?.style.display==='block';
@@ -11085,7 +11165,11 @@ function delOrder(id){const o=ord(id);if(!confirm(o.no+' silinsin mi? Bu işlem 
 /* ============ YAZDIRMA ============ */
 function sigHtml(){const u=S.user;if(!u)return '';return `<div class="psig"><div><b>${esc(u.name||u.username)}</b>${u.meslek?`<br>${esc(u.meslek)}`:''}</div>${u.sig?`<img src="${u.sig}" alt="">`:''}</div>`}
 function sigFoot(){const h=sigHtml();return h?`<div class="psigfoot"><span>Hazırlayan</span>${h}</div>`:''}
-function printDoc(h){document.getElementById('print').innerHTML=h;setTimeout(()=>window.print(),50)}
+function printDoc(h,withSig){const has=/class="psig"/.test(h)&&!!(S.user&&S.user.sig),mode=DB.settings.sigPrint||'ask';
+  if(has&&withSig===undefined&&mode==='ask'){S.pendPrint=h;openModal('sigask','Yazdır: imza eklensin mi?',`<p style="margin-top:0">Bu çıktıda “Hazırlayan” alanına imzan basılabilir.</p><div class="sigask"><img src="${S.user.sig}" alt="İmza"></div><label style="display:flex;gap:8px;align-items:center;margin-top:12px;cursor:pointer"><input type="checkbox" id="sa_rem" style="width:auto"> Bu seçimi hatırla, bir daha sorma <span class="sub">(Dosya ve ayarlar’dan değiştirilebilir)</span></label>`,
+    `<button class="btn" onclick="sigAsk(false)">İmzasız yazdır</button><button class="btn pri" onclick="sigAsk(true)">İmzalı yazdır</button>`);return}
+  const sig=withSig!==undefined?withSig:mode!=='no',el=document.getElementById('print');el.innerHTML=h;if(!sig)el.querySelectorAll('.psig img').forEach(i=>i.remove());setTimeout(()=>window.print(),50)}
+function sigAsk(v){const rem=document.getElementById('sa_rem')?.checked,h=S.pendPrint;S.pendPrint=null;closeModal();if(rem){DB.settings.sigPrint=v?'yes':'no';touch('Yazdırma imza tercihi: '+(v?'her zaman ekle':'hiç ekleme'))}if(h)printDoc(h,v)}
 function coInfo(){const s=DB.settings;return [s.coAddr,[s.coPhone?'Tel: '+s.coPhone:'',s.coEmail,s.coWeb].filter(Boolean).join(' · '),[s.coTaxOffice?s.coTaxOffice+' V.D.':'',s.coTaxNo?'No: '+s.coTaxNo:''].filter(Boolean).join(' ')].filter(Boolean)}
 const CO_FIELDS=[['coAddr','Adres','wide','Mahalle, cadde/sokak, no, ilçe / il'],['coPhone','Telefon','',''],['coEmail','E-posta','',''],['coWeb','Web sitesi','',''],['coTaxOffice','Vergi dairesi','',''],['coTaxNo','Vergi no / MERSİS no','','']];
 function coForm(){const s=DB.settings;openModal('coinfo','Firma adres ve iletişim bilgileri',`<p class="sub" style="margin-top:0">Bu bilgiler proforma, iş emri, reçete ve diğer çıktıların başlığında firma adının altına yazılır.</p><div class="fg">${CO_FIELDS.map(([k,l,w,ph])=>`<label class="f ${w}"><span>${l}</span>${k==='coAddr'?`<textarea id="co_${k}" style="min-height:64px" placeholder="${ph}">${esc(s[k]||'')}</textarea>`:`<input id="co_${k}" value="${esc(s[k]||'')}" placeholder="${ph}">`}</label>`).join('')}</div>`,
