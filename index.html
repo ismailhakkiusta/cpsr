@@ -10,7 +10,7 @@
 <meta name="theme-color" content="#9A5B26">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
-<title>YKU Proforma & Sipariş Takip v90</title>
+<title>YKU Proforma & Sipariş Takip v93</title>
 <style>
 :root{
   --zebra:#FAF7F3;--sb:rgba(40,30,20,.18);--sbh:rgba(40,30,20,.34);
@@ -755,13 +755,14 @@ th.ts-h:hover{text-decoration:underline;text-underline-offset:3px}
 th.ts-h::after{content:'⇅';opacity:.28;font-size:.85em;margin-left:4px;font-weight:400}
 th.ts-h.ts-a::after{content:'▲';opacity:.85}
 th.ts-h.ts-d::after{content:'▼';opacity:.85}
+.fxnote{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between;border:1.5px solid var(--warn);background:var(--warn-bg);border-radius:10px;padding:10px 12px;margin:0 0 12px}
 </style>
 </head>
 <body>
 <div id="app">
   <aside class="side">
     <div class="brand">
-      <img id="brandSeal" class="brand-seal" alt=""><div class="brand-t"><b>Proforma & Sipariş</b><span>YKU Cosmetic v90</span></div><button class="thbtn th-m" onclick="themePicker()" title="Tema seç"></button>
+      <img id="brandSeal" class="brand-seal" alt=""><div class="brand-t"><b>Proforma & Sipariş</b><span>YKU Cosmetic v93</span></div><button class="thbtn th-m" onclick="themePicker()" title="Tema seç"></button>
       <span class="mobile-save" id="mUser"></span><button class="btn sm pri mobile-save" onclick="saveNow()">Kaydet</button>
     </div>
     <nav class="nav" id="nav"></nav>
@@ -8990,7 +8991,7 @@ const SEG=['#2E5B61','#6E9C8F','#C9A44C','#9A6B8E','#4F7FA8','#B5694F','#7D8B3E'
 
 function blankDB(){return{version:2,settings:{company:'',logo:'',currency:'TRY',kdv:20,pfNext:1,orNext:1,supNext:1,rndNext:1,colors:null,colorHex:{},customTypes:[]},firms:[],materials:[],packs:[],products:[],proformas:[],orders:[],supplies:[],rnd:[],users:[],log:[],stockMoves:[]}}
 let DB=Object.assign(blankDB(),{stageVer:4});
-const S={view:'panel',q:{},pfTab:'active',prFirm:'',orFilter:'open',fileHandle:null,fileName:'',dirHandle:null,dirty:false,lastSaved:null,lastBackup:0,modalKey:null,matSel:null,saveTimer:null,xlsMode:null,xlsFirm:'',rpTab:'pending',rpFirm:'',rpYear:'',prOpen:new Set(),chkMissing:false,supTab:'open',rpOpen:new Set(),rndTab:'open',miss:{mt:false,pk:false,pr:false}};
+const S={view:'panel',q:{},pfTab:'pending',prFirm:'',orFilter:'open',fileHandle:null,fileName:'',dirHandle:null,dirty:false,lastSaved:null,lastBackup:0,modalKey:null,matSel:null,saveTimer:null,xlsMode:null,xlsFirm:'',rpTab:'pending',rpFirm:'',rpYear:'',prOpen:new Set(),chkMissing:false,supTab:'open',rpOpen:new Set(),rndTab:'open',miss:{mt:false,pk:false,pr:false}};
 let ED=null;
 
 /* ============ Yardımcılar ============ */
@@ -9100,9 +9101,18 @@ const r3=v=>Math.round((+v||0)*1000)/1000;
 const revTxt=r=>'Rev. '+String(r??0).padStart(2,'0');
 /* formülü değişen (revizyon / Ar-Ge) ürün işareti */
 const FX_RECENT=30;
-function fxInfo(p){if(!p)return null;const ar=/Ar-Ge/.test(p.revNote||''),rv=(p.rev||0)>0;if(!rv&&!ar)return null;const d=p.revDate?daysTo(p.revDate):null,recent=d!=null&&-d<=FX_RECENT;return{ar,rv,recent,txt:`${ar?'Ar-Ge':'Formül değişti'}${rv?' · '+revTxt(p.rev):''}`,tip:`${ar?'Formül Ar-Ge denemesinden geldi':'Formül değiştirildi'}: ${revTxt(p.rev)}${p.revDate?' ('+fmtD(p.revDate)+')':''}${p.revNote?' — '+p.revNote:''}${(p.revisions||[]).length?' · '+(p.revisions.length)+' önceki revizyon':''}`}}
-function fxMark(p,o={}){const f=fxInfo(p);if(!f)return '';return ` <span class="pill fxm ${f.recent?'new':''} ${f.ar?'ar':''}" title="${esc(f.tip)}">${f.ar?'⚗':'✎'} ${o.short?(f.ar?'Ar-Ge':revTxt(p.rev)):f.txt}${f.recent?' · yeni':''}</span>`}
-function fxOld(l){const p=prod(l.productId);return p&&l.rev!=null&&l.rev!==(p.rev??0)}
+const fxSig=p=>`${p.rev||0}|${p.revDate||''}|${p.revNote||''}`;
+const fxUser=()=>S.user?S.user.username:'_';
+const fxSeen=p=>!!(p&&(p.fxSeen||{})[fxUser()]===fxSig(p));
+function fxAck(pid,silent){const p=prod(pid);if(!p)return;p.fxSeen={...(p.fxSeen||{}),[fxUser()]:fxSig(p)};S.dirty=true;scheduleSave();if(!silent){touch(`Formül değişikliği kontrol edildi: ${p.name} ${revTxt(p.rev)}`);productDetail(pid)}}
+function fxUnack(pid){const p=prod(pid);if(!p||!p.fxSeen)return;delete p.fxSeen[fxUser()];touch(null);productDetail(pid)}
+function fxLineAck(oid,lid){const o=ord(oid),l=o&&o.lines.find(x=>x.id===lid),p=l&&prod(l.productId);if(!p)return;l.fxOk=p.rev??0;touch(`${o.no} / ${l.desc}: formül değişikliği kontrol edildi, ${revTxt(l.rev)} ile devam`);if(String(S.modalKey||'').startsWith('lrv'))lineRecipeView(oid,lid);else orderDetail(oid)}
+function fxNotice(p){const f=fxInfo(p,true);if(!f)return '';const prev=(p.revisions||[]).length?p.revisions[p.revisions.length-1].rev:null;
+  if(fxSeen(p))return `<p class="sub" style="margin:0 0 10px">✓ Formül değişikliği (${revTxt(p.rev)}) kontrol edildi. <button class="btn link xsl" onclick="fxUnack('${p.id}')">İşareti geri getir</button></p>`;
+  return `<div class="fxnote"><div><b>${f.ar?'⚗ Formül Ar-Ge denemesinden geldi':'✎ Formül değişti'}</b> · ${revTxt(p.rev)}${p.revDate?' · '+fmtD(p.revDate):''}${p.revNote?`<div class="sub">${esc(p.revNote)}</div>`:''}</div><div class="row-actions" style="margin:0">${prev!=null?`<button class="btn sm" onclick="revCompare('${p.id}',${prev})">Önceki revizyonla karşılaştır</button>`:''}<button class="btn sm pri" onclick="fxAck('${p.id}')">✓ Kontrol ettim</button></div></div>`}
+function fxInfo(p,all){if(!p)return null;const ar=/Ar-Ge/.test(p.revNote||''),rv=(p.rev||0)>0;if(!rv&&!ar)return null;if(!all&&fxSeen(p))return null;const d=p.revDate?daysTo(p.revDate):null,recent=d!=null&&-d<=FX_RECENT;return{ar,rv,recent,txt:`${ar?'Ar-Ge':'Formül değişti'}${rv?' · '+revTxt(p.rev):''}`,tip:`${ar?'Formül Ar-Ge denemesinden geldi':'Formül değiştirildi'}: ${revTxt(p.rev)}${p.revDate?' ('+fmtD(p.revDate)+')':''}${p.revNote?' — '+p.revNote:''}${(p.revisions||[]).length?' · '+(p.revisions.length)+' önceki revizyon':''}`}}
+function fxMark(p,o={}){const f=fxInfo(p);if(!f)return '';return ` <span class="pill fxm ${f.recent?'new':''} ${f.ar?'ar':''}" title="${esc(f.tip)} — tıkla: ürün kartında kontrol et" onclick="event.stopPropagation();productDetail('${p.id}')" style="cursor:pointer">${f.ar?'⚗':'✎'} ${o.short?(f.ar?'Ar-Ge':revTxt(p.rev)):f.txt}${f.recent?' · yeni':''}</span>`}
+function fxOld(l){const p=prod(l.productId);return p&&l.rev!=null&&l.rev!==(p.rev??0)&&l.fxOk!==(p.rev??0)}
 function formulaSig(o){return JSON.stringify({f:(o.formula||[]).map(f=>JSON.stringify([phKey(f.phase),f.matId,pn(f.pct)])).sort(),s:o.steps||[],n:o.notes||'',u:pn(o.unitKg)})}
 function revSnapshot(p){return{rev:p.rev??0,date:p.revDate||'',note:p.revNote||'',formula:JSON.parse(JSON.stringify(p.formula||[])),steps:[...(p.steps||[])],notes:p.notes||'',unitKg:p.unitKg}}
 /* ürünü yeni değerlerle güncelle; formül değiştiyse eskisini sakla, revizyon numarasını artır */
@@ -9382,9 +9392,15 @@ function fileInfo(){const noFile=!S.fileName&&!S.fileHandle;let size=0;try{size=
    <div class="info" style="margin-top:12px"><div><small>Kayıt şekli</small>${S.fileHandle?'Otomatik (Chrome / Edge)':noFile?'—':'Elle kaydet (paylaş / indir)'}</div><div><small>Boyut</small>${kb}</div><div><small>Kullanıcı</small>${activeUsers().length} aktif</div>${S.dirHandle?`<div><small>Yedek klasörü</small>${esc(S.dirHandle.name)}</div>`:''}${bk?`<div><small>Bu oturumdaki yedekler</small>${esc(bk)}</div>`:''}</div>
    <div class="stats" style="margin:8px 0 0;flex-wrap:wrap"><span><b>${DB.firms.length}</b>firma</span><span><b>${DB.products.length}</b>ürün</span><span><b>${DB.materials.length}</b>hammadde</span><span><b>${DB.packs.length}</b>ambalaj</span><span><b>${DB.proformas.length}</b>proforma</span><span><b>${DB.orders.length}</b>sipariş</span><span><b>${DB.supplies.length}</b>tedarik</span><span><b>${(DB.rnd||[]).length}</b>Ar-Ge</span>${steHasData()?`<span><b>${(SL.firms||[]).length}</b>STE firması</span><span><b>${(st['cpsr-products']||[]).length}</b>CPSR işi</span><span><b>${(SB.payments||[]).length}</b>tahsilat</span>`:''}</div>`,
    `<button class="btn" onclick="closeModal();go('file')">Dosya ve ayarlar</button><button class="btn" onclick="newFile()">Yeni</button><button class="btn" onclick="openFile()">Aç</button><button class="btn" onclick="saveAs()">Farklı kaydet</button><button class="btn pri" onclick="saveNow();setTimeout(fileInfo,400)">Kaydet</button>`)}
+/* STE menüsündeki sayılar (kayıt dosyasındaki STE verisinden) */
+function steNavCounts(){if(steLocked())return {};const st=DB.ste||{},L=st['cpsr-libraries']||{},B=st['cpsr-business']||{},P=Array.isArray(st['cpsr-products'])?st['cpsr-products']:[];
+  const firms=L.firms||[],jobs=B.jobs||[],pays=B.payments||[],ings=L.ingredients||[],closed=['Tamamlandı','Teslim Edildi','Sonlandırıldı','İptal'];
+  const soz=firms.reduce((a,f)=>a+(f.contracts||[]).filter(c=>(c.status||'Aktif')==='Aktif').length,0);
+  return {'ste:firmalar':firms.length,'ste:fu':(st['ste-urunler']||[]).length,'ste:sozlesmeler':soz,'ste:urunler':P.length,'ste:isler':jobs.filter(j=>!closed.includes(j.durum)).length,'ste:tahsilatlar':pays.length,'ste:hammadde':ings.length}}
+const STE_NAV_TIP={'ste:firmalar':'STE firma sayısı','ste:fu':'Firma ürünü kartı','ste:sozlesmeler':'Aktif sözleşme','ste:urunler':'CPSR işi','ste:isler':'Açık (tamamlanmamış) iş','ste:tahsilatlar':'Tahsilat kaydı','ste:hammadde':'INCI sayısı'};
 function renderSide(){applyTheme();{const bs=document.getElementById('brandSeal');if(bs&&!bs.getAttribute('src'))bs.src=SEAL}
-  const c={'ste:fu':(((DB.ste||{})['ste-urunler'])||[]).length,proformas:DB.proformas.filter(p=>p.status==='Beklemede').length,orders:DB.orders.filter(isOpen).length,products:DB.products.length,materials:DB.materials.length,packs:DB.packs.length,firms:DB.firms.length,supply:DB.supplies.filter(x=>SUP_OPEN.includes(x.status)).length,rnd:DB.rnd.filter(x=>RND_OPEN.includes(x.status)).length};
-  const btn=([k,l],cls)=>!canSee(k)?'':`<button data-v="${k}" class="${S.view===k||(k==='reports'&&S.view==='ste:raporlar')?'on':''} ${cls||''}" onclick="go('${k}')"><span class="nl">${cls?'':icoSvg(k)}${l}</span>${c[k]?`<span class="c">${c[k]}</span>`:''}</button>`;
+  const c={...steNavCounts(),proformas:DB.proformas.filter(p=>p.status==='Beklemede').length,orders:DB.orders.filter(isOpen).length,products:DB.products.length,materials:DB.materials.length,packs:DB.packs.length,firms:DB.firms.length,supply:DB.supplies.filter(x=>SUP_OPEN.includes(x.status)).length,rnd:DB.rnd.filter(x=>RND_OPEN.includes(x.status)).length};
+  const btn=([k,l],cls)=>!canSee(k)?'':`<button data-v="${k}" class="${S.view===k||(k==='reports'&&S.view==='ste:raporlar')?'on':''} ${cls||''}" onclick="go('${k}')"><span class="nl">${cls?'':icoSvg(k)}${l}</span>${c[k]?`<span class="c"${STE_NAV_TIP[k]?` title="${STE_NAV_TIP[k]}"`:''}>${c[k]}</span>`:''}</button>`;
   const inSte=String(S.view).startsWith('ste:')&&S.view!=='ste:raporlar',steOpen=S.steOpen!=null?S.steOpen:inSte;
   const grp=!canSee('ste:x')?'':`<button class="navgrp ${inSte?'cur':''}" onclick="S.steOpen=!steOpenNow();renderSide()" title="STE grubunu aç / kapat" aria-expanded="${steOpen}"><span class="nl">${icoSvg('ste')}STE</span><span class="c">${steOpen?'▾':'▸'}</span></button>`+(steOpen?NAV_STE.map(x=>btn(x,'subnav')).join(''):'')+'<div class="navsep"></div>';
   document.getElementById('nav').innerHTML=grp+NAV.map(x=>(x[0]==='help'?'<div class="navsep"></div>':'')+btn(x)).join('');
@@ -9605,6 +9621,7 @@ const HELP=[
 <p><b>Eksik bilgiler</b> (formül, toplam %100, birim hacim, ambalaj, üretim aşamaları, INCI’si eksik hammadde), <b>Ürünleri Excel’e aktar</b> (seçili firma ya da hepsi; geri aktarılabilir), <b>Ürün yedeği al / Yedekten yükle</b> ve her ürünün yanında <b>Kopyala</b>.</p>`},
 
 {id:'proforma',t:'8. Proformalar',go:'proformas',h:`
+<p>Proformalar dört sekmededir: <b>Proformalar</b> (siparişe dönüşmemiş; beklemede ya da onaylanmış), <b>Devam eden işler</b> (siparişe dönüşmüş, henüz teslim edilmemiş), <b>Tamamlanan işler</b> (teslim ayına göre) ve <b>Reddedilen</b>.</p>
 <p>Gelen proformaları kaydettiğin bölüm. Proforma; firma, tarih, geçerlilik, para birimi, kalemler (ürün, miktar, birim fiyat, iskonto, KDV) ve şartlarla girilir. Firma ve kalemdeki ürün alanı <b>yazdıkça arar</b>: birkaç harf yazınca benzer adlar sıralanır (yazım farklarını da yakalar), ok tuşlarıyla seçip Enter’a basarsın. Firma listede yoksa “＋ yeni firma ekle” çıkar. Firma seçmeden ürün ararsan ürünün firması kendiliğinden gelir; ürüne bağlı olmayan satır için “Serbest kalem”i seç.</p>
 <ul><li>Durumlar: <b>Beklemede → Onaylandı → Siparişe dönüştü → Tamamlandı</b> ya da <b>Reddedildi</b>.</li>
 <li><b>Siparişe dönüştür</b> ile proformadan sipariş açılır; kalemler ve fiyatlar aktarılır, her ürün formülün o anki revizyonuna kilitlenir.</li>
@@ -9614,7 +9631,8 @@ const HELP=[
 {id:'siparis',t:'9. Siparişler ve aşamalar',go:'orders',h:`
 <p>Sipariş doğrudan ya da proformadan açılır. Sipariş detayında her ürünün aşaması ayrı ayrı takip edilir.</p>
 <h4>Üretim aşamaları</h4>
-<p><b>Formül değişikliği işareti:</b> formülü revize edilen ürünlerde <span class="pill fxm">✎ Formül değişti · Rev. 02</span>, Ar-Ge denemesinden gelen ürünlerde <span class="pill fxm ar">⚗ Ar-Ge</span> işareti görünür (Ürünler ve formüller listesi, ürün kartı, firma kartı, sipariş reçeteleri). Son 30 günde değişenler turuncu ve “yeni” etiketlidir; firma başlığında kaç ürünün yeni değiştiği yazar. Sipariş açıldıktan sonra formülü değişen ürünler Siparişler listesinde ve sipariş penceresinde <span class="pill fxm new">✎ formül değişti</span> ile işaretlenir. İşaretin üzerine gelince revizyon tarihi ve açıklaması görünür.</p>
+<p>Hammadde ve ambalaj kartlarının altındaki <b>＋ Tedarik oluştur</b> düğmesi o malzeme için tedarik kalemini açar (malzeme seçili gelir, miktarı yazman yeter). Malzemenin açık tedarik kalemi varsa düğmede sayısı görünür.</p>
+<p><b>Formül değişikliği işareti:</b> formülü revize edilen ürünlerde <span class="pill fxm">✎ Formül değişti · Rev. 02</span>, Ar-Ge denemesinden gelen ürünlerde <span class="pill fxm ar">⚗ Ar-Ge</span> işareti görünür (Ürünler ve formüller listesi, ürün kartı, firma kartı, sipariş reçeteleri). Son 30 günde değişenler turuncu ve “yeni” etiketlidir; firma başlığında kaç ürünün yeni değiştiği yazar. Sipariş açıldıktan sonra formülü değişen ürünler Siparişler listesinde ve sipariş penceresinde <span class="pill fxm new">✎ formül değişti</span> ile işaretlenir. İşaretin üzerine gelince revizyon tarihi ve açıklaması görünür. İşarete tıklayınca ürün kartı açılır; kartın üstündeki uyarıda <b>Önceki revizyonla karşılaştır</b> ve <b>✓ Kontrol ettim</b> vardır. Kontrol ettim deyince işaret o revizyon için (kullanıcı başına) kalkar; formül yeniden değişirse işaret tekrar çıkar. Siparişlerdeki “formül değişti” işareti, reçete bölümündeki <b>✓ Kontrol ettim, eski formülle devam</b> ile ya da <b>Güncel revizyona geçir</b> ile kalkar.</p>
 <p>Çıktılarda ürünlerin üretim aşaması görünür: <b>Siparişler</b> sayfasının liste çıktısında (tutar ve bakiye sütunları varsayılan olarak yer almaz; yazdırırken <b>Tutar ve bakiye sütunları eklensin</b> işaretlenirse eklenir, seçim hatırlanır) her ürün ayrı satırda miktarı ve aşamasıyla (ör. “Dolum / ambalaj 4/9”); sipariş penceresindeki <b>İş emri yazdır</b> çıktısında ise ürün × aşama tablosu (tamamlanan ✓, şu anki ●, aşamaya geçiş tarihleriyle) ve lot numarası yer alır.</p>
 <p>Üretim reçetelerinde (ekranda, çıktıda ve Excel’de) <b>Üretim kontrol</b> tablosu vardır: üretim adedi, görünüm, renk, pH, viskozite ve yoğunluk için <b>Hedef</b> (ürün kartındaki hedef değerler) ve <b>Ölçülen</b> (Üretim kontrol aşamasında girilen değerler ve üretilen adet) satırları. Ölçüm girilmemişse çıktıda bu satır elle doldurulmak üzere boş gelir. Sipariş reçetesindeki <b>Ölçüm gir</b> düğmesiyle aşamayı değiştirmeden ölçüm girilebilir.</p>
 <p>Sipariş, ürün ve Ar-Ge pencerelerindeki üretim reçetelerinde <b>hammadde adına tıklayınca hammadde kartı açılır</b>; düzeltip kaydedince (ya da <b>Geri dön</b> ile) bulunduğun pencereye dönülür.</p>
@@ -9687,6 +9705,7 @@ const HELP=[
 
 {id:'ste',t:'14. STE bölümü',go:'ste:dashboard',h:`
 <p>STE grubu, Sorumlu Teknik Eleman işlerinin yönetildiği bölümdür. Menünün en üstündedir; <b>STE</b> başlığına tıklayarak grubu açıp kapatabilirsin (içerideyken de).</p>
+<p>Menüdeki STE sayfalarının yanındaki sayılar: STE firma sayısı, firma ürünü kartı, aktif sözleşme, CPSR işi, açık (tamamlanmamış) iş, tahsilat kaydı ve INCI sayısı. STE şifreyle kilitliyken sayılar gizlenir.</p>
 <ul><li><b>Genel bilgiler:</b> firma, tahsilat, iş ve ürün özet kartları, grafikler. Kartlar düzenlenebilir.</li>
 <li><b>Takvim:</b> tahsilat günleri, iş teslimleri, sözleşme bitişleri.</li>
 <li><b>STE firmalar:</b> ürün sahibi/sorumlu kişi (sözleşmeli), üretici (fason) ve danışmanlık müşterisi rolleri; cari, üretici ve danışmanlık kodları.</li>
@@ -10008,7 +10027,7 @@ function lineRecipes(lines,firmId,oid){
   if(!items.length)return '<div class="sub">Kalemler bu firmanın ürün listesindeki bir ürüne bağlanırsa üretim reçetesi burada oluşur.</div>';
   return items.map(x=>{const man=pn(x.l.prodKg)>0,nOv=Object.keys(x.ov).length;
     return `<details class="fx" open><summary><span><b>${esc(x.p.name)}</b> <span class="pill ${x.p._old?'warn':''}">${revTxt(x.p.rev)}${x.p._old?' (eski)':''}</span>${x.p._old?'':fxMark(prod(x.p.id),{short:true})} <span class="sub">${fmtQ(x.qty)} adet × ${fmtQ(x.p.unitKg*1000)} g</span></span><span>Üretim <b>${fmtKg(x.kg)} kg</b>${man||nOv?' <span class="pill warn">elle değiştirildi</span>':''} ${x.p.formula.length?`<span class="${pctOk(x.p)?'pct-ok':'pct-bad'}">%${fmtP(pctTotal(x.p))}</span>`:'<span class="pill warn">Formül yok</span>'} ${x.p.unitKg?'':'<span class="pill warn">Birim hacim yok</span>'} ${oid?`<button class="btn sm" onclick="event.preventDefault();printLineRecipe('${oid}','${x.l.id}')">Yazdır</button> `:''}<button class="btn sm" onclick="event.preventDefault();productDetail('${x.p.id}')">Ürüne git</button></span></summary><div class="in">
-    ${x.p._old?`<div class="kgbar"><span class="pill warn">Bu sipariş ${revTxt(x.p.rev)} formülüyle açıldı; ürünün güncel formülü ${revTxt(prod(x.l.productId).rev)}.</span>${oid?`<button class="btn sm" onclick="setLineRev('${oid}','${x.l.id}')">Güncel revizyona geçir</button>`:''}</div>`:''}
+    ${x.p._old?`<div class="kgbar"><span class="pill warn">Bu sipariş ${revTxt(x.p.rev)} formülüyle açıldı; ürünün güncel formülü ${revTxt(prod(x.l.productId).rev)}.</span>${oid?`<button class="btn sm" onclick="setLineRev('${oid}','${x.l.id}')">Güncel revizyona geçir</button>${x.l.fxOk===(prod(x.l.productId).rev??0)?'<span class="sub">✓ kontrol edildi, eski formülle devam</span>':`<button class="btn sm" onclick="fxLineAck('${oid}','${x.l.id}')" title="İşareti kaldır; sipariş eski formülle üretilir">✓ Kontrol ettim, eski formülle devam</button>`}`:''}</div>`:''}
     ${oid?`<div class="kgbar"><label>Üretim miktarı (kg) <input class="kgin ${man?'man':''}" inputmode="decimal" value="${numIn(r3(x.kg))}" onchange="setProdKg('${oid}','${x.l.id}',this.value)"></label><span class="sub">Otomatik hesap ${fmtKg(x.autoKg)} kg. Hammadde kg’larını tablodan tek tek de değiştirebilirsin.</span>${man||nOv?`<button class="btn sm" onclick="resetKg('${oid}','${x.l.id}')">Otomatiğe dön</button>`:''}</div>`:''}
     ${recipeTable(x.p,x.qty,{kg:x.kg,ov:x.ov,edit:oid?{oid,lid:x.l.id}:null})}${oid?rcpCtrlHtml(oid,x):''}${packTable(x.p,x.qty)}${stepsHtml(x.p)}</div></details>`}).join('');
 }
@@ -10169,7 +10188,7 @@ VIEWS.panel=()=>{
     dcard('pipe','','',`<div class="pipe" style="margin:0">${STAGES.map((s,i)=>`<button style="--i:${i+1}" onclick="S.orFilter=${i};go('orders')"><span class="n ${counts[i]?'':'z'}">${counts[i]}</span><span class="l">${s}</span></button>`).join('')}</div>`),
     dcard('stats','','',`<div class="stats" style="margin:0"><span><b class="${late.length?'bad':''}">${late.length}</b>termini geçen</span><span><b>${week.length}</b>7 gün içinde termin</span><span><b>${open.length}</b>açık sipariş</span><span><b>${pend.length}</b>yanıt bekleyen proforma</span><span><b>${thisMonth.length}</b>bu ay tamamlanan iş</span></div>`),
     dcard('due','Yaklaşan terminler',` <button class="btn link" onclick="S.orFilter='open';go('orders')">Tüm siparişler</button>`,dlist(up.map(ordRow),'Açık sipariş yok.')),
-    dcard('pend','Yanıt bekleyen proformalar',` <button class="btn link" onclick="S.pfTab='active';go('proformas')">Tüm proformalar</button>`,dlist(pend.slice(0,8).map(p=>`<tr class="click" onclick="proformaDetail('${p.id}')"><td><b>${esc(p.ref||p.no)}</b><div class="sub">${esc(firmName(p.firmId))}</div></td><td>${fmtD(p.date)}${p.validUntil?`<div class="sub">Geçerlilik ${fmtD(p.validUntil)}</div>`:''}</td><td class="r">${fmtM(calc(p.lines).total,p.currency)}</td></tr>`),'Bekleyen proforma yok.')),
+    dcard('pend','Yanıt bekleyen proformalar',` <button class="btn link" onclick="S.pfTab='pending';go('proformas')">Tüm proformalar</button>`,dlist(pend.slice(0,8).map(p=>`<tr class="click" onclick="proformaDetail('${p.id}')"><td><b>${esc(p.ref||p.no)}</b><div class="sub">${esc(firmName(p.firmId))}</div></td><td>${fmtD(p.date)}${p.validUntil?`<div class="sub">Geçerlilik ${fmtD(p.validUntil)}</div>`:''}</td><td class="r">${fmtM(calc(p.lines).total,p.currency)}</td></tr>`),'Bekleyen proforma yok.')),
     dcard('chk','Hazırlığı eksik ürünler',` <button class="btn link" onclick="openChecklist()">Kontrol listesi</button>`,dlist(chk.map(({o,l})=>{const p=checkProgress(l),c=l.check||{},miss=checkCats(l).filter(k=>!c[k.key]).map(k=>k.cat);return `<tr class="click" onclick="openChecklist()"><td><b>${esc(l.desc)}</b><div class="sub">${esc(o.no)}, ${esc(firmName(o.firmId))}</div></td><td class="sub">Eksik: ${esc(miss.join(', '))}</td><td class="r"><span class="pill warn">${p.done}/${p.total}</span></td></tr>`}),'Hazırlığı eksik ürün yok.')),
     dcard('sup','Açık tedarik kalemleri',` <button class="btn link" onclick="go('supply')">Tedarik</button>`,dlist(supO.map(x=>`<tr class="click" onclick="supplyDetail('${x.id}')"><td><b>${esc(supName(x))}</b><div class="sub">${fmtQ(x.qty)} ${esc(x.unit)}</div></td><td>${supPill(x.status)}</td><td class="r">${fmtD(x.needDate)}</td></tr>`),'Açık tedarik kalemi yok.')),
     dcard('late','Termini geçen siparişler','',dlist(late.slice(0,8).map(ordRow),'Termini geçen sipariş yok.')),
@@ -10186,11 +10205,14 @@ function dashEdit(){S.dashEdit=!S.dashEdit;renderMain()}
 
 /* ---- Proformalar ---- */
 VIEWS.proformas=()=>{
-  const tabs=[['active','Devam eden',DB.proformas.filter(p=>!['Tamamlandı','Reddedildi'].includes(p.status)).length],['done','Tamamlanan işler',DB.proformas.filter(p=>p.status==='Tamamlandı').length],['rejected','Reddedilen',DB.proformas.filter(p=>p.status==='Reddedildi').length]];
+  if(!['pending','active','done','rejected'].includes(S.pfTab))S.pfTab='pending';
+  const tabs=[['pending','Proformalar',DB.proformas.filter(pfPending).length],['active','Devam eden işler',DB.proformas.filter(pfRunning).length],['done','Tamamlanan işler',DB.proformas.filter(p=>p.status==='Tamamlandı').length],['rejected','Reddedilen',DB.proformas.filter(p=>p.status==='Reddedildi').length]];
   return head('Proformalar','Gelen proformalar, içerdikleri ürünler ve üretim reçeteleri',`<input type="search" class="search" placeholder="No, firma veya ürün ara" value="${esc(S.q.pf||'')}" oninput="S.q.pf=this.value;document.getElementById('list').innerHTML=listPF()"><button class="btn pri" onclick="proformaForm()">＋ Proforma gir</button>`)+
   `<div class="tabs">${tabs.map(([k,l,n])=>`<button class="${S.pfTab===k?'on':''}" onclick="S.pfTab='${k}';renderMain()">${l} <span class="sub">${n}</span></button>`).join('')}</div><div id="list">${listPF()}</div>`;
 };
 function pfRows(rows,showDone){return `<div class="tw"><table class="t"><thead><tr><th>Proforma</th><th>Firma</th><th>${showDone?'Tamamlanma':'Tarih'}</th><th>Ürünler</th><th>Durum</th><th class="r">Toplam</th></tr></thead><tbody>${rows.map(p=>`<tr class="click" onclick="proformaDetail('${p.id}')"><td><b>${esc(p.ref||'—')}</b><div class="sub">${esc(p.no)}</div></td><td>${esc(firmName(p.firmId))}</td><td>${fmtD(showDone?pfDoneDate(p):p.date)}</td><td class="sub">${esc(p.lines.map(l=>l.desc).join(', ').slice(0,80))}</td><td>${pfPill(p.status)}</td><td class="r">${fmtM(calc(p.lines).total,p.currency)}</td></tr>`).join('')}</tbody></table></div>`}
+const pfPending=p=>!['Siparişe dönüştü','Tamamlandı','Reddedildi'].includes(p.status)&&!(p.orderId&&ord(p.orderId));
+const pfRunning=p=>!['Tamamlandı','Reddedildi'].includes(p.status)&&!pfPending(p);
 function listPF(){
   const q=norm(S.q.pf);
   const match=p=>!q||norm([p.no,p.ref,firmName(p.firmId),...p.lines.map(l=>l.desc)].join(' ')).includes(q);
@@ -10199,8 +10221,8 @@ function listPF(){
     if(!rows.length)return `<div class="tw"><div class="empty">Tamamlanan iş yok. Bir sipariş “Teslim edildi” aşamasına geldiğinde proformasıyla birlikte buraya, teslim ayına göre düşer.</div></div>`;
     return monthGroups(rows,pfDoneDate).map((g,i)=>`<details class="month" ${i<2?'open':''}><summary><b>${esc(g.label)}</b><span class="sub">${g.items.length} iş</span><span class="mt">${curTotals(g.items,p=>p.lines,p=>p.currency)}</span></summary>${pfRows(g.items,true)}</details>`).join('');
   }
-  const rows=DB.proformas.filter(p=>(S.pfTab==='rejected'?p.status==='Reddedildi':!['Tamamlandı','Reddedildi'].includes(p.status))&&match(p)).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
-  if(!rows.length)return `<div class="tw"><div class="empty">${DB.proformas.length?'Bu listede proforma yok.':'Henüz proforma girilmedi.'}<br><button class="btn pri" onclick="proformaForm()">＋ Proforma gir</button></div></div>`;
+  const rows=DB.proformas.filter(p=>(S.pfTab==='rejected'?p.status==='Reddedildi':S.pfTab==='active'?pfRunning(p):pfPending(p))&&match(p)).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  if(!rows.length)return `<div class="tw"><div class="empty">${DB.proformas.length?(S.pfTab==='pending'?'Siparişe dönüşmemiş proforma yok.':S.pfTab==='active'?'Siparişe dönüşüp devam eden iş yok.':'Bu listede proforma yok.'):'Henüz proforma girilmedi.'}<br><button class="btn pri" onclick="proformaForm()">＋ Proforma gir</button></div></div>`;
   return pfRows(rows,false);
 }
 
@@ -10390,7 +10412,7 @@ function packForm(id){
     <label class="f wide"><span>Not</span><input id="k_note" value="${v('note')}"></label></div>
     <div class="sec"><h3>Görseller <span class="sub" id="pkImgCount"></span> <label class="btn sm" style="cursor:pointer">＋ Görsel ekle<input type="file" accept="image/*" multiple style="display:none" onchange="pkImgAdd(this)"></label></h3><div class="pkimgs" id="pkImgs"></div><p class="sub" style="margin:4px 0 0">Ürün fotoğrafı, teknik çizim ya da tedarikçi kataloğundan görüntü. Görseller küçültülerek kayıt dosyasına eklenir ve STE’deki CPSR ambalaj kayıtlarına da aktarılır.</p></div>
     ${id?`<div class="sec"><h3>Kullanıldığı ürünler <span class="sub">${used.length}</span></h3>${used.length?used.map(p=>`<button class="btn sm" style="margin:0 6px 6px 0" onclick="productDetail('${p.id}')">${esc(p.name)} <span class="sub">${esc(firmName(p.firmId))}</span></button>`).join(''):'<div class="sub">Hiçbir üründe kullanılmıyor.</div>'}</div>${priceHistory('pack',id)}`:''}`,
-    `${id?`<button class="btn bad sp" onclick="delPack('${id}')">Sil</button><button class="btn" onclick="mergeForm('pack','${id}')">Birleştir</button><button class="btn" onclick="dupPack('${id}')">Farklı renk/hacim kopyası</button>`:''}<button class="btn" onclick="closeModal()">Vazgeç</button><button class="btn pri" onclick="savePack('${id||''}')">Ambalajı kaydet</button>`);
+    `${id?`<button class="btn bad sp" onclick="delPack('${id}')">Sil</button><button class="btn" onclick="mergeForm('pack','${id}')">Birleştir</button>${supBtn('pack',id)}<button class="btn" onclick="dupPack('${id}')">Farklı renk/hacim kopyası</button>`:''}<button class="btn" onclick="closeModal()">Vazgeç</button><button class="btn pri" onclick="savePack('${id||''}')">Ambalajı kaydet</button>`);
   pkImgRender();
 }
 function pkImgRender(){const b=document.getElementById('pkImgs');if(!b)return;document.getElementById('pkImgCount').textContent=ED.images.length?ED.images.length+' görsel':'';
@@ -10776,12 +10798,12 @@ function listSP(){
   if(t==='done')return monthGroups(rows,x=>x.receivedAt).map((g,i)=>`<details class="month" ${i<2?'open':''}><summary><b>${esc(g.label)}</b><span class="sub">${g.items.length} kalem</span></summary>${supRows(g.items)}</details>`).join('');
   return supRows(rows);
 }
-function supplyForm(id){
-  const x=id?sup(id):{kind:'mat',unit:'kg',status:'Teklif bekleniyor'};
+function supplyForm(id,pre){
+  const x=id?sup(id):{kind:'mat',unit:'kg',status:'Teklif bekleniyor',...(pre||{})};if(!id&&pre&&pre.kind==='pack'&&!pre.unit)x.unit='adet';const back=!id&&pre&&pre.refId?(pre.kind==='pack'?`packForm('${pre.refId}')`:`materialForm('${pre.refId}')`):'';
   ED={kind:'sup',id:id||null,skind:x.kind};
   openModal('supe'+(id||''),id?`Tedarik ${x.no}, düzenle`:'Yeni tedarik kalemi',`<div class="fg">
     <label class="f"><span>Tür</span><select id="s_kind" onchange="ED.skind=this.value;supDatalist();document.getElementById('s_item').value='';document.getElementById('s_unit').value=this.value==='pack'?'adet':'kg'"><option value="mat" ${x.kind!=='pack'?'selected':''}>Hammadde</option><option value="pack" ${x.kind==='pack'?'selected':''}>Ambalaj</option></select></label>
-    <label class="f wide" style="grid-column:span 2"><span>Malzeme (kütüphaneden ara) *</span><input id="s_item" list="supList" value="${id?esc(supName(x)):''}"><datalist id="supList"></datalist></label>
+    <label class="f wide" style="grid-column:span 2"><span>Malzeme (kütüphaneden ara) *</span><input id="s_item" list="supList" value="${id||x.refId?esc(supName(x)):''}"><datalist id="supList"></datalist></label>
     <label class="f"><span>Miktar *</span><input id="s_qty" inputmode="decimal" value="${numIn(x.qty??'')}"></label>
     <label class="f"><span>Birim</span><select id="s_unit">${['kg','adet','g','lt'].map(u=>`<option ${u===x.unit?'selected':''}>${u}</option>`).join('')}</select></label>
     <label class="f"><span>İhtiyaç tarihi</span><input type="date" id="s_need" value="${x.needDate||''}"></label>
@@ -10793,9 +10815,10 @@ function supplyForm(id){
     <label class="f"><span>Önceki tedarikçi</span>${supCbx('s_psup',x.prevManual?.supplier)}</label>
     <label class="f wide"><span>Not</span><input id="s_note" value="${esc(x.note||'')}"></label></div>
     <p class="sub">Kütüphanede olmayan bir ad yazarsan ilgili kütüphaneye yeni kayıt olarak eklenir.</p>`,
-    `<button class="btn" onclick="${id?`supplyDetail('${id}')`:'closeModal()'}">Vazgeç</button><button class="btn pri" onclick="saveSupply()">Kaydet</button>`);
-  supDatalist();
+    `<button class="btn" onclick="${id?`supplyDetail('${id}')`:back||'closeModal()'}">Vazgeç</button><button class="btn pri" onclick="saveSupply()">Kaydet</button>`);
+  supDatalist();if(!id&&x.refId)setTimeout(()=>document.getElementById('s_qty')?.focus(),30);
 }
+function supBtn(kind,id){const o=DB.supplies.filter(z=>z.kind===kind&&z.refId===id&&SUP_OPEN.includes(z.status));return `<button class="btn" onclick="supplyForm(null,{kind:'${kind}',refId:'${id}'})" title="${o.length?'Açık tedarik: '+esc(o.map(z=>z.no+' ('+z.status+')').join(', ')):'Bu malzeme için tedarik kalemi aç'}">＋ Tedarik oluştur${o.length?` <span class="pill warn" style="pointer-events:none">${o.length} açık</span>`:''}</button>`}
 function supDatalist(){const L=ED.skind==='pack'?DB.packs.map(packLabel):DB.materials.map(matLabel);document.getElementById('supList').innerHTML=L.sort((a,b)=>a.localeCompare(b,'tr')).map(t=>`<option value="${esc(t)}">`).join('')}
 function saveSupply(){
   const g=k=>document.getElementById('s_'+k).value.trim();
@@ -11506,7 +11529,7 @@ function materialForm(id){S.mRet=S._mRetNext||null;S._mRetNext=null;
     <div class="inci-plain"><span class="sub">INCI (büyükten küçüğe):</span> <span id="mcPlain"></span> <button class="btn link xsl" onclick="navigator.clipboard&&navigator.clipboard.writeText(document.getElementById('mcPlain').textContent).then(()=>toast('Kopyalandı'))">Kopyala</button></div></div>
     ${stockSection(m)}
     ${id?`<details class="sec mu-det" ${used.length&&used.length<=6?'open':''}><summary><h3 style="display:inline">Kullanıldığı ürünler <span class="sub">${used.length} ürün${used.length?', '+new Set(used.map(p=>p.firmId)).size+' firma':''}</span></h3></summary><div class="mu-box" style="margin-top:8px">${matUseHtml(id)}</div></details>${priceHistory('mat',id)}`:''}`,
-    `${id?`<button class="btn bad sp" onclick="delMaterial('${id}')">Sil</button><button class="btn" onclick="mergeForm('mat','${id}')">Birleştir</button>`:''}<button class="btn" onclick="matBack()">${S.mRet?'Geri dön':'Vazgeç'}</button><button class="btn pri" onclick="saveMaterial('${id||''}')">Hammaddeyi kaydet</button>`);
+    `${id?`<button class="btn bad sp" onclick="delMaterial('${id}')">Sil</button><button class="btn" onclick="mergeForm('mat','${id}')">Birleştir</button>${supBtn('mat',id)}`:''}<button class="btn" onclick="matBack()">${S.mRet?'Geri dön':'Vazgeç'}</button><button class="btn pri" onclick="saveMaterial('${id||''}')">Hammaddeyi kaydet</button>`);
   mcRender();
   if(!steFrameReady)steEnsure().then(ok=>{if(ok&&ED&&ED.kind==='mat'&&document.getElementById('inciLib')){document.getElementById('inciLib').innerHTML=inciDatalist();mcRender()}});
 }
@@ -11703,7 +11726,7 @@ function prodImportCommit(){
 function productDetail(id,qty){
   const p=prod(id);if(!p)return closeModal();ED={kind:'pd',id,qty:qty??1000,kg:null};
   openModal('pd'+id,p.name,`<div class="info"><div><small>Firma</small>${esc(firmName(p.firmId))}</div><div><small>Ürün kodu</small>${esc(p.code||'—')}</div><div><small>Birim hacim</small>${p.unitKg?fmtQ(p.unitKg)+' kg ('+fmtQ(p.unitKg*1000)+' g)':'<span class="pill warn">Girilmemiş</span>'}</div><div><small>Formül no / versiyon</small>${esc(p.version||'—')}</div><div><small>Formül revizyonu</small><b>${revTxt(p.rev)}</b>${fxMark(p,{short:true})} <span class="sub">${fmtD(p.revDate)}${p.revNote?', '+esc(p.revNote):''}</span></div></div>
-   ${compBar(p.formula)}
+   ${fxNotice(p)}${compBar(p.formula)}
    <div class="sec"><h3>Üretim reçetesi</h3><div class="fg" style="max-width:560px;align-items:end"><label class="f"><span>Sipariş adedi</span><input id="pd_qty" inputmode="decimal" value="${numIn(ED.qty)}" oninput="pdQty(this.value)"></label><label class="f"><span>veya üretim miktarı (kg)</span><input id="pd_kg" class="kgin" inputmode="decimal" value="${numIn(r3(recipeTotalKg(p,ED.qty)))}" oninput="pdKg(this.value)"></label></div><div id="pdRec">${pdRecipe()}</div></div>
    ${stepsHtml(p)}
    ${ctrlSection(p)}
